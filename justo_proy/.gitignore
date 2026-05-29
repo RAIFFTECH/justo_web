@@ -13,3 +13,9 @@ db.sqlite3
 
 # VSCode
 .vscode/
+
+# Archivos estáticos compilados
+staticfiles/
+
+# Logs
+*.log

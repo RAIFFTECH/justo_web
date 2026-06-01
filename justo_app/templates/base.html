@@ -511,7 +511,7 @@
             <div class="submenu">
                 <a href="{% url 'iniciar_sesion' %}"><i class="fas fa-city"></i>  Ciudades</a>
                 <a href="{% url 'restore_backup' %}"><i class="fas fa-undo-alt"></i> Restaurar Backup</a>
-                <!-- <a href="{% url 'registrar_usuario' %}">Crear</a> -->
+                <a href="{% url 'listar_clientes' %}">Datos Empresa</a>
             </div>
         {% else %}
             <li onclick="location.href='{% url 'iniciar_sesion' %}'"></li>

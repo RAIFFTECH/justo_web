@@ -30,9 +30,9 @@ from reportlab.graphics.widgets.markers import makeMarker
 from reportlab.lib.colors import lightblue, navy
 from reportlab.graphics import renderPDF
 
-from justo_creditos import perdida_esperada, Liquida_cre, Reclasificacion
+from justo_app.justo_creditos import perdida_esperada, Liquida_cre, Reclasificacion
 from categorias_creditos_app.models import CAT_DES_DIA_CRE
-from justo_app.views import formato_fecha, formatear_cod_aso
+from justo_app.funciones_principales import formato_fecha, formatear_cod_aso
 from clientes_app.models import CLIENTES
 from pagadores_app.models import PAGADORES
 from oficinas_app.models import OFICINAS

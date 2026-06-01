@@ -5,7 +5,7 @@ from .models import HECHO_ECONO
 from documentos_app.models import DOCTO_CONTA
 from cuentas_app.models import PLAN_CTAS
 from localidades_app.models import LOCALIDADES
-from justo_app.fields import CustomDateField
+
 import re
 from django.forms import inlineformset_factory
 from datetime import date 

@@ -1,7 +1,8 @@
 from django.db import models
 import re
 from django.core.exceptions import ValidationError
-from justo_app.models import validate_numeric,OPC_BOOL,CLASE_COOP
+from justo_app.opciones import OPC_BOOL,CLASE_COOP
+from justo_app.funciones_principales import validate_numeric
 
 class CLIENTES(models.Model):
     codigo = models.CharField(max_length=1, null=False, verbose_name='Código' )

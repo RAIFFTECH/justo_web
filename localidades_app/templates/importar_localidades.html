@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h3>Importar Ciudades</h3>
+
+<!-- 🔥 FORM SUBIR ARCHIVO -->
+<form method="POST" enctype="multipart/form-data">
+	{% csrf_token %}
+	<input type="file" name="archivo" class="form-control mb-2" required>
+	<button class="btn btn-primary">Subir</button>
+</form>
+
+<hr>
+
+<!-- 🔥 PREVIEW -->
+{% if data %}
+<form method="POST" action="{% url 'confirmar_importacion' %}">
+	{% csrf_token %}
+
+	<table class="table table-bordered">
+		<thead>
+			<tr>
+				<th>Código</th>
+				<th>Nombre</th>
+				<th>Cod Postal</th>
+				<th>Departamento</th>
+				<th>Estado</th>
+			</tr>
+		</thead>
+
+		<tbody>
+			{% for row in data %}
+			<tr>
+				<td>{{ row.codigo }}</td>
+				<td>{{ row.nombre }}</td>
+				<td>{{ row.cod_pos }}</td>
+				<td>{{ row.departamento }}</td>
+				<td>
+					{% if row.error %}
+					<span style="color:red">{{ row.error }}</span>
+					{% else %}
+					<span style="color:green">OK</span>
+					{% endif %}
+				</td>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+
+	<!-- 🔥 AQUÍ VA EL JSON CORRECTO -->
+	<input type="hidden" name="data" value='{{ data_json }}'>
+
+	<button class="btn btn-success">
+		Confirmar Importación
+	</button>
+
+	<div class="progress">
+		<div id="bar" class="progress-bar" style="width:0%">0%</div>
+	</div>
+
+</form>
+{% endif %}
+
+{% endblock %}

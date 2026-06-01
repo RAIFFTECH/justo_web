@@ -2,7 +2,7 @@ from django.db import models
 from ctas_ahorros_app.models import CTAS_AHORRO
 from cdat_app.models import CTA_CDAT
 from hecho_economico_app.models import HECHO_ECONO
-from justo_app.models import OPC_BOOL
+from justo_app.opciones import OPC_BOOL
 # Create your models here.
 
 class CTA_CDAT_AMP(models.Model):

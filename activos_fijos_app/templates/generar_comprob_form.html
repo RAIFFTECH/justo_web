@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% block content %}
+<style>
+    /* Estilo general para todos los form-control */
+    .form-control {
+      height: 40px !important;
+      border-radius: 0 !important;
+      padding: 8px 10px !important;
+      font-size: 14px !important;
+      line-height: 1.5 !important;
+      width: 100% !important;
+      box-sizing: border-box !important;
+    }
+  
+    /* Si quieres diferenciar select específicamente */
+    select.form-control {
+      appearance: none; /* Opcional: elimina el estilo nativo del navegador */
+    }
+  
+    /* Bordes suaves solo para botones */
+    .btn, .btn-sm {
+      border-radius: 12px !important;
+    }
+  
+    .form-group {
+      margin-bottom: 15px;
+    }
+  
+    label {
+      margin-bottom: 0;
+      font-size: 0.9rem;
+    }
+  
+    .mensaje-overlay {
+      position: fixed;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: rgba(0, 128, 0, 0.9);
+      color: white;
+      padding: 10px 20px;
+      border-radius: 5px;
+      font-size: 14px;
+      z-index: 1000;
+      opacity: 0;
+      transition: opacity 0.5s ease-in-out;
+    }
+  
+    .select2-container .select2-selection--single {
+      height: 40px !important;
+      border-radius: 0 !important;
+      padding: 6px 12px !important;
+      display: flex;
+      align-items: center;
+      font-size: 14px;
+    }
+  
+  /* Ajuste del texto dentro del campo */
+    .select2-container .select2-selection__rendered {
+      line-height: 1.5 !important;
+    }
+  
+  /* Eliminar forma ovalada de la flecha */
+    .select2-container .select2-selection__arrow {
+      height: 40px !important;
+    }
+  
+  </style>
+
+      <h1>Generar Comprobante de Depreciación</h1>
+  
+      <form method="POST">
+          {% csrf_token %}
+          
+          <div class="form-group">
+              {{ form.mes|as_crispy_field }}
+          </div>
+
+
+          {% if mensaje %}
+            <div class="alert alert-warning mt-3">
+                {{ mensaje }}
+            </div>
+          {% endif %}
+  
+          <div class="form-group d-flex justify-content-start gap-2 mt-3">
+              <button type="submit" class="btn btn-success btn-sm" title="Generar Comprobante" id="generar" {% if pk %}disabled{% endif %}>
+                  <i class="fas fa-save"></i> Generar
+              </button>
+              <!-- Botón para ver el comprobante (solo si pk está disponible) -->
+              {% if pk %}
+                  <a href="{% url 'ver_comprobante' pk=pk %}" class="btn btn-outline-secondary btn-sm" title="Ver Comprobante" id="ver">
+                      <i class="bi bi-eye"></i> Ver Comprobante
+                  </a>
+              {% else %}
+                  <div class="btn btn-outline-secondary btn-sm" disabled>
+                      <i class="bi bi-eye"></i> Ver Comprobante
+                  </div>
+              {% endif %}
+  
+              <!-- Los botones de exportación también dependen del pk -->
+              <button type="button" class="btn btn-outline-secondary btn-sm" title="Exportar a Excel" id="excel" {% if not pk %}disabled{% endif %}>
+                  <i class="fas fa-file-excel"></i> Excel
+              </button>
+  
+              <button type="button" class="btn btn-outline-secondary btn-sm" title="Exportar a CSV" id="csv" {% if not pk %}disabled{% endif %}>
+                  <i class="fas fa-file-csv"></i> CSV
+              </button>
+  
+              <!-- Botón Salir -->
+              <a href="{% url 'listar_activos_fijos' %}" class="btn btn-secondary btn-sm" title="Cancelar">
+                  <i class="fas fa-times"></i> Salir
+              </a>
+          </div>
+      </form>
+  
+  {% endblock %}
+  

@@ -51,7 +51,7 @@ from contabilizacion_capital_creditos_app.models import IMP_CON_CRE
 from cxc_app.models import CTAS_X_COBRAR
 from auditoria_app.models import AuditLog
 from terceros_app.models import TERCEROS
-from justo_creditos import Liquida_cre
+from justo_app.justo_creditos import Liquida_cre
 from .forms import HechoEconoForm
 from django.db.models import Max
 

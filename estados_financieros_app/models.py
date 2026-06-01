@@ -1,6 +1,6 @@
 from django.db import models
 from clientes_app.models import CLIENTES
-from justo_app.models import DefaultToZeroMixin
+from justo_app.funciones_principales import DefaultToZeroMixin
 from justo_app.opciones import OPC_BOOL
 from terceros_app.models import TERCEROS
 from localidades_app.models import LOCALIDADES

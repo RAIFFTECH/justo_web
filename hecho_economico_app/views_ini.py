@@ -158,7 +158,7 @@ def buscar_subcuenta(request):
             results.append({'subcuenta':cxcsel.cod_cxc , 'nombre': cxcsel.tercero.nombre,'valor':cxc['total_valor'],'tip_con':'6' })
     return JsonResponse(results, safe=False)
 
-from justo_ahorros import ahorros
+from justo_app.justo_ahorros import ahorros
 from datetime import date
 from aportes_app.views import saldo_aportes_fecha
 

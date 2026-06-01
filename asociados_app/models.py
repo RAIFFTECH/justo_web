@@ -8,7 +8,7 @@ from oficinas_app.models import OFICINAS
 from terceros_app.models import TERCEROS
 from localidades_app.models import LOCALIDADES
 from pagadores_app.models import PAGADORES 
-from justo_app.models import DefaultToZeroMixin
+from justo_app.funciones_principales import DefaultToZeroMixin
 # Create your models here.
 
 class ASOCIADOS(DefaultToZeroMixin):

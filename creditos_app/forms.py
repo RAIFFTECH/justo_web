@@ -6,7 +6,6 @@ from contabilizacion_capital_creditos_app.models import IMP_CON_CRE
 from datetime import date,datetime
 import datetime
 from django import forms
-from justo_app.widgets import CustomDateInput
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout,Field
 from django import forms

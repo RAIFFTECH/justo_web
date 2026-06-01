@@ -18,7 +18,6 @@ from .forms import CrearForm
 from .models import CLIENTES
 from creditos_app.models import CREDITOS
 
-
 # Para obtener todos los registros
 class Lista(LoginRequiredMixin, ListView):
     model = CLIENTES

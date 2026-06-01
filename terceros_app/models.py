@@ -1,7 +1,7 @@
 from django.db import models
 from multiselectfield import MultiSelectField
 from clientes_app.models import CLIENTES
-from justo_app.models import validate_numeric, DefaultToZeroMixin
+from justo_app.funciones_principales import validate_numeric, DefaultToZeroMixin
 from justo_app.opciones import OPC_BOOL, OPC_REGIMEN, OPC_CLASEDOC, OPC_TIPTER, OPC_VINCULO, OPC_NACIONALIDAD, OPC_GRUPO_ESPECIAL, OPC_ASESORIA
 from localidades_app.models import LOCALIDADES
 from django.contrib.auth.models import User

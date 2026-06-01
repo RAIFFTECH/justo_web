@@ -1,9 +1,7 @@
 from django.shortcuts import render
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
-from django.db.models import Q
-from django.db.models import Max
-from django.db.models import IntegerField
+from django.db.models import Q, Max, IntegerField, Sum
 from django.db.models.functions import Cast
 from .models import CTAS_X_COBRAR,CXC_DET
 from django.views.generic import CreateView, UpdateView, DeleteView
@@ -15,6 +13,7 @@ from django.http import JsonResponse
 from django.views.generic import TemplateView
 from terceros_app.models import TERCEROS
 from conceptos_app.models import CONCEPTOS
+from asociados_app.models import ASOCIADOS
 from .forms import CtasXCobrarForm,BusquedaForm,ImportarCxcForm,EliminarCxcForm
 from django.http import Http404
 from django.views.generic.edit import FormView
@@ -528,3 +527,37 @@ class CtasXCobrarEliminar(CreateView):
         
     def dispatch(self, request, *args, **kwargs):
         return super().dispatch(request, *args, **kwargs)
+    
+    
+def lista_cxp(id_socio, fecha_corte):
+    try:
+        asociado = ASOCIADOS.objects.select_related('tercero').get(id=id_socio)
+        tercero = asociado.tercero
+
+        cuentas = CTAS_X_COBRAR.objects.filter(tercero=tercero).select_related('concepto')
+
+        lista_resultados = []
+
+        for cta in cuentas:
+            # Sumar solo los movimientos hasta la fecha de corte
+            movimientos = CXC_DET.objects.filter(
+                cuenta_x_cobrar=cta,
+                tip_mov='P',
+                fecha__lte=fecha_corte  # 🔥 Importante: Solo movimientos hasta esa fecha
+            ).aggregate(total=Sum('valor'))['total'] or 0  # Aquí corregido 
+                        
+            saldo = (cta.valor or 0) + movimientos
+            if saldo > 0:
+                datos = {
+                    'val_ini': cta.valor or 0,
+                    'fec_des': cta.fecha_des,
+                    'fec_ven': cta.fecha_exi,
+                    'concepto': cta.concepto.descripcion if cta.concepto else '',
+                    'saldo': saldo
+                }
+                lista_resultados.append(datos)
+
+        return lista_resultados
+
+    except ASOCIADOS.DoesNotExist:
+        return [] 

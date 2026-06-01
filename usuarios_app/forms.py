@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django import forms
 from django.contrib.auth.models import User
 from .models import UserProfile
-from justo_app.models import OPC_BOOL
+from justo_app.opciones import OPC_BOOL
 
 
 class CrearForm(forms.ModelForm):

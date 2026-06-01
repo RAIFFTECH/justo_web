@@ -14,7 +14,7 @@ from dateutil.relativedelta import relativedelta
 from django.views.generic import UpdateView, CreateView, ListView
 from django.views.generic.edit import CreateView, UpdateView
 from django.views.decorators.csrf import csrf_exempt
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse, QueryDict
 from django.urls import reverse_lazy, reverse
 from django.utils.decorators import method_decorator
 from django.views.decorators.http import require_GET
@@ -24,9 +24,9 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .forms import FechaForm, CreditoForm, CreditosFilterForm, CodeudorForm
 from asociados_app.models import ASOCIADOS
 from cambios_creditos_app.models import CAMBIOS_CRE
-from justo_creditos import calculo_cuota
+from justo_app.justo_creditos import calculo_cuota, Liquida_cre
 from terceros_app.models import TERCEROS
-from .models import CODEUDORES, CREDITOS
+from .models import CODEUDORES, CREDITOS, GAR_NO_IDONEA
 from clientes_app.models import CLIENTES
 from oficinas_app.models import OFICINAS
 from detalle_producto_app.models import DETALLE_PROD
@@ -51,14 +51,28 @@ class CreditosListView(ListView):
     context_object_name = 'creditos'
     paginate_by = 10  # Opcional: número de créditos por página
 
+class CreditosListView(ListView):
+    model = CREDITOS
+    template_name = 'creditos_list.html'
+    context_object_name = 'creditos'
+    paginate_by = 10
+
     def get_queryset(self):
         queryset = CREDITOS.objects.all()
-        form = CreditosFilterForm(self.request.GET)
+        form = CreditosFilterForm(self.request.GET or None)
+        
         if form.is_valid():
-            estado = form.cleaned_data.get('estado')
+            print("GET:", self.request.GET)
+            print("Form válido:", form.is_valid())
+            print("Form cleaned_data:", form.cleaned_data if form.is_valid() else "No válido")
+
+            estado = form.cleaned_data.get('estado') or 'activo'
             cod_cre = form.cleaned_data.get('cod_cre')
             nombre_deudor = form.cleaned_data.get('nombre_deudor')
-            cod_aso = form.cleaned_data.get('cod_aso') 
+            cod_aso = form.cleaned_data.get('cod_aso')
+
+            pk = self.kwargs.get('pk')
+
             if estado:
                 queryset = queryset.filter(estado=estado)
             if cod_cre:
@@ -67,12 +81,23 @@ class CreditosListView(ListView):
                 queryset = queryset.filter(socio__tercero__nombre__icontains=nombre_deudor)
             if cod_aso:
                 queryset = queryset.filter(socio__cod_aso__icontains=cod_aso)
+            if pk:
+                queryset = queryset.filter(socio_id=pk)
+        else:
+            queryset = queryset.filter(estado='activo')
+
         return queryset
+
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['filter_form'] = CreditosFilterForm(self.request.GET)
+        get_copy = self.request.GET.copy()
+        if not get_copy.get('estado'):
+            get_copy['estado'] = 'A'
+        form = CreditosFilterForm(get_copy)
+        context['filter_form'] = form
         return context
+
 
 DATE_PATTERN = re.compile(r'^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$')
 
@@ -91,7 +116,7 @@ class BaseCreditoView(View):
         socio = ASOCIADOS.objects.filter(oficina_id = 1,cod_aso = cod_soc).first()
         if socio == None:
              print('cos_aso   no Existe ')
-             errors[cod_soc] = 'No Existe este Codigo de Asociado'
+             errors[cod_soc] = 'No Existe este Código de Asociado'
         fec_des = form.cleaned_data.get('fec_des')
         if not isinstance(fec_des, str):
             return errors
@@ -162,7 +187,6 @@ class CreditoCreateView(BaseCreditoView, CreateView):
                 .aggregate(max_value=Max('cod_cre_int'))['max_value']
             )
         new_cod_cre = str(max_cod_cre + 1).zfill(8) if max_cod_cre is not None else '00000001'
-        print('codigo credito ',new_cod_cre)
         kwargs['request'] = self.request
         kwargs['initial'] = {
             'cliente_id': cliente_id,
@@ -182,37 +206,53 @@ class CreditoCreateView(BaseCreditoView, CreateView):
         return context
 
     def post(self, request, *args, **kwargs):
-        is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest'
+        print('entra a post')
+        # ✅ 1. Acceder a la sesión (esto no se toca)
         cliente_id = self.request.session.get('cliente_id')
         oficina_id = self.request.session.get('oficina_id')
-        data = json.loads(request.body)
+
+        # ✅ 2. Validar que hay datos en el cuerpo de la petición
         if not request.body:
             return JsonResponse({'success': False, 'message': 'No data received'}, status=400)
-        form = CreditoForm(data)
+
+        raw_data = json.loads(request.body)
+        data = QueryDict('', mutable=True)
+        for key, value in raw_data.items():
+            data[key] = value
+
+        form = CreditoForm(data, request=request)
         if form.is_valid():
             errors = self.validate_models(form)
-            if errors:       
+            if errors: 
                 for field, error_list in errors.items():
-                    form.errors[field] = form.errors.get(field, []) + error_list
+                    if not isinstance(error_list, list):
+                        error_list = [error_list]
+                        form.errors[field] = form.errors.get(field, []) + error_list      
+
                 return JsonResponse({'success': False, 'errors': form.errors}, status=400)
             hay_error = validate_codeudores(form,cliente_id,'C')
             if hay_error:
                 for field, error_list in hay_error.items():
                     form.errors[field] = form.errors.get(field, []) + error_list
                 return JsonResponse({'success': False, 'errors': form.errors}, status=400)
+
             cod_cre = form.cleaned_data.get('cod_cre')
             doc_ide = form.cleaned_data.get('doc_ide')
             cap_ini = form.cleaned_data.get('cap_ini')
             num_cuo_ini = form.cleaned_data.get('num_cuo_ini')
             num_cuo_gra = form.cleaned_data.get('num_cuo_gra')
-            tian_ic_ini = form.cleaned_data.get('tian_ic_ini')
+            #tian_ic_ini = form.cleaned_data.get('tian_ic_ini')
             cod_lin_cre = form.cleaned_data.get('cod_lin_cre')
             fec_des = form.cleaned_data.get('fec_des')
-            decreciente = form.cleaned_data.get('decreciente')
+            #decreciente = form.cleaned_data.get('decreciente')
             tian_pol_seg = form.cleaned_data.get('tian_pol_seg')
             per_ano = form.cleaned_data.get('per_ano')
             fec_pag_ini = form.cleaned_data.get('fec_pag_ini')
             val_cuo_ini = form.cleaned_data.get('val_cuo_ini')
+            print('val_cuo_ini  ',val_cuo_ini)
+            val_cuo_act = form.cleaned_data.get('val_cuo_act')
+            print('val_cuo_act  ',val_cuo_act)
+            tian_ic_act = form.cleaned_data.get('tian_ic_act')
             tian_im = form.cleaned_data.get('tian_im')
             imputacion = form.cleaned_data.get('imputacion')
             libranza = form.cleaned_data.get('libranza')
@@ -248,11 +288,11 @@ class CreditoCreateView(BaseCreditoView, CreateView):
                             credito.num_cuo_ini = num_cuo_ini
                             credito.num_cuo_act = num_cuo_ini
                             credito.num_cuo_gra = num_cuo_gra
-                            credito.tian_ic_ini = tian_ic_ini
-                            credito.tian_ic_act = tian_ic_ini  # revisar si es la variable
+                            #credito.tian_ic_ini = tian_ic_ini
+                            credito.tian_ic_act = tian_ic_act  # revisar si es la variable
                             credito.cod_lin_cre = cod_lin_cre
                             credito.fec_des = fec_des
-                            credito.decreciente = decreciente
+                            credito.decreciente = 'N'
                             credito.tian_pol_seg = tian_pol_seg
                             credito.per_ano = per_ano
                             credito.fec_pag_ini = fec_pag_ini
@@ -323,165 +363,113 @@ class CreditoCreateView(BaseCreditoView, CreateView):
 
 class UpdateViewCredito(BaseCreditoView, UpdateView):
     model = CREDITOS
-    form_class = CreditoForm  # Asegúrate de usar el formulario correcto
+    form_class = CreditoForm
     template_name = 'creditos_form.html'
     success_url = reverse_lazy('crear_credito_justo')
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        cliente_id = self.request.session.get('cliente_id')
-        kwargs['request'] = self.request
-        kwargs['initial'] = {'cliente_id': cliente_id}
+        kwargs['request'] = self.request  # ✅ importante: para que el form use request
         return kwargs
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
-        credito = get_object_or_404(CREDITOS, pk=kwargs.get('pk'))
-        print('Credito  ... ',credito.cod_cre)
+        credito = self.object
         codeudores = CODEUDORES.objects.filter(credito_id=credito.id)
-        print('Codeudores ...',codeudores)
-        initial_data = {
-            'doc_ide': credito.socio.tercero.doc_ide,
-            'nom_soc': credito.socio.tercero.nombre,
-        }
-        form = CreditoForm(instance=credito, initial=initial_data)
+
+        # ✅ Usamos self.get_form() para que incluya 'request' y demás kwargs
+        form = self.get_form()
+        form.initial.update({
+            'doc_ide': credito.socio.tercero.doc_ide if credito.socio and credito.socio.tercero else '',
+            'nom_soc': credito.socio.tercero.nombre if credito.socio and credito.socio.tercero else '',
+        })
+
         context = {
             'form': form,
             'operation': 'update',
             'codeudores': codeudores,
-            'credito' : credito,
+            'credito': credito,
         }
-        print('Context de get ',context)
-        return render(request, 'creditos_form.html', context)
-    
+        return render(request, self.template_name, context)
+
     def get_form(self, form_class=None):
         print('get_form de update')
         form = super().get_form(form_class)
-        #if self.object:
-        #    form.instance = self.object
-        # Define atributos de los campos
-        form.fields['cod_cre'].widget.attrs['readonly'] = 'readonly'
-        form.fields['cod_cre'].widget.attrs['class'] = 'form-control bg-light'
-        form.fields['fec_des'].widget.attrs['class'] = 'form-control custom-background'
+
+        # Personalización de los widgets
+        form.fields['cod_cre'].widget.attrs.update({
+            'readonly': 'readonly',
+            'class': 'form-control bg-light'
+        })
+        form.fields['fec_des'].widget.attrs.update({
+            'class': 'form-control custom-background'
+        })
         return form
-    
+
     @method_decorator(csrf_exempt)
     def post(self, request, *args, **kwargs):
         pk = kwargs.get('pk')
-        print('Ingresa a post de Actuaizar Creditos ',pk)
         is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest'
-        cliente_id = self.request.session.get('cliente_id')
-        oficina_id = self.request.session.get('oficina_id')
+        cliente_id = request.session.get('cliente_id')
+        oficina_id = request.session.get('oficina_id')
         data = json.loads(request.body)
-        credito_id = self.kwargs.get('pk')  # Asumimos que el 'pk' llega en la URL o como argumento
-        if credito_id:
-            credito = get_object_or_404(CREDITOS,id = pk)
-            form = CreditoForm(data, instance = credito)  # Pasar la instancia existente al formulario
-        else:
-            # Si no hay ID, significa que es un nuevo registro
-            form = CreditoForm(data)
-        print('Instancia en la vista:', form.instance.pk)
+
+        credito = get_object_or_404(CREDITOS, id=pk)
+
+        # ✅ Pasamos 'request' al form también en POST
+        form = CreditoForm(data, instance=credito, request=request)
 
         if form.is_valid():
-            print('Inicia is_valid ')
             errors = self.validate_models(form)
-            if errors:       
-                if is_ajax:
-                    return JsonResponse({'success': False, 'errors': errors}, status=400)
-            print('Validacion Correcta 1')
-            hay_error = validate_codeudores(form,cliente_id,'U')
-            print('va a mirar si hay error ----> ') 
-            if hay_error: 
-                print('Hay Error ----> ',hay_error)  
+            if errors:
+                return JsonResponse({'success': False, 'errors': errors}, status=400)
+
+            hay_error = validate_codeudores(form, cliente_id, 'U')
+            if hay_error:
                 hay_error = {key: [value] if isinstance(value, str) else value for key, value in hay_error.items()}
                 return JsonResponse({'success': False, 'error': hay_error})
-            print('Sale de validar detalles')
-            if credito == None:
-                return JsonResponse({'success': False, 'error': 'No existe un Credito con este numero'}, status=400)
-            else:
-                print('Entra a gestion ')
-                hay_borrados = ''
-                if len(hay_borrados) != 0:
-                    print('retorno  ',hay_borrados)
-                    return JsonResponse({'success': False, 'error': hay_borrados}, status=400)
-                doc_ide = form.cleaned_data.get('doc_ide')
-                cod_cre = form.cleaned_data.get('cod_cre')
-                socio = ASOCIADOS.objects.filter(oficina_id = oficina_id,cod_aso = doc_ide).first()
-                credito = CREDITOS.objects.filter(oficina_id= oficina_id,cod_cre = cod_cre).first()
-                credito.socio = socio
-                print('Cap Ini ---> ',form.cleaned_data.get('cap_ini'))
-                credito.cap_ini = form.cleaned_data.get('cap_ini')
-                credito.num_cuo_ini = form.cleaned_data.get('num_cuo_ini')
-                credito.num_cuo_act = form.cleaned_data.get('num_cuo_ini')
-                credito.num_cuo_gra = form.cleaned_data.get('num_cuo_gra')
-                credito.tian_ic_ini = form.cleaned_data.get('tian_ic_ini')
-                credito.tian_ic_act = form.cleaned_data.get('tian_ic_ini')
-                credito.cod_lin_cre = form.cleaned_data.get('cod_lin_cre')
-                credito.fec_des = form.cleaned_data.get('fec_des')
-                credito.decreciente = form.cleaned_data.get('decreciente')
-                credito.tian_pol_seg = form.cleaned_data.get('tian_pol_seg')
-                credito.per_ano = form.cleaned_data.get('per_ano')
-                credito.fec_pag_ini = form.cleaned_data.get('fec_pag_ini')
-                credito.val_cuo_ini = form.cleaned_data.get('val_cuo_ini')
-                credito.val_cuo_act = form.cleaned_data.get('val_cuo_ini')
-                credito.tian_im = form.cleaned_data.get('tian_im')
-                credito.imputacion = form.cleaned_data.get('imputacion')
-                credito.libranza = form.cleaned_data.get('libranza')
-                credito.pagare = form.cleaned_data.get('pagare')
-                credito.termino = form.cleaned_data.get('termino')
-                credito.for_pag = form.cleaned_data.get('for_pag')
-                credito.tip_gar = form.cleaned_data.get('tip_gar')
-                credito.por_des_pro_pag = form.cleaned_data.get('por_des_pro_pag')
-                credito.estado = form.cleaned_data.get('estado')
-                credito.est_jur = form.cleaned_data.get('est_jur')
-                credito.rep_cen_rie = form.cleaned_data.get('rep_cen_rie')
-                credito.figarantias = form.cleaned_data.get('figarantias')
-                credito.fec_ult_pag = form.cleaned_data.get('fec_ult_pag')
-                credito.num_cuo_act = form.cleaned_data.get('num_cuo_act')
-                credito.val_gar_hip = form.cleaned_data.get('val_gar_hip')
-                credito.mat_inm_gar = form.cleaned_data.get('mat_inm_gar')
-                credito.num_pol_gar_hip = form.cleaned_data.get('num_pol_gar_hip')
-                credito.cat_nue = form.cleaned_data.get('cat_nue')
-                credito.prima = form.cleaned_data.get('prima')
-                credito.porcentaje_prima = form.cleaned_data.get('porcentaje_prima')
-                try:
-                    with transaction.atomic():
-                        print('Entra a Atomic......')
-                        credito.save()
-                        codeudors_bac = data.get('codeudores', [])
-                        print('Codeudors Back ',codeudors_bac)
-                        codeudors_mod = CODEUDORES.objects.filter(credito_id = credito.id)
-                        print('Codeudors mod ',codeudors_mod)
-                        for codeudor_mod in codeudors_mod:
-                            existe = any(codeudor['doc_ide'] == codeudor_mod.tercero.doc_ide for codeudor in codeudors_bac)
-                            if existe == False :
-                                codeudor_mod.delete()
-                        for codeudo in codeudors_bac:
-                            documento = codeudo.get('doc_ide')
-                            tercero = TERCEROS.objects.filter(cliente_id = cliente_id,doc_ide = documento).first()
-                            if tercero == None:
-                                continue
-                            codeudo_nue = CODEUDORES.objects.filter(oficina_id = oficina_id,credito_id = credito.id,tercero_id = tercero.id).first()
-                            if codeudo_nue == None:
-                                codeudo_nue = CODEUDORES.objects.create(oficina_id = oficina_id,credito_id = credito.id,tercero_id = tercero.id)
-                                codeudo_nue.save()
-                        if is_ajax:
-                            return JsonResponse({'success': True, 'message': 'Se grabó correctamente.','Numero' : credito.cod_cre})
-                        else:
-                            print('Se pudo grabar y no is_ajax')
-                            messages.success(request, 'Se grabó correctamente.')
-                            return JsonResponse({'success': True})
-                except IntegrityError as e:
-                    print("Errores en el formulario 1:", form.errors)
+
+            socio = ASOCIADOS.objects.filter(oficina_id=oficina_id, cod_aso=form.cleaned_data['doc_ide']).first()
+            credito.socio = socio
+            # 🛠 Asignas todos los campos del form a la instancia
+            for field in [
+                'cap_ini', 'num_cuo_ini', 'num_cuo_gra', 'tian_ic_act',
+                'cod_lin_cre', 'fec_des', 'tian_pol_seg', 'per_ano',
+                'fec_pag_ini', 'val_cuo_ini', 'tian_im', 'imputacion',
+                'libranza', 'pagare', 'termino', 'for_pag', 'tip_gar',
+                'por_des_pro_pag', 'estado', 'est_jur', 'rep_cen_rie',
+                'figarantias', 'fec_ult_pag', 'num_cuo_act', 'val_cuo_act',
+                'val_gar_hip', 'mat_inm_gar', 'num_pol_gar_hip', 'cat_nue',
+                'prima', 'porcentaje_prima'
+            ]:
+                setattr(credito, field, form.cleaned_data.get(field))
+
+            try:
+                with transaction.atomic():
+                    credito.save()
+                    # Manejo de codeudores (igual que antes)
+                    codeudors_bac = data.get('codeudores', [])
+                    codeudors_mod = CODEUDORES.objects.filter(credito_id=credito.id)
+                    for codeudor_mod in codeudors_mod:
+                        if not any(c['doc_ide'] == codeudor_mod.tercero.doc_ide for c in codeudors_bac):
+                            codeudor_mod.delete()
+                    for codeudo in codeudors_bac:
+                        documento = codeudo.get('doc_ide')
+                        tercero = TERCEROS.objects.filter(cliente_id=cliente_id, doc_ide=documento).first()
+                        if tercero and not CODEUDORES.objects.filter(oficina_id=oficina_id, credito_id=credito.id, tercero_id=tercero.id).exists():
+                            CODEUDORES.objects.create(oficina_id=oficina_id, credito_id=credito.id, tercero_id=tercero.id)
+
                     if is_ajax:
-                        print('Retorna Los errores 2')
-                        return JsonResponse({'success': False, 'errors': form.errors})
-        else:
-            print("Errores en el formulario 2:", form.errors)
-            if is_ajax:
-                print('Retorna Los errores 3')
+                        return JsonResponse({'success': True, 'message': 'Se grabó correctamente.', 'Numero': credito.cod_cre})
+                    else:
+                        messages.success(request, 'Se grabó correctamente.')
+                        return JsonResponse({'success': True})
+
+            except IntegrityError:
                 return JsonResponse({'success': False, 'errors': form.errors})
-    
+        else:
+            return JsonResponse({'success': False, 'errors': form.errors})
+
 # -----------------  end point ---------------------
 
 @csrf_exempt  
@@ -490,9 +478,9 @@ def calculo_cuota_view(request):
     if request.method == 'POST':
         ikapital = float(request.POST.get('cap_ini', 0))
         per_ano = int(request.POST.get('per_ano', 0))
-        iTIAN = float(request.POST.get('tian_ic_ini', 0))
         iTIDIC = float(request.POST.get('tian_im', 0))
-        iTIEA = round(((1+((iTIAN/12)/100))**12 - 1)*100,3)
+        iTIEA = float(request.POST.get('tiae_ic_ini', 0)) 
+        iTIAN = xTasIntAnuNom = round(((1+iTIEA/100)**(1/per_ano)-1)*per_ano*100,3)
         xTasIntPer = round((iTIEA/100+1)**(1/per_ano)-1,6)           
         iTIDIC = round(xTasIntPer*per_ano*100/36525,6)                   
         iNumCuo = int(request.POST.get('num_cuo_ini', 0))
@@ -589,8 +577,11 @@ def ImprimePlanAmortizacionPDF(request):
             nom_deu = request.POST.get('nom_deu', '')
             ikapital = float(request.POST.get('cap_ini', 0))
             per_ano = int(request.POST.get('per_ano', 0))
-            iTIAN = float(request.POST.get('tian_ic_ini', 0))
-            iTIEA = round(((1 + (iTIAN / 12 / 100)) ** 12 - 1) * 100, 3)
+            iTIAN = float(request.POST.get('tian_ic_act', 0))
+            print('por que recibe aqui cero   ',request.POST.get('tiae_ic_ini', 0))
+            iTIEA = float(request.POST.get('tiae_ic_ini', 0))
+            print('iTIEA  ',iTIAN, iTIEA)
+
             xTasIntPer = round((iTIEA / 100 + 1) ** (1 / per_ano) - 1, 6)
             iTIDIC = round(xTasIntPer * per_ano * 100 / 36525, 6)
             iNumCuo = int(request.POST.get('num_cuo_ini', 0))
@@ -703,7 +694,7 @@ def confirmar_eliminar_credito(request, pk):
 
 def detalle_credito(request, credito_id):
     credito = get_object_or_404(CREDITOS, id=credito_id)
-    codeudores = CODEUDORES.objects.filter(credito=credito)
+    codeudores = GAR_NO_IDONEA.objects.filter(credito=credito)
     return render(request, 'detalle_credito.html', {'credito': credito, 'codeudores': codeudores})
 
 def agregar_codeudor(request, credito_id):
@@ -720,7 +711,7 @@ def agregar_codeudor(request, credito_id):
     return render(request, 'agregar_codeudor.html', {'form': form, 'credito': credito})
 
 def editar_codeudor(request, codeudor_id):
-    codeudor = get_object_or_404(CODEUDORES, id=codeudor_id)
+    codeudor = get_object_or_404(GAR_NO_IDONEA, id=codeudor_id)
     if request.method == 'POST':
         form = CodeudorForm(request.POST, instance=codeudor)
         if form.is_valid():
@@ -747,8 +738,6 @@ def creditos_desembolsados(request):
         id_ofi = request.session.get('oficina_id')
         fec_ini = datetime.strptime(request.POST['fec_ini'], '%Y-%m-%d').date()
         fec_fin = datetime.strptime(request.POST['fec_fin'], '%Y-%m-%d').date()
-        # cta_ini = request.POST['cta_ini'] or '1'
-        # cta_fin = request.POST['cta_fin'] or '9999999999'
         estado_cre = request.POST['estado_cre']
         estado_cre_nom = {
             'A': 'Activos',
@@ -972,7 +961,7 @@ def creditos_desembolsados(request):
                     # (row['val_cuo_act'], 70), 
                     (f"{row['val_cuo_act']:,.2f}",60,'right'), 
                     (f"{row['est_jur']}", 20,'right'),
-                    (f"{row['tian_ic_ini']}", 30,'right'), 
+                    # (f"{row['tian_ic_ini']}", 30,'right'), 
                     (f"{row['tian_ic_act']}", 30,'right'),
                     (f"{row['figarantias']}", 20,'right'),
                     (f"{row['estado']}", 20,'right'),
@@ -1040,7 +1029,6 @@ def listado_desembolsos(fecha_inicial, fecha_final, estado_cre):
             'val_cuo_ini': c.val_cuo_ini,
             'val_cuo_act': c.val_cuo_act,
             'est_jur': c.est_jur,
-            'tian_ic_ini': c.tian_ic_ini,
             'tian_ic_act': c.tian_ic_act,
             'figarantias': c.figarantias,
             'estado': c.estado
@@ -1073,5 +1061,94 @@ def obtener_fecha_movimiento(oficina_id,fecha,subcuenta=None,cliente_id=None):
                 socio__tercero__cliente_id=cliente_id
                 ).values_list('cod_cre', flat=True)
             ).exclude(concepto='DESEM').aggregate(max_fecha=Max('hecho_econo__fecha'))['max_fecha']
-    print('fecha movimiento--->', fecha_movimiento)
     return fecha_movimiento if fecha_movimiento else date(2000, 1, 1)
+
+def fecha_ultimo_movimiento(fecha, cod_cre): 
+    fecha_movimiento = DETALLE_PROD.objects.filter(
+            producto='CR',
+            hecho_econo__fecha__lte=fecha,
+            subcuenta = cod_cre
+            ).exclude(concepto='DESEM').aggregate(max_fecha=Max('hecho_econo__fecha'))['max_fecha']
+    print('fecha ,ovimiento',fecha_movimiento)
+    return fecha_movimiento.strftime('%d/%m/%Y') if fecha_movimiento else ''
+
+def lista_creditos_asociado(id_socio, fecha_corte):
+    creditos = CREDITOS.objects.filter(
+        estado = "A",
+        socio_id = id_socio
+    )
+    resultados = []
+    for credito in creditos:
+        liq_cre = Liquida_cre(credito.cod_cre, fecha_corte)
+        liq_cre.liq_al_dia(fecha_corte, recarga = True)
+        saldo_total = (liq_cre.sal_cap_tot + liq_cre.sal_int_dia + liq_cre.int_cau_fra + liq_cre.int_mor_a_pag + liq_cre.pol_seg_a_pag + liq_cre.acreedor_a_pag)
+        val_cuo_dia = (liq_cre.capital_a_pag + liq_cre.sal_int_dia + liq_cre.int_cau_fra + liq_cre.int_mor_a_pag + liq_cre.pol_seg_a_pag + liq_cre.acreedor_a_pag)
+        liq_cre.calculo_periodo()
+        xdias_mor = (liq_cre.fecha_focal-liq_cre.fec_al_dia).days
+        xdias_mor = xdias_mor if xdias_mor > 0 else 0
+        cuotas_pagadas = liq_cre.cuo_pag
+        altura = liq_cre.altura
+        if cuotas_pagadas == altura:
+            estado = 'AL DÍA'
+        elif cuotas_pagadas > altura:
+            estado = 'ADELANTADO'
+        else:
+            estado = 'EN MORA '+str(xdias_mor)+' DÍAS'
+            
+        resultados.append(
+            {
+            'cod_cre': credito.cod_cre,
+            'lin_cre': credito.cod_lin_cre.descripcion,
+            'fec_des': credito.fec_des,
+            'cap_ini': credito.cap_ini,
+            'num_cuo_ini': credito.num_cuo_ini,
+            'val_cuo_ini': credito.val_cuo_ini,
+            'saldo': saldo_total,
+            'val_cuo_dia': val_cuo_dia,
+            'cuotas_pagadas': cuotas_pagadas,
+            'altura': altura,
+            'estado': estado
+            }
+        )
+    return resultados
+
+def lista_deudor_solidario(id_socio,fecha_corte):
+    # Obtener el tercero relacionado al id_asociado
+    asociado = ASOCIADOS.objects.select_related('tercero').get(id=id_socio)
+    tercero = asociado.tercero.doc_ide
+    # Buscar los créditos en los que es codeudor
+    codeudores = GAR_NO_IDONEA.objects.filter(doc_ide=tercero, credito__estado='A').select_related('credito','credito__oficina')
+    resultados = []
+    # Mostrar la información
+    for codeudor in codeudores:
+        credito = codeudor.credito
+        liq_cre = Liquida_cre(credito.cod_cre,fecha_corte)  # función propia
+        liq_cre.liq_al_dia(fecha_corte, recarga = True)
+        saldo_total = (liq_cre.sal_cap_tot + liq_cre.sal_int_dia + liq_cre.int_cau_fra + liq_cre.int_mor_a_pag + liq_cre.pol_seg_a_pag + liq_cre.acreedor_a_pag)
+        liq_cre.calculo_periodo()
+        xdias_mor = (liq_cre.fecha_focal-liq_cre.fec_al_dia).days
+        xdias_mor = xdias_mor if xdias_mor > 0 else 0
+        cuotas_pagadas = liq_cre.cuo_pag
+        altura = liq_cre.altura
+        if cuotas_pagadas == altura:
+            estado = 'AL DÍA'
+        elif cuotas_pagadas > altura:
+            estado = 'ADELANTADO'
+        else:
+            estado = 'EN MORA '+str(xdias_mor)+' DÍAS'  
+        datos = {
+        'cod_cre': credito.cod_cre,
+        'lin_cre': credito.cod_lin_cre.descripcion,
+        'nom_deu': credito.socio.tercero.nombre,
+        'fec_des': credito.fec_des,
+        'cap_ini': credito.cap_ini,
+        'num_cuo_ini': credito.num_cuo_ini,
+        'saldo': saldo_total,
+        'estado': estado
+        }    
+        resultados.append(datos)
+    return resultados
+
+def novacion_reestrucion(request, pk):
+
+    return

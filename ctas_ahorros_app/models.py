@@ -1,8 +1,9 @@
 from django.db import models
 from oficinas_app.models import OFICINAS
 from asociados_app.models import ASOCIADOS
+from hecho_economico_app.models import HECHO_ECONO
 from lineas_ahorro_app.models import LINEAS_AHORRO
-from justo_app.opciones import OPC_BOOL,OPC_EST_CTA_AHO
+from justo_app.opciones import OPC_BOOL,OPC_EST_CTA_AHO,OPC_CANJE
 
 # Create your models here.
 
@@ -25,6 +26,24 @@ class CTAS_AHORRO(models.Model):
     def __str__(self):
         return f"{self.num_cta} - {self.est_cta}"
 
+class CANJE_AHORROS(models.Model):
+    oficina = models.ForeignKey(OFICINAS, on_delete=models.PROTECT,default = None, verbose_name='Oficina')
+    cta_aho = models.ForeignKey(CTAS_AHORRO, on_delete=models.PROTECT,verbose_name='Cuenta de Ahorro')
+    num_cta = models.CharField(max_length=10,null = True,verbose_name='Número Cuenta')
+    hec_eco_1 = models.ForeignKey(HECHO_ECONO,on_delete=models.PROTECT,verbose_name='comprob1',
+        related_name='canjes_ahorros_comprob1')
+    fecha_1 = models.DateField(null=True, blank=True)
+    valor_1 = models.BigIntegerField(null=True)
+    estado =  models.CharField(max_length=1,choices=OPC_CANJE,null = True,verbose_name='Estado')
+    hec_eco_2 = models.ForeignKey(HECHO_ECONO,on_delete=models.PROTECT,verbose_name='comprob2',
+        null=True,blank=True,related_name='canjes_ahorros_comprob2')
+    fecha_2 = models.DateField(null=True, blank=True,verbose_name='Fecha Canje2')
+    valor_2 = models.BigIntegerField(null=True)
+    aplicado = models.CharField(max_length=1, choices=OPC_BOOL, verbose_name='Aplicado')
+
+    class Meta:
+        unique_together = [['oficina','cta_aho','hec_eco_1']]
+        db_table = 'canje_ahorros'  
 
 class INT_DIA_AHO(models.Model):
     oficina = models.ForeignKey(OFICINAS, on_delete=models.PROTECT,default = None, verbose_name='Oficina')
@@ -47,7 +66,6 @@ class TEMPO_AHO(models.Model):
     class Meta:
         unique_together = [['num_cta','agno','mes']]
         db_table = 'tempo_aho'  
-
 
 class XAJU_SAL_AHO(models.Model):
     agno = models.IntegerField()

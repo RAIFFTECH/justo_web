@@ -2,7 +2,9 @@ import csv, os
 from django.db import connection
 from django.utils.timezone import make_aware
 import pandas as pd
+from calendar import monthrange
 from openpyxl import Workbook
+from openpyxl.styles import Font, Alignment
 from django.views import View
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect
@@ -25,6 +27,8 @@ from django.core.paginator import Paginator
 from datetime import date, timedelta, datetime
 from itertools import chain
 from django import forms
+from dateutil.relativedelta import relativedelta  
+from pagadores_app.models import PAGADORES
 
 from .forms import CrearForm
 from .models import PLAN_APORTES
@@ -38,14 +42,26 @@ from creditos_app.models import CREDITOS
 from estados_financieros_app.models import ESTADOS_FIN
 from localidades_app.models import LOCALIDADES
 from recla_carte_app.models import CARTE_CAT_HIS
+from conceptos_app.models import CONCEPTOS
 from justo_app.opciones import OPC_EST_SOCIO, OPC_EDUCACION, OPC_EST_CIV
-from justo_app.views import formato_fecha
+from justo_app.funciones_principales import formato_fecha, formatear_cod_aso
+
 # Para obtener todos los registros
 class Lista(LoginRequiredMixin, ListView):
     model = PLAN_APORTES
     form = CrearForm
     template_name = 'lista_aportes.html'
-    # ordering = ['cliente','per_con','cod_cta']
+    ordering = ['oficina','-agno']
+    
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        for obj in queryset:
+            # Calculamos el aporte mensual
+            try:
+                obj.aporte_mensual = obj.totadu / obj.meses if obj.meses else 0
+            except (TypeError, ZeroDivisionError):
+                obj.aporte_mensual = 0
+        return queryset
 
 # Para obtener todos los detalles de un registro
 class Detalles(LoginRequiredMixin, DetailView):
@@ -146,45 +162,38 @@ def ejecutar_consulta_orm(oficina_id,subcuenta,fecha_ini,fecha_fin):
 
 def movtos_aporte_socio(request, cliente_id=None, oficina_id=None):
     if request.method == 'GET':
-        # return render(request, 'movtos_apo_soc.html')
-    # if request.method == 'POST':
-        accion = request.GET.get("accion")  # Obtener la acción
-        id_cli = request.session.get('cliente_id')
-        id_ofi = request.session.get('oficina_id')
+        accion = request.GET.get("accion")
         filtro_socio = request.GET.get('filtro_cod_socio', '').strip()
         fecha_ini = request.GET.get('fecha_inicio', None)
         fecha_fin = request.GET.get('fecha_final', None)
-        print('Filtro  ',filtro_socio,'    fecha_ini ',fecha_ini,'   fecha_fin ',fecha_fin)
-        oficina_id = request.session.get('oficina_id')
+        from datetime import datetime
         date_format = "%Y-%m-%d"
         fecha_actual = datetime.now()
-        if fecha_ini == None:
+        if not fecha_ini:
             fecha_inicio = datetime(fecha_actual.year - 1, 1, 1).date()
         else:
             fecha_inicio = datetime.strptime(fecha_ini, date_format).date()
-        if fecha_fin == None:
-            fecha_final = datetime(fecha_actual.year - 1, 1, 1).date()
+        if not fecha_fin:
+            fecha_final = fecha_actual.date()
         else:
             fecha_final = datetime.strptime(fecha_fin, date_format).date()
-        fecha_final = fecha_actual.date()
-        fecha_inicio_str = fecha_inicio.strftime('%Y-%m-%d')
-        fecha_final_str = fecha_final.strftime('%Y-%m-%d')
-        oficina_id = int(request.GET.get('oficina_id', 1))  # Obtiene el valor de oficina_id de los parámetros GET
-        if len(filtro_socio) > 3: 
-            resultados = ejecutar_consulta_orm(oficina_id,filtro_socio,fecha_inicio,fecha_final)
+        oficina_id = int(request.GET.get('oficina_id', 1))
+        if len(filtro_socio) > 3:
+            resultados = ejecutar_consulta_orm(oficina_id, filtro_socio, fecha_inicio, fecha_final)
         else:
             resultados = []
-        rows = []
         sal_acu = 0
+        rows = []
         for row in resultados:
-            sal_acu = sal_acu + float(row['Aporte']) - float(row['Retiro']) + float(row['Saldo'])
+            sal_acu += float(row['Aporte']) - float(row['Retiro']) + float(row['Saldo'])
             upd_row = row
             upd_row['Saldo'] = sal_acu
             rows.append(upd_row)
-
-        print(resultados)
-
-        paginator = Paginator(rows, 10)  # 10 resultados por página
+        print('filtro_socio  ',filtro_socio)
+        saldo_aporte = saldo_aporte_socio_fecha(1,filtro_socio,fecha_final)
+        saldo_esperado = aporte_esperado_fecha(filtro_socio,fecha_final)
+        from django.core.paginator import Paginator
+        paginator = Paginator(rows, 10)
         page_number = request.GET.get('page')
         page_obj = paginator.get_page(page_number)
 
@@ -198,9 +207,11 @@ def movtos_aporte_socio(request, cliente_id=None, oficina_id=None):
         return render(request, 'movtos_apo_soc.html', {
             'context': page_obj,
             'page_obj': page_obj,
-            'filtro_cod_socio' : filtro_socio,
-            'fecha_inicio': fecha_inicio_str,
-            'fecha_final': fecha_final_str
+            'filtro_cod_socio': filtro_socio,
+            'fecha_inicio': fecha_inicio.strftime('%Y-%m-%d'),
+            'fecha_final': fecha_final.strftime('%Y-%m-%d'),
+            'saldo_aporte': saldo_aporte,
+            'aporte_esperado': saldo_esperado,
         })
     return HttpResponse("Método no permitido", status=405)
 
@@ -511,112 +522,133 @@ def imprimir(request, rows):
 
         dibujar_fila(y, row)
         y -= 10
-
-    # # Resumen al final
-    # p.setFont("Times-Roman", 10)
-    # p.line(margin_x + 400, y - 5, margin_x + 472, y - 5)
-    # p.line(margin_x + 472, y - 5, margin_x + 542, y - 5)
-    # p.drawString(margin_x - 10, y - 25, "Resumen del Comprobante")
-    # p.drawString(margin_x + 250, y - 25, f"Total Débitos:")
-    # p.drawString(margin_x + 250, y - 40, f"Total Créditos:")
-    # p.drawRightString(margin_x + 470, y - 25, f"{sum([det.debito for det in detalle_econos]):,.2f}")
-    # p.line(margin_x + 400, y - 27, margin_x + 472, y - 27)
-    # p.line(margin_x + 400, y - 29, margin_x + 472, y - 29)
-    # p.drawRightString(margin_x + 540, y - 40, f"{sum([det.credito for det in detalle_econos]):,.2f}")
-    # p.line(margin_x + 472, y - 42, margin_x + 542, y - 42)
-    # p.line(margin_x + 472, y - 44, margin_x + 542, y - 44)
-
     p.showPage()
     p.save()
     return response
-      
+
 def liquidar_aportes(request):
+    id_cli = request.session.get('cliente_id')
+    id_ofi = request.session.get('oficina_id')
+    if request.method == 'GET':
+        return render(request, 'aportes_a_la_fecha.html')  # tu formulario
     if request.method == 'POST':
-        fecha_corte_str = request.POST.get('fecha_corte')
-        nombre_archivo = request.POST.get('nombre_archivo')
+        fecha_str = request.POST.get('fecha_corte')
         try:
-            total_aportes = liquidar_aportes_process(fecha_corte_str, nombre_archivo, request)
-            return JsonResponse({'message': 'Cálculos de liquidación iniciados.'})
-        except ValueError as e:
-            return JsonResponse({'error': str(e)}, status=400)
-    else:
-        return render(request, 'aportes_a_la_fecha.html')
-
-    print('Total aportes--->', total_aportes)
-
-def liquidar_aportes_process(fecha_corte_str, nombre_archivo, request):
-    # Lógica para exportar Crear el libro de Excel
-    workbook = Workbook()
-    sheet = workbook.active
-    sheet.title = "Saldo Aportes" 
-
-    fecha_corte = datetime.strptime(fecha_corte_str, '%Y-%m-%d').date()
-    if not os.path.exists(os.path.dirname(nombre_archivo)):
-        raise ValueError("El directorio especificado no existe.")
-    
-    resultados = []
-    print('Hora de Inicio ',datetime.now())
-    result= (
-        DETALLE_PROD.objects.filter(
-            producto = 'AP',
-            hecho_econo__fecha__lte = fecha_corte,
-            hecho_econo__docto_conta__oficina_id=1
+            fecha_corte = datetime.strptime(fecha_str, '%Y-%m-%d').date()  # ✅ Conversión obligatoria
+        except (ValueError, TypeError):
+            return HttpResponse("Fecha inválida", status=400)
+        resultados = []
+        print('Hora de Inicio ',datetime.now())
+        result= (
+            DETALLE_PROD.objects.filter(
+                producto = 'AP',
+                hecho_econo__fecha__lte = fecha_corte,
+                hecho_econo__docto_conta__oficina_id=1
+            )
+            .values('subcuenta')  # Agrupamos por 'subcuenta'
+            .annotate(
+                cod_aso=F('subcuenta'),
+                Aporte_fecha=-Sum(F('valor')),  # Negamos la suma como en la SQL
+                fec_ult_apo=Max('hecho_econo__fecha')
+            )
         )
-        .values('subcuenta')  # Agrupamos por 'subcuenta'
-        .annotate(
-            cod_aso=F('subcuenta'),
-            Aporte_fecha=-Sum(F('valor')),  # Negamos la suma como en la SQL
-            fec_ult_apo=Max('hecho_econo__fecha')
-        )
+        result_list = list(result)
+        for item in result_list:
+            if item['Aporte_fecha'] is not None or item['fec_ult_apo'] is not None:
+                asociado = ASOCIADOS.objects.filter(oficina_id = 1,cod_aso = item['cod_aso']).first()
+                if asociado == None:
+                    print('No Hay Asociado con código ',item['cod_aso'])
+                    continue
+                if asociado.tercero_id == None:
+                    print('Error de Integridad cod_aso ',asociado.cod_aso)
+                    continue
+                tercero = TERCEROS.objects.filter(id = asociado.tercero_id).first()
+                if tercero != None:
+                    resultados.append({
+                        'cod_aso': asociado.cod_aso,
+                        'nombre': tercero.nombre,
+                        'Aporte_fecha': item['Aporte_fecha'],
+                        'fec_ult_apo': item['fec_ult_apo']
+                    })
+
+        wb = Workbook()
+        ws = wb.active
+        ws.title = "Saldos_aportes_a_la_fecha"
+        titulo = f"Saldo de aportes a {fecha_corte}"
+        ws.merge_cells('A1:E1')
+        ws['A1'] = titulo
+        ws['A1'].font = Font(bold=True, size=14)
+        ws['A1'].alignment = Alignment(horizontal='center')
+        ws.merge_cells('A2:E2')
+        ws['A2'].font = Font(size=12)
+        ws['A2'].alignment = Alignment(horizontal='center')
+        headers = ['cod_aso','Nombre','Aporte','fec_ult_pag']
+        ws.append([])  # Fila 3 vacía
+        ws.append(headers)
+        for col_index in range(1, len(headers) + 1):
+            cell = ws.cell(row=4, column=col_index)
+            cell.font = Font(bold=True)
+            cell.alignment = Alignment(horizontal='center')
+        # Volcar los resultados en la hoja de Excel
+        fila_inicio_datos = 5  # La fila donde empiezan los datos
+        fila_actual = fila_inicio_datos
+        total_aporte = 0
+        for item in resultados:
+            if item['Aporte_fecha'] == 0:
+                continue
+            ws.append([
+                item['cod_aso'],
+                item['nombre'],
+                item['Aporte_fecha'],
+                item['fec_ult_apo']
+            ])
+            # Acumular el total (solo si Aporte_fecha es numérico)
+            if isinstance(item['Aporte_fecha'], (int, float)):
+                total_aporte += item['Aporte_fecha']
+            elif isinstance(item['Aporte_fecha'], str):
+                try:
+                    total_aporte += float(item['Aporte_fecha'])
+                except:
+                    pass
+            fila_actual += 1
+        ws.cell(row=fila_actual, column=2).value = "TOTAL"
+        ws.cell(row=fila_actual, column=2).font = Font(bold=True)
+        ws.cell(row=fila_actual, column=3).value = total_aporte
+        ws.cell(row=fila_actual, column=3).font = Font(bold=True)
+
+
+    response = HttpResponse(
+        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     )
-    result_list = list(result)
-    for item in result_list:
-        if item['Aporte_fecha'] is not None or item['fec_ult_apo'] is not None:
-            asociado = ASOCIADOS.objects.filter(oficina_id = 1,cod_aso = item['cod_aso']).first()
-            if asociado == None:
-                print('No Hay Asociado con código ',item['cod_aso'])
-                continue
-            if asociado.tercero_id == None:
-                print('Error de Integridad cod_aso ',asociado.cod_aso)
-                continue
-            tercero = TERCEROS.objects.filter(id = asociado.tercero_id).first()
-            if tercero != None:
-                resultados.append({
-                    'cod_aso': asociado.cod_aso,
-                    'nombre': tercero.nombre,
-                    'Aporte_fecha': item['Aporte_fecha'],
-                    'fec_ult_apo': item['fec_ult_apo']
-                })
-
-    print('Hora de Final  ',datetime.now())  
-    nombre_archivo = f"saldo_aportes.xlsx"
-    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    nombre_archivo = f"aportes_a_{fecha_corte}.xlsx"
     response['Content-Disposition'] = f'attachment; filename="{nombre_archivo}"'
-    workbook.save(response)  
+    wb.save(response)
+    return response
 
-    # df = pd.DataFrame(resultados)
-    # df.to_excel(nombre_archivo, index=False)
-
-def saldo_aportes_fecha(oficina_id, subcuenta, fecha_corte):
-
-    result = (
+def saldo_aportes_fecha(oficina_id, cod_socio, fecha_corte):
+    resultado = (
         DETALLE_PROD.objects.filter(
             producto='AP',
-            subcuenta=subcuenta,
+            subcuenta=cod_socio,
             hecho_econo__fecha__lte=fecha_corte,
             hecho_econo__docto_conta__oficina_id=oficina_id
         )
-        .exclude(concepto='APREV')
-        .annotate(
-            cod_aso=F('subcuenta'),
-            Aporte_fecha=-Sum(F('valor')),  # Negamos la suma como en la SQL
-            fec_ult_apo=Max('hecho_econo__fecha')
+        .aggregate(
+            Fecha=Max('hecho_econo__fecha'),
+            Aporte_fecha=Coalesce(-Sum('valor', output_field=FloatField()), 0.0)
         )
-        .order_by('-hecho_econo__fecha')  # Ordenar por fecha descendente
-        .values('cod_aso', 'Aporte_fecha', 'hecho_econo__fecha')
-        .first()  # Retorna un único registro o None si no hay resultados
     )
-    return result
+    if resultado['Fecha'] is None:
+        return {
+            'cod_soc': cod_socio,
+            'Fecha': fecha_corte,
+            'Aporte_fecha': 0.0
+        }
+    return {
+        'cod_soc': cod_socio,
+        'Fecha': resultado['Fecha'],
+        'Aporte_fecha': resultado['Aporte_fecha']
+    }
 
 def saldo_aporte_socio_fecha(oficina_id, subcuenta, fecha_corte):
     saldo = (
@@ -625,10 +657,74 @@ def saldo_aporte_socio_fecha(oficina_id, subcuenta, fecha_corte):
                 oficina_id = oficina_id,
                 producto = "AP",
                 subcuenta = subcuenta,
-                hecho_econo__fecha__lt = fecha_corte
+                hecho_econo__fecha__lte = fecha_corte
             )
         .aggregate(saldo=Coalesce(Sum("valor"), Value(0, output_field=FloatField())))
     ) 
+    return -saldo["saldo"]
+
+def promedio_aporte_socio_fecha(oficina_id, subcuenta, fecha_corte):
+    fecha_inicio = date(fecha_corte.year, 1, 1)
+    # fecha_inicio = fecha_corte.replace(year=fecha_corte.year - 1)
+    saldo = (
+        DETALLE_PROD.objects
+            .filter(
+                oficina_id=oficina_id,
+                producto="AP",
+                subcuenta=subcuenta,
+                hecho_econo__fecha__gt=fecha_inicio,
+                hecho_econo__fecha__lte=fecha_corte,
+                valor__lt=0
+            )
+            .aggregate(saldo=Coalesce(Sum("valor"), Value(0, output_field=FloatField())))
+    )
+    return -saldo["saldo"]/365
+
+def saldo_aporte_extra_socio_fecha(oficina_id, subcuenta, fecha_corte):
+    extra = CONCEPTOS.objects.filter(tip_dev_ap='E').values_list('cod_con', flat=True)
+    saldo = (
+        DETALLE_PROD.objects
+            .filter(
+                oficina_id=oficina_id,
+                producto="AP",
+                subcuenta=subcuenta,
+                hecho_econo__fecha__lte=fecha_corte,
+                concepto__in=extra
+            )
+            .aggregate(saldo=Coalesce(Sum("valor"), Value(0, output_field=FloatField())))
+    )
+    return -saldo["saldo"]
+
+def saldo_aporte_voluntario_socio_fecha(oficina_id, subcuenta, fecha_corte):
+    voluntario = CONCEPTOS.objects.filter(tip_dev_ap='V').values_list('cod_con', flat=True)
+    saldo = (
+        DETALLE_PROD.objects
+            .filter(
+                oficina_id=oficina_id,
+                producto="AP",
+                subcuenta=subcuenta,
+                hecho_econo__fecha__lte=fecha_corte,
+                concepto__in=voluntario
+            )
+            .aggregate(saldo=Coalesce(Sum("valor"), Value(0, output_field=FloatField())))
+    )
+    return -saldo["saldo"]
+
+def saldo_revalorizacion_aportes_socio_fecha(oficina_id, subcuenta, fecha_corte):
+    revalorizacion = CONCEPTOS.objects.filter(tip_dev_ap='R').values_list('cod_con', flat=True)
+    fecha_inicio = date(fecha_corte.year, 1, 1)
+    saldo = (
+        DETALLE_PROD.objects
+            .filter(
+                oficina_id=oficina_id,
+                producto="AP",
+                subcuenta=subcuenta,
+                hecho_econo__fecha__gte=fecha_inicio,
+                hecho_econo__fecha__lte=fecha_corte,
+                concepto__in=revalorizacion
+            )
+            .aggregate(saldo=Coalesce(Sum("valor"), Value(0, output_field=FloatField())))
+    )
     return -saldo["saldo"]
 
 def saldo_aportes(request):
@@ -641,7 +737,7 @@ def saldo_aportes(request):
         id_ofi = request.session.get('oficina_id')
         accion = request.POST.get("accion")   
       
-        fecha_corte = request.POST.get('fecha_corte1')
+        fecha_corte = request.POST.get('fecha_corte')
             
         saldos = obtener_reporte(id_cli, id_ofi, fecha_corte)
 
@@ -780,8 +876,7 @@ def obtener_reporte(cliente_id, oficina_id, fecha_corte_str):
     EST_SOC_DICT = dict(OPC_EST_SOCIO)
 
     fecha_corte = datetime.strptime(fecha_corte_str, '%Y-%m-%d').date()
-    print('Fecha Corte',fecha_corte,'  ',type(fecha_corte))
-    print('Inicio aportes apoRtes    ',datetime.now())
+    
     creditos_socio = contar_creditos_socio(oficina_id, fecha_corte)
     score_nit = score_creditos_por_nit(oficina_id, fecha_corte)
 
@@ -789,7 +884,7 @@ def obtener_reporte(cliente_id, oficina_id, fecha_corte_str):
          oficina_id=oficina_id
         ).exclude(
             estado='R', 
-            fec_ret__lt=fecha_corte
+            fec_ret__lte=fecha_corte
         ).annotate(
             fecha_maxima=Max('tercero__estados_fin__fec_inf')  # Fecha más reciente por tercero
             ).filter(
@@ -879,52 +974,62 @@ def calcular_edad(fecha_nacimiento, fecha_corte):
     return edad
 
 def aporte_esperado_fecha(cod_aso, fec_cor):
-    asociado = ASOCIADOS.objects.filter(cod_aso=cod_aso,oficina = 1).first()
-    x_tip_soc = asociado.tercero.tip_ter
-    xAgnoIni = asociado.fec_afi.year
-    plan_apo = PLAN_APORTES.objects.filter(agno = xAgnoIni).first()
-    if x_tip_soc == "J":
-        x_tot_apo_esp = plan_apo.inijur
-        x_dia_ing = 0
-    else:
-        x_dia_ing = (asociado.fec_afi - asociado.fec_nac).days
-        if x_dia_ing < 365 * 18:
-            x_tot_apo_esp = plan_apo.inichi2
+    if cod_aso is None or not cod_aso:
+        return 0
+    asociado = ASOCIADOS.objects.select_related('tercero').get(cod_aso=cod_aso, oficina=1)
+    tip_ter = asociado.tercero.tip_ter
+    inicio = asociado.fec_afi if asociado.fec_afi is not None else date.today()
+    corte = fec_cor
+    print('Asociado  ',asociado.cod_aso,' corte ',corte,'type ',type(corte),' inicio',type(inicio))
+    if corte < inicio:
+        return 0
+    monthly_by_year = {}
+    for year in range(inicio.year, corte.year + 1):
+        plan = PLAN_APORTES.objects.get(agno=year)
+
+        if tip_ter == 'J':
+            mensual = (plan.totadu or 0) / 12
         else:
-            x_tot_apo_esp = plan_apo.iniadu
-    aportaciones = PLAN_APORTES.objects.all()
-    for aportacion in aportaciones:
-        if aportacion.agno <= fec_cor.year:
-            if x_tip_soc == "J":
-                x_tot_apo_esp += (
-                    (aportacion.totadu / 12 * (12 - asociado.fec_afi.month))
-                    if aportacion.agno == asociado.fec_afi.year else aportacion.totadu
-                ) - (
-                    (aportacion.totadu / 12 * (12 -fec_cor.month))
-                    if aportacion.agno == fec_cor.year else 0
-                )
+            fecha_corte_edad = date(year, 1, 1)
+            edad_dias = (fecha_corte_edad - asociado.fec_nac).days
+            es_menor = edad_dias < 365 * 18
+            if es_menor:
+                mensual = (plan.totchi2 or 0) / 12
             else:
-                if x_dia_ing < 365 * 18:
-                    x_tot_apo_esp += (
-                        (aportacion.totchi2 / 12 * (12 - asociado.fec_afi.month))
-                        if aportacion.agno == asociado.fec_afi.year else aportacion.totchi2
-                    ) - (
-                        (aportacion.totchi2 / 12 * (12 - asociado.fec_afi.month)) * aportacion.meses / 12
-                        if aportacion.agno == fec_cor.year else 0
-                    )
-                else:
-                    x_tot_apo_esp += (
-                        (aportacion.totadu / 12 * (12 - fec_cor.month))
-                        # (aportacion.totadu / 12 * (12 -asociado.fec_afi.month))
-                        if aportacion.agno == fec_cor.year else aportacion.totadu
-                        # if aportacion.agno == asociado.fec_afi.year else aportacion.totadu
-                    ) - (
-                        (aportacion.totadu / 12 * (12 - fec_cor.month)) * aportacion.meses / 12
-                        # (aportacion.totadu / 12 * (12 - asociado.fec_afi.month)) * aportacion.meses / 12
-                        if aportacion.agno == fec_cor.year else 0
-                    )
-        x_dia_ing += 365
-    return x_tot_apo_esp
+                mensual = (plan.totadu or 0) / 12
+
+        monthly_by_year[year] = mensual
+
+    # 2) Acumular por mes, prorrateando por días
+    total = 0.0
+    y, m = inicio.year, inicio.month
+    while (y, m) <= (corte.year, corte.month):
+        dias_mes = monthrange(y, m)[1]
+        ini_mes = date(y, m, 1)
+        fin_mes = date(y, m, dias_mes)
+
+        desde = max(inicio, ini_mes)
+        hasta = min(corte, fin_mes)
+
+        if desde <= hasta:
+            dias_cubiertos = (hasta - desde).days + 1  # inclusivo
+            mensual = monthly_by_year[y]
+            total += mensual * dias_cubiertos / dias_mes
+
+        # siguiente mes
+        if m == 12:
+            y += 1
+            m = 1
+        else:
+            m += 1
+
+    # Si quieres incluir la "cuota de ingreso" (iniadu/inichi2/inijur), súmala aquí 1 sola vez:
+    # if tip_ter == 'J':
+    #     total += plan_inicial_del_año_de_afiliacion.inijur
+    # else:
+    #     total += plan_inicial_del_año_de_afiliacion.inichi2 o iniadu según edad
+    print('este se supone debe ser el esperado', total)
+    return round(total, 2)
 
 def aporte_mensual(oficina_id, cod_aso, fec_cor):
     asociado = ASOCIADOS.objects.filter(cod_aso=cod_aso, oficina=oficina_id).first()
@@ -963,7 +1068,7 @@ def aportes_super(request):
         accion = request.POST.get("accion")   
       
         fecha_corte = request.POST.get('fecha_corte')
-            
+        
         saldos = reporte_super(id_cli, id_ofi, fecha_corte)
 
         if accion == "exportar":
@@ -982,9 +1087,11 @@ def aportes_super(request):
             saldos = reporte_super(id_cli, id_ofi, fecha_corte)                            
             if not saldos:
                 return HttpResponse("No se encontraron datos para exportar", status=404)
-                      
+            
+            print('fecha_corte',fecha_corte)          
+            
             fecha_corte_formateada = formato_fecha(fecha_corte)
-                        
+            print('fec_cor_formato', fecha_corte_formateada)                        
             # Añadir datos adicionales encima de los encabezados
             empresa = f"{entidad.nombre.strip()}"
             nit_empresa = f"NIT. {entidad.doc_ide.strip()}-{entidad.dv.strip()}"
@@ -1054,30 +1161,64 @@ def aportes_super(request):
     return render(request, 'aportes_supersolidaria.html')
 
 def reporte_super(cliente_id, oficina_id, fecha_corte_str):
+    fec_cor = datetime.strptime(fecha_corte_str, '%Y-%m-%d').date()
 
-    fecha_corte = datetime.strptime(fecha_corte_str, '%Y-%m-%d').date()
-    
-    asociados = obtener_reporte(cliente_id, oficina_id, fecha_corte_str)
-    
+    # Traer asociados activos con su tercero
+    asociados = list(ASOCIADOS.objects.filter(oficina_id=oficina_id)
+        .exclude(estado='R', fec_ret__lte=fec_cor)
+        .select_related('tercero')
+    )
+
+    asociados_dict = []
+
     for asociado in asociados:
-        fecha_aporte = saldo_aportes_fecha(oficina_id,  asociado['Cod_Aso'], fecha_corte)
-        asociado['tip_doc'] = asociado['Tip_Doc']
-        asociado['cod_aso'] = asociado['Cod_Aso']
-        asociado['total_aportes'] = asociado['Total Aportes']
-        asociado['aporte_mensual'] = aporte_mensual(oficina_id, asociado['Cod_Aso'], fecha_corte)
-        asociado['aporte_ordinario'] =asociado['Total Aportes']
-        asociado['aporte_extra_ordinario'] = 0
-        asociado['revalorizacion'] = 0
-        asociado['aporte_voluntario'] = 0
-        asociado['aporte_esperado'] = asociado['Apor_al_dia']
-        # asociado['aporte_esperado'] = asociado.get('Apor_al_dia')
-        # ult_apo = saldo_aportes_fecha(oficina_id, asociado['cod_aso'], fecha_corte)
-        asociado['fec_ult_apo'] = fecha_aporte["hecho_econo__fecha"] if fecha_aporte else None
-                                   
+        tercero = asociado.tercero
+
+        # Formatear cod_aso si cla_doc es "N"
+        if tercero.cla_doc == "N":
+            cod_aso_formateado = formatear_cod_aso(asociado.cod_aso)
+            if tercero.dig_ver:
+                cod_aso_formateado += f"-{tercero.dig_ver}"
+        else:
+            cod_aso_formateado = asociado.cod_aso
+
+        # Cálculo de fechas y saldos
+        fecha_aporte = saldo_aportes_fecha(oficina_id, asociado.cod_aso, fec_cor)
+        aporte_ordinario = saldo_aporte_socio_fecha(oficina_id, asociado.cod_aso, fec_cor)
+        revalorizacion = saldo_revalorizacion_aportes_socio_fecha(oficina_id, asociado.cod_aso, fec_cor)
+        extra = saldo_aporte_extra_socio_fecha(oficina_id, asociado.cod_aso, fec_cor)
+        voluntario = saldo_aporte_voluntario_socio_fecha(oficina_id, asociado.cod_aso, fec_cor)
+        promedio_aporte = promedio_aporte_socio_fecha(oficina_id, asociado.cod_aso, fec_cor)
+
+        datos = {
+            'tip_doc': "I" if tercero.cla_doc == "T" else (tercero.cla_doc if tercero.cla_doc else ""),
+            'cod_aso': cod_aso_formateado,
+            'aporte_mensual': aporte_mensual(oficina_id, asociado.cod_aso, fec_cor),
+            'aporte_ordinario': aporte_ordinario - revalorizacion - extra - voluntario,
+            'aporte_extra_ordinario': extra,
+            'revalorizacion': revalorizacion,
+            'promedio_aporte': round(promedio_aporte,0), #(asociado.cod_aso, fec_cor),
+            'fec_ult_apo': fecha_aporte["Fecha"].strftime('%d/%m/%Y') if fecha_aporte else None,
+            'aporte_voluntario': voluntario,
+            'fec_nac': asociado.fec_nac,
+        }
+
+        datos['total_aportes'] = (
+            datos['aporte_ordinario']
+            + datos['aporte_extra_ordinario']
+            + datos['revalorizacion']
+            + datos['aporte_voluntario']
+        )
+
+        asociados_dict.append(datos)
+
+    # Orden y renombramiento
     orden = [
-        'tip_doc', 'cod_aso', 'total_aportes', 'aporte_mensual', 'aporte_ordinario','aporte_extra_ordinario', 'revalorizacion', 'aporte_voluntario', 'aporte_esperado', 'fec_ult_apo'
-        ]
-    
+        'tip_doc', 'cod_aso', 'total_aportes', 'aporte_mensual',
+        'aporte_ordinario', 'aporte_extra_ordinario', 'revalorizacion',
+        'promedio_aporte', 'fec_ult_apo', 'aporte_voluntario', 'fec_nac'
+    ]
+
     renombrar = {
         'tip_doc': 'Tip_Doc',
         'cod_aso': 'Cod_Aso',
@@ -1086,20 +1227,264 @@ def reporte_super(cliente_id, oficina_id, fecha_corte_str):
         'aporte_ordinario': 'Aporte Ordinario',
         'aporte_extra_ordinario': 'Aporte Extra',
         'revalorizacion': 'Revalorizacion',
+        'promedio_aporte': 'Promedio Aporte',
+        'fec_ult_apo': 'Fec_Ult_Apo',
         'aporte_voluntario': 'Aporte Voluntario',
-        'aporte_esperado': 'Aporte Esperado',
-        'fec_ult_apo': 'Fec_Ult_Apo'
-        }
-    
-    # asociados_filtrados = asociados.filter(total_aportes__gt=0)
-    asociados_filtrados = [a for a in asociados if a.get('total_aportes', 0) > 0]
-    # Reorganizar los diccionarios en el orden deseado
-    for asociado in asociados:
-        asociado_ordenado = {campo: asociado.get(campo) for campo in orden}
-        asociado.clear()
-        asociado.update({renombrar.get(k, k): v for k, v in asociado_ordenado.items()})
-    
-    asociados_ordenados = sorted(asociados_filtrados, key=lambda x: x.get('Cod_Aso', ''))
-    
+        'fec_nac': 'Fec_Nac'
+    }
+
+    # Filtrar asociados con aportes > 0
+    asociados_filtrados = [a for a in asociados_dict if a['total_aportes'] > 0]
+
+    # Reordenar y renombrar campos
+    asociados_renombrados = []
+    for a in asociados_filtrados:
+        nuevo = {renombrar.get(k, k): a.get(k) for k in orden}
+        asociados_renombrados.append(nuevo)
+
+    # Orden final por código de asociado
+    asociados_ordenados = sorted(asociados_renombrados, key=lambda x: x.get('Cod_Aso', ''))
+
     return asociados_ordenados
-    
+
+def riesgo_de_liquidez_aportes(request):
+    id_cli = request.session.get('cliente_id')
+    id_ofi = request.session.get('oficina_id')
+    print('id_ofi  ',id_ofi)
+
+    if request.method == 'GET':
+        return render(request, 'Riesgo_liq_aportes.html')  # tu formulario
+
+    if request.method == 'POST':
+        fecha_str = request.POST.get('fecha_corte')
+        try:
+            fecha_base = datetime.strptime(fecha_str, '%Y-%m-%d').date()  # ✅ Conversión obligatoria
+        except (ValueError, TypeError):
+            return HttpResponse("Fecha inválida", status=400)
+        accion = request.POST.get('accion')
+        # Fecha final: por ejemplo, hoy o una fecha del formulario
+        fecha_inicio = (fecha_base - relativedelta(months=12)) + timedelta(days=1)
+        # Estructura equivalente al cursor AHORRO:
+        ahorro = []  # Lista de dicts con claves: 'DIA', 'M01', ..., 'M12'
+        for dia in range(1, 32):
+            fila = {'DIA': dia}
+            for mes in range(1, 13):
+                clave_mes = f"M{mes:02}"  # M01, M02, ..., M12
+                fila[clave_mes] = 0
+            ahorro.append(fila)
+        MESES = [[0 for _ in range(31)] for _ in range(12)]
+        pagador_codigo = Subquery(
+            ASOCIADOS.objects.filter(
+                cod_aso=OuterRef('subcuenta'),oficina_id=id_ofi
+            ).filter(id_pag__isnull=False
+            ).values('id_pag__codigo')[:1]
+        )
+        queryset = DETALLE_PROD.objects.filter(
+            producto='AP',
+            hecho_econo__anulado='N',
+            hecho_econo__fecha__year__gt=2014,
+            hecho_econo__docto_conta__oficina_id=id_ofi,
+        ).annotate(
+            fecha=F('hecho_econo__fecha'),
+            cod_ent=pagador_codigo
+        ).values(
+            'fecha','subcuenta','concepto','valor','cod_ent'
+        )
+        codigos_lib = [
+            "005", "013", "999", "016", "017", "018", "019", "021", "022", "025",
+            "027", "028", "029", "031", "032", "033", "034", "035", "036", "038", "040", "041"
+        ]
+        if accion == 'Libranza': 
+            resultado = [fila for fila in queryset if fila['cod_ent'] in codigos_lib]
+        elif accion == 'Personal':
+            resultado = [fila for fila in queryset if fila['cod_ent'] not in codigos_lib]
+        elif accion == 'Ingreso Libranza':
+            resultado = [fila for fila in queryset if fila['cod_ent'] in codigos_lib and valor < 0 and concepto != 'APREV']
+        elif accion == 'Retiro Libranza':
+            resultado = [fila for fila in queryset if fila['cod_ent'] in codigos_lib and valor > 0 and concepto != 'APREV']
+        elif accion == 'Ingreso Personal':
+            resultado = [fila for fila in queryset if fila['cod_ent'] not in codigos_lib and valor < 0 and concepto != 'APREV']
+        elif accion == 'Retiro Personal':
+            resultado = [fila for fila in queryset if fila['cod_ent'] not in codigos_lib and valor > 0 and concepto != 'APREV']
+        else:
+            resultado = list(queryset)
+        xant_aporte = 0
+        if accion != 'activos_1_ano':
+            for fila in resultado:
+                fecha = fila['fecha']
+                subcuenta = fila['subcuenta']
+                concepto  = fila['concepto']
+                valor = fila['valor']
+                if fecha >= fecha_inicio:
+                    mes_idx = fecha.month - 1  # 0 basado
+                    dia_idx = fecha.day - 1    # 0 basado
+                    MESES[mes_idx][dia_idx] -= valor
+                else:
+                    xant_aporte -= valor
+            print('Accion ',accion,'   Valor Anterior ',xant_aporte)
+            wb = Workbook()
+            ws = wb.active
+            ws.title = 'Accion Riesgo de Aportes ... '+accion+'   de la fecha '+fecha_base.strftime("%Y-%m-%d")
+            ws.append(['Accion Riesgo de Aportes ... '+accion+'   de la fecha '+fecha_base.strftime("%Y-%m-%d")])
+            ws.append([])
+            encabezado = ['Día'] + [f"Mes {m+1:02}" for m in range(12)]
+            ws.append(encabezado)
+            for dia in range(31):
+                fila = [f"Día {dia+1:02}"]  # Primera columna: Día
+                for mes in range(12):
+                    fila.append(MESES[mes][dia])  # Valor de ese día en cada mes
+                ws.append(fila)
+            ws.append([])
+            ws.append([])
+            ws.append(['Aporte Anterior :', xant_aporte ])
+            response = HttpResponse(
+                content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            )
+        else:
+            xFecFin = fecha_base  # Suponiendo que ya la tienes como datetime.date
+            xFecIni = xFecFin - relativedelta(months=12) + relativedelta(days=1)
+            if xFecIni.month == 2 and xFecIni.year % 4 == 0:
+                xFecIni = xFecIni + relativedelta(days=1)
+            tab_rie_apo = {}
+            xFecCor = xFecIni
+            while xFecCor <= xFecFin:
+                mes_str = f"{xFecCor.year}-{xFecCor.month:02}"
+                mes_str = f"{xFecCor.year}-{xFecCor.month:02}"
+                tab_rie_apo[mes_str] = {
+                    "NumAntIng": 0,
+                    "NumAntRet": 0,
+                    "AntLibIng": 0.0,
+                    "AntLibEgr": 0.0,
+                    "AntPerIng": 0.0,
+                    "AntPerEgr": 0.0,
+                    "NumNueIng": 0,
+                    "NumNueRet": 0,
+                    "NueLibIng": 0.0,
+                    "NueLibEgr": 0.0,
+                    "NuePerIng": 0.0,
+                    "NuePerEgr": 0.0,
+                }
+                xFecCor += relativedelta(months=1)
+            xIniAntLib = 0
+            xIniAntPer = 0
+            xIniNueLib = 0
+            xIniNuePer = 0
+            for fila in resultado:
+                fecha = fila['fecha']
+                subcuenta = fila['subcuenta']
+                concepto  = fila['concepto']
+                cod_ent = fila['cod_ent']
+                valor = fila['valor']
+                mes = f"{fecha.year:04}-{fecha.month:02}"
+                if mes in tab_rie_apo:
+                    socio = ASOCIADOS.objects.filter(oficina_id = id_ofi,cod_aso = subcuenta).first()
+                    if socio == None:
+                        continue
+                    if fecha >= xFecIni and fecha <= xFecFin and concepto != 'APREV':
+                        if (socio.estado != "R" and socio.fec_afi < xFecIni)  or (socio.estado == "R" and socio.fec_ret is not None and socio.fec_ret >= xFecIni):
+                            if cod_ent in codigos_lib:  #  Libranza
+                                if valor < 0: # Ingreso
+                                    tab_rie_apo[mes]["AntLibIng"] -= valor
+                                else:
+                                    tab_rie_apo[mes]["AntLibEgr"] -= valor
+                            else:
+                                if valor < 0: # Ingreso
+                                    tab_rie_apo[mes]["AntPerIng"] -= valor
+                                else:
+                                    tab_rie_apo[mes]["AntPerEgr"] -= valor
+                        else:
+                            if cod_ent in codigos_lib:  #  Libranza
+                                if valor < 0: # Ingreso
+                                    tab_rie_apo[mes]["NueLibIng"] -= valor
+                                else:
+                                    tab_rie_apo[mes]["NueLibEgr"] -= valor
+                            else:
+                                if valor < 0: # Ingreso
+                                    tab_rie_apo[mes]["NuePerIng"] -= valor
+                                else:
+                                    tab_rie_apo[mes]["NuePerEgr"] -= valor
+                    else:
+                        if fecha < xFecIni:
+                            if cod_ent in codigos_lib:
+                                xIniAntLib -= valor
+                            else:
+                                xIniAntPer -= valor
+            xNumAntIng = 0
+            socios = ASOCIADOS.objects.filter(oficina_id = id_ofi)
+            for socio in socios:
+                if socio.fec_afi is None:
+                    continue
+                if socio.fec_afi <= xFecFin:
+                    if (socio.estado != 'R' and socio.fec_afi < xFecIni):
+                        xNumAntIng=xNumAntIng+1    
+                    if (socio.estado == 'R' and socio.fec_ret is not None and socio.fec_ret >= xFecIni and socio.fec_afi < xFecIni):   # antiguos retirados
+                        mes = f"{socio.fec_ret.year:04}-{socio.fec_ret.month:02}"
+                        if mes in tab_rie_apo:
+                            tab_rie_apo[mes]["NumAntRet"] += 1
+                    if (socio.estado != 'R' and socio.fec_afi >= xFecIni):   #   Nuevos
+                        mes = f"{socio.fec_afi.year:04}-{socio.fec_afi.month:02}"
+                        if mes in tab_rie_apo:
+                            tab_rie_apo[mes]["NumNueIng"] += 1
+                    if (socio.estado == 'R' and socio.fec_afi >= xFecIni and socio.fec_ret <= xFecFin):
+                        mes = f"{socio.fec_ret.year:04}-{socio.fec_ret.month:02}"
+                        if mes in tab_rie_apo:
+                            tab_rie_apo[mes]["NumNueRet"] += 1
+            tab_rie_apo["SalIni"] = {
+                "NumAntIng": xNumAntIng,
+                "NumAntRet": 0,
+                "AntLibIng": xIniAntLib,
+                "AntLibEgr": 0.0,
+                "AntPerIng": xIniAntPer,
+                "AntPerEgr": 0.0,
+                "NumNueIng": 0,
+                "NumNueRet": 0,
+                "NueLibIng": xIniNueLib,
+                "NueLibEgr": 0.0,
+                "NuePerIng": xIniNuePer,
+                "NuePerEgr": 0.0,
+            }
+
+            wb = Workbook()
+            ws = wb.active
+            ws.title = 'Accion Riesgo de Aportes ... '+accion+'   de la fecha '+fecha_base.strftime("%Y-%m-%d")
+            ws.append(['Accion Riesgo de Aportes ... '+accion+'   de la fecha '+fecha_base.strftime("%Y-%m-%d")])
+            ws.append([])
+            headers = [
+                "Mes",
+                "NumAntIng", "NumAntRet", "AntLibIng", "AntLibEgr", "AntPerIng", "AntPerEgr",
+                "NumNueIng", "NumNueRet", "NueLibIng", "NueLibEgr", "NuePerIng", "NuePerEgr"
+            ]
+            ws.append(headers)
+            claves = list(tab_rie_apo.keys())
+            if "SalIni" in claves:
+                claves.remove("SalIni")
+                claves = ["SalIni"] + sorted(claves)
+            else:
+                claves = sorted(claves)
+            for mes in claves:
+                fila = [mes]
+                fila += [
+                    tab_rie_apo[mes].get("NumAntIng", 0),
+                    tab_rie_apo[mes].get("NumAntRet", 0),
+                    tab_rie_apo[mes].get("AntLibIng", 0.0),
+                    tab_rie_apo[mes].get("AntLibEgr", 0.0),
+                    tab_rie_apo[mes].get("AntPerIng", 0.0),
+                    tab_rie_apo[mes].get("AntPerEgr", 0.0),
+                    tab_rie_apo[mes].get("NumNueIng", 0),
+                    tab_rie_apo[mes].get("NumNueRet", 0),
+                    tab_rie_apo[mes].get("NueLibIng", 0.0),
+                    tab_rie_apo[mes].get("NueLibEgr", 0.0),
+                    tab_rie_apo[mes].get("NuePerIng", 0.0),
+                    tab_rie_apo[mes].get("NuePerEgr", 0.0),
+                ]
+                ws.append(fila)
+            print('Fin Por menos de un año')
+        
+        nombre_archivo = f"rl_aportes_{accion}_{fecha_base}.xlsx"
+        print('Ahora Graba ',nombre_archivo )
+        response = HttpResponse(
+            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
+        response['Content-Disposition'] = f'attachment; filename="{nombre_archivo}"'
+        wb.save(response)
+        return response

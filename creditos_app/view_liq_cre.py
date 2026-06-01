@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from .models import CREDITOS
-from justo_creditos import Liquida_cre  # Asegúrate de importar tu clase de liquidación
+from justo_app.justo_creditos import Liquida_cre  # Asegúrate de importar tu clase de liquidación
 from django.http import HttpResponse, JsonResponse
 import os
 import pandas as pd

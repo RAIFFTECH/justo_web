@@ -3,7 +3,7 @@ import time
 import redis
 from datetime import datetime
 from oficinas_app.models  import OFICINAS
-from justo_creditos import perdida_esperada  # Ajusta si es otro archivo
+from justo_app.justo_creditos import perdida_esperada  # Ajusta si es otro archivo
 
 r = redis.StrictRedis(host='localhost', port=6379, db=0)
 

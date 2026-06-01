@@ -705,10 +705,6 @@ OPC_PENSION = (
     ('7', 'OTRA'),
 )
 
-def validate_numeric(value):
-    if not re.match(r'^[0-9]+$', value):
-        raise ValidationError('El número de celular debe contener solo dígitos numéricos.')
-
 OPC_BANCOS = (
     ('1059', 'BANCAMIA S.A'),
     ('1040', 'BANCO AGRARIO'),

@@ -53,7 +53,7 @@ from contabilizacion_capital_creditos_app.models import IMP_CON_CRE
 from terceros_app.models import TERCEROS
 from clientes_app.models import CLIENTES
 from oficinas_app.models import OFICINAS
-from justo_creditos import Liquida_cre
+from justo_app.justo_creditos import Liquida_cre
 from justo_app.opciones import OPC_CANALES
 
 

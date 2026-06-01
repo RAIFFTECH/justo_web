@@ -33,7 +33,7 @@ from django.conf import settings
 from .forms import CrearForm, BeneficiarioForm, ReferenciaForm
 from .models import ASOCIADOS, ASO_BENEF, ASO_REFERENCIAS
 from .models import TERCEROS
-from justo_app.views import formato_fecha, formatear_cod_aso
+from justo_app.funciones_principales import formato_fecha, formatear_cod_aso
 from clientes_app.models import CLIENTES
 from oficinas_app.models import OFICINAS
 from creditos_app.models import CREDITOS
@@ -45,8 +45,8 @@ from ctas_ahorros_app.views import obtener_fecha_ctas_ahorros, lista_ahorros_aso
 from aportes_app.models import PLAN_APORTES
 from aportes_app.views import saldo_aporte_socio_fecha, calcular_edad, saldo_aportes_fecha, aporte_mensual, saldo_aporte_extra_socio_fecha, saldo_aporte_voluntario_socio_fecha, saldo_revalorizacion_aportes_socio_fecha
 from cxc_app.views import lista_cxp
-from justo_ahorros import obtener_saldos_ctas_ahorros
-from justo_creditos import Liquida_cre
+from justo_app.justo_ahorros import obtener_saldos_ctas_ahorros
+from justo_app.justo_creditos import Liquida_cre
 
 # Para obtener todos los registros
 class Lista(LoginRequiredMixin, ListView):

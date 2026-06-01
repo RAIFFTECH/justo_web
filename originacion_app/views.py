@@ -13,7 +13,7 @@ from reportlab.pdfgen import canvas
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
-from justo_app.views import formato_fecha, formatear_cod_aso
+from justo_app.funciones_principales import formato_fecha, formatear_cod_aso
 
 from django import forms
 from .forms import CrearForm
@@ -295,7 +295,7 @@ from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from terceros_app.models import TERCEROS
 from django.db.models import Count
-from justo_creditos import Liquida_cre
+from justo_app.justo_creditos import Liquida_cre
 from recla_carte_app.models import CARTE_CAT_HIS
 from creditos_app.models import CREDITOS,GAR_NO_IDONEA
 from categorias_creditos_app.models import CAT_DES_DIA_CRE 

@@ -1,0 +1,176 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+    <!--Menú y barra superior -->
+<div class="content-wrapper">
+        <div class="page-header">
+            <h2 class=" text-primary">Agregar beneficiario </h2>
+            <a href="{% url 'listar_asociados' %}" class="btn btn-primary rounded-4">
+                <i class="mdi mdi-arrow-left mx-2"></i>
+                Volver
+            </a>
+        </div>
+        <!-- del container fluid de la barra superior del menú -->
+        <!-- Logo e iniciales -->
+    <div class="row g-3">
+        <div class="col-md-12">
+            <button id="add-form" type="button" class="btn btn-primary">+</button>
+            {% if data %}
+                <div class="row g-3">
+                    <div id="form-container'saved">
+                        {% for item in data %}
+                        <div class="col-md-12 mt-5">
+                            <div class="card border rounded">
+                                <div class="card-header">
+                                    <h5>Beneficiario</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row g-3">
+                                            <div class="col-md-3">
+                                                <div class="mb-3">
+                                                    <label class="form-label requiredField">
+                                                        Clase Documento<span class="asteriskField">*</span>
+                                                    </label>
+                                                    <input type="text" class="form-control" value="{{ item.cla_doc }}" readonly>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="mb-3">
+                                                    <label class="form-label requiredField">
+                                                        Documento<span class="asteriskField">*</span>
+                                                    </label>
+                                                    <input type="text" class="form-control" value="{{ item.doc_ide }}" readonly>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="mb-3">
+                                                    <label class="form-label requiredField">
+                                                        Nombre Completo<span class="asteriskField">*</span>
+                                                    </label>
+                                                    <input type="text" class="form-control" value="{{ item.nombre }}" readonly>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="mb-3">
+                                                    <label class="form-label requiredField">
+                                                        Año de Nacimiento<span class="asteriskField">*</span>
+                                                    </label>
+                                                    <input type="text" class="form-control" value="{{ item.agno_nac }}" readonly>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="mb-3">
+                                                    <label class="form-label requiredField">
+                                                        Parentesco<span class="asteriskField">*</span>
+                                                    </label>
+                                                    <input type="text" class="form-control" value="{{ item.parentesco }}" readonly>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="mb-3">
+                                                    <label class="form-label requiredField">
+                                                        Porcentaje
+                                                    </label>
+                                                    <input type="text" class="form-control" value="{{ item.porcentaje }}" readonly>
+                                                </div>
+                                            </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <input id="pk" name="pk" type="hidden" value="{{ pk }}">
+                <div class="row g-3">
+                    <div id="form-container">
+                        <div class="col-md-12 mt-5">
+                            <div class="card border rounded">
+                                <div class="card-header d-flex justify-content-between">
+                                    <h5>Beneficiario</h5>
+                                    <button type="button" id="delete" class="btn btn-danger" onclick="deleteCard()">
+                                        Eliminar
+                                    </button>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row g-3">
+                                            <div class="col-md-3">
+                                                {{ form.cla_doc|as_crispy_field }}
+                                            </div>
+                                            <div class="col-md-3">
+                                                {{ form.doc_ide|as_crispy_field }}
+                                            </div>
+                                            <div class="col-md-3">
+                                                {{ form.nombre|as_crispy_field }}
+                                            </div>
+                                            <div class="col-md-3">
+                                                {{ form.agno_nac|as_crispy_field }}
+                                            </div>
+                                            <div class="col-md-3">
+                                                {{ form.parentesco|as_crispy_field }}
+                                            </div>
+                                            <div class="col-md-3">
+                                                {{ form.porcentaje|as_crispy_field }}
+                                            </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-12 text-center">
+                        <button type="submit" title="Guardar" class="btn btn-primary rounded-4"><i
+                                class="bi bi-floppy"></i> Guardar</button>
+                        <a href="{% url 'listar_asociados' %}" title="Cancelar" type="submit" class="btn btn-primary rounded-4"><i
+                                class="bi bi-x-square"></i> Cancelar</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    </div>
+
+    <script>
+
+         document.getElementById('add-form').onclick = function() {
+             let formsetContainer = document.getElementById('form-container');
+            let totalForms = formsetContainer.children.length;
+            let newForm = formsetContainer.children[0].cloneNode(true);
+            let inputs = newForm.getElementsByTagName('input');
+            for (let i = 0; i < inputs.length; i++) {
+                inputs[i].value = '';
+            }
+
+            newForm.innerHTML = newForm.innerHTML.replace(/form-\d+/, 'form-' + totalForms);
+
+            let selects = newForm.getElementsByTagName('select');
+            for (let i = 0; i < selects.length; i++) {
+                selects[i].name = selects[i].name + "_" + totalForms;
+                selects[i].id = selects[i].id + "_" + totalForms;
+            }
+
+            for (let input of inputs) {
+                input.name = input.name + "_" + totalForms;
+                input.id = input.id + "_" + totalForms;
+            }
+
+            formsetContainer.appendChild(newForm);
+
+        };
+
+          function deleteCard() {
+            let formsetContainer = document.getElementById('form-container');
+            let totalForms = formsetContainer.children.length;
+            if (totalForms > 1) {
+                formsetContainer.removeChild(formsetContainer.children[totalForms - 1]);
+            }
+        }
+    </script>
+{% endblock %}

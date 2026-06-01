@@ -1,0 +1,179 @@
+        /* Estilos CSS para los resultados de búsqueda */
+        .beneficiary-result {
+            padding: 20px; /* Aumenta el espacio alrededor de cada resultado */
+            margin-bottom: 5px; /* Agrega margen inferior entre cada resultado */
+            cursor: pointer;
+        }
+
+        .beneficiary-result:hover {
+            background-color: #6b2424; /* Cambia el color de fondo cuando se pasa el mouse */
+        }
+
+        /* Estilos CSS para el contenedor de resultados */
+        #searchResults {
+            max-width: 500px; /* Establece un ancho máximo para el contenedor de resultados */
+            max-height: 360px;
+            padding: 10px;
+            overflow-x: scroll;
+            overflow-y: auto;
+            
+        }
+
+        #searchResults .result-row {
+            white-space: nowrap; /* Evita que el texto se rompa en varias líneas */
+            overflow-x: auto; /* Agrega desplazamiento horizontal si el texto es demasiado largo */
+        }
+
+        body {
+            font-size: 0.8rem;
+            line-height: 0.5;
+        }
+        .container {
+            display: flex;
+            margin-bottom: 3px;
+        }
+        .container > fieldset {
+            margin-right: 5px;
+            border: none !important;
+            padding: 5px;
+            margin-bottom: 3px;
+        }
+        legend {
+            font-size: 0.9rem;
+        }
+        select, input[type="text"], input[type="date"], input[type="number"] {
+            font-size: 0.8rem;
+            padding: 2px;
+            margin: 2px 0;
+            max-width: 150px;
+        }
+        #txtConcepto {
+            width: 100px;
+        }
+        #txtDetalle {
+            width: 800px;
+        }
+        button {
+            font-size: 0.8rem;
+            padding: 2px 5px;
+            margin: 2px;
+            height: 24px;
+        }
+        .fieldset-container {
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 10px;
+            margin: 10px;
+        }
+
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgb(0,0,0); /* Fallback color */
+            background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto; /* 15% from the top and centered */
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%; /* Could be more or less, depending on screen size */
+            max-width: 600px;
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .list-item {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+            cursor: pointer;
+        }
+        .list-item:hover {
+            background-color: #f1f1f1;
+        }
+
+        .search-results {
+            text-align: left; /* Alinea el texto a la izquierda dentro de la lista desplegable */
+            width: 90%;
+            overflow-x: auto;
+            overflow-y: auto;
+        }
+
+
+        .beneficiary-result {
+            padding: 10px;
+            cursor: pointer;
+            overflow-x: auto;
+            overflow-y: auto;
+            width: 90%;
+        }
+
+        .beneficiary-result:hover {
+            background-color: #f0f0f0;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        } 
+
+        .checkbox-container {
+            border: 1px solid #ccc;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        
+        .checkbox-container input[type="checkbox"] {
+            margin-right: 5px;
+        }
+
+
+        .custom-checkbox {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 1px solid #ccc;
+            cursor: pointer;
+        }
+    
+        .custom-checkbox.checked {
+            background-color: #007bff;
+        }
+
+        .checkbox-container {
+            display: inline-flex; /* Usar inline-flex para que el tamaño se ajuste al contenido */
+            align-items: flex-start; /* Alinear verticalmente los elementos en la esquina superior */
+            padding: 10px;
+            border: 2px solid #000; /* Borde del recuadro */
+            border-radius: 5px; /* Esquinas redondeadas del recuadro (opcional) */
+        }
+        .checkbox-container label {
+            margin: 0; /* Eliminar márgenes adicionales */
+        }
+
+        

@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Prueba de Fecha</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <form id="miFormulario" method="post">
+        {% csrf_token %}
+        {{ form.fec_de|as_crispy_field }}
+        <button type="submit">Enviar</button>
+    </form>
+
+    <script>
+        $(document).ready(function() {
+            // Configura el formato de la fecha al cargar la página
+            var fechaInput = $('#id_fec_de');
+            var fechaValor = fechaInput.val(); // Obtén el valor actual
+
+            // Asegúrate de que la fecha esté en el formato yyyy-MM-dd
+            if (fechaValor) {
+                var partes = fechaValor.split('-');
+                if (partes.length === 3) {
+                    // El formato de fecha es dd-MM-yyyy, conviértelo a yyyy-MM-dd
+                    var fechaFormateada = `${partes[2]}-${partes[1]}-${partes[0]}`;
+                    fechaInput.val(fechaFormateada);
+                }
+            }
+
+            $('#miFormulario').on('submit', function(e) {
+                e.preventDefault(); // Evita el envío del formulario
+
+                // Obtener la fecha del campo
+                var fecha = $('#id_fec_de').val();
+                console.log('Fecha en el formulario:', fecha);
+                
+                // Enviar la fecha al servidor
+                $.post({
+                    url: '{% url "prueba_fecha" %}', // Asegúrate de que la URL coincida con la de tu vista
+                    data: {
+                        'fec_de': fecha,
+                        'csrfmiddlewaretoken': '{{ csrf_token }}'
+                    },
+                    success: function(response) {
+                        console.log('Respuesta del servidor:', response);
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error:', error);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
+{% endblock %}

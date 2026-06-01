@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+
+<div align="left" class="btn_crear mb-0">
+    <a href="{% url 'hecho_econo_create' %}" target="_blank" title="Agregar" type="button" class="btn btn-light rounded-pill">
+        <i class="bi bi-file-earmark-plus"></i> Agregar
+    </a>
+    <!-- Botón de Importar -->
+    <a href="{% url 'importar_cxc' %}" 
+        target="_blank" type="button" class="btn btn-light rounded-pill"
+        data-bs-toggle="tooltip" data-bs-placement="top"
+        title="El Archivo exel debe tener doc_ide y valor en las columnas 1 y 2. Los datos deben estar a partir de la segunda fila ">
+        <i class="bi bi-upload"></i> Importar
+    </a>
+</div>
+
+
+<h3 class="text-center">Movimiento de Comprobantes</h3>
+<form method="GET" action="{% url 'buscar_hechos_econo' %}" class="form-row justify-content-center">
+    <div class="row w-100">
+        <div class="form-group col-md-6">
+            <label for="docto_conta">Documento:</label>
+            <select name="docto_conta" class="form-control">
+                <option value="">Seleccionar docto_conta</option>
+                {% for opcion in docto_conta_options %}
+                    <option value="{{ opcion.id }}" {% if opcion.id == docto_conta_id %}selected{% endif %}>{{ opcion.nombre }}</option>
+                    <!-- Ajusta 'nombre' según el campo correcto en tu modelo DOCTO_CONTA -->
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group col-md-6">
+            <label for="filtro_texto">Búsqueda: Número / Concepto / Valor</label>
+            <input type="text" name="filtro_texto" value="{{ filtro_texto }}" placeholder="Número o Descripción" class="form-control">
+        </div>
+    </div>
+    <div class="row w-100">
+        <div class="form-group col-md-6">
+            <label for="fecha_inicio">Fecha inicio:</label>
+            <input type="date" name="fecha_inicio" value="{{ fecha_inicio }}" class="form-control">
+        </div>
+        <div class="form-group col-md-6">
+            <label for="fecha_fin">Fecha fin:</label>
+            <input type="date" name="fecha_fin" value="{{ fecha_fin }}" class="form-control">
+        </div>
+    </div>
+    <div class="form-group col-md-12 text-center">
+        <button type="submit" class="btn btn-primary">
+            <i class="fas fa-search"></i> Buscar
+        </button>
+    </div>
+</form>
+
+<table class="table table-striped mt-3">
+    <thead>
+        <tr>
+            <th>Documento</th>
+            <th>Numero</th>
+            <th>Fecha</th>
+            <th>Descripcion</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% if mostrar_resultados %}
+            {% for hecho in hechos_econo %}
+          <!--<p>El ID de hecho_econo es: {{ hecho_econo.id }}</p> -->
+                <tr>
+                    <td>{{ hecho.docto_conta }}</td>
+                    <td>{{ hecho.numero }}</td>
+                    <td>{{ hecho.fecha }}</td>
+                    <td>{{ hecho.descripcion }}</td>
+                    <td>
+                        <!-- <a href="{% url 'imprime_comprobante' pk=hecho.id %}" class="btn btn-info btn-sm imprimir-btn" id="imprimir-btn-{{ hecho.id }}" title="Imprimir">
+                            <i class="fas fa-print"></i> Imprimir
+                        </a> -->
+                        <a href="{% url 'imprime_comprobante' pk=hecho.id %}" target="_blank" title="Imprimir" type="button" class="btn btn-light rounded-pill"><i
+                            class="bi bi-printer-fill"></i> Imprimir
+                        </a>
+                        <a href="{% url 'hecho_econo_update' pk=hecho.id %}" class="btn btn-warning btn-sm edit-btn" id="edit-btn-{{ hecho.id }}" title="Editar">
+                            <i class="fas fa-edit"></i> Editar
+                        </a>
+                        <a href="{% url 'hecho_econo_delete' pk=hecho.id %}" class="btn btn-danger btn-sm" title="Eliminar">
+                            <i class="fas fa-trash-alt"></i> Eliminar
+                        </a>
+
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="5">No se encontraron resultados.</td>
+                </tr>
+            {% endfor %}
+        {% endif %}
+        <script src="{% static 'js/custom.js' %}"></script>
+    </tbody>
+</table>
+
+{% if mostrar_resultados %}
+<div class="pagination">
+    <ul class="pagination justify-content-center">
+        {% if hechos_econo.has_previous %}
+            <li class="page-item">
+                <a href="?page=1&filtro_texto={{ filtro_texto }}&docto_conta={{ docto_conta_id }}&fecha_inicio={{ fecha_inicio }}&fecha_fin={{ fecha_fin }}" class="page-link" title="Primero">
+                    <i class="fas fa-angle-double-left"></i>
+                </a>
+            </li>
+            <li class="page-item">
+                <a href="?page={{ hechos_econo.previous_page_number }}&filtro_texto={{ filtro_texto }}&docto_conta={{ docto_conta_id }}&fecha_inicio={{ fecha_inicio }}&fecha_fin={{ fecha_fin }}" class="page-link" title="Anterior">
+                    <i class="fas fa-angle-left"></i>
+                </a>
+            </li>
+        {% endif %}
+
+        <li class="page-item active">
+            <span class="page-link">
+                Página {{ hechos_econo.number }} de {{ hechos_econo.paginator.num_pages }}.
+            </span>
+        </li>
+
+        {% if hechos_econo.has_next %}
+            <li class="page-item">
+                <a href="?page={{ hechos_econo.next_page_number }}&filtro_texto={{ filtro_texto }}&docto_conta={{ docto_conta_id }}&fecha_inicio={{ fecha_inicio }}&fecha_fin={{ fecha_fin }}" class="page-link" title="Siguiente">
+                    <i class="fas fa-angle-right"></i>
+                </a>
+            </li>
+            <li class="page-item">
+                <a href="?page={{ hechos_econo.paginator.num_pages }}&filtro_texto={{ filtro_texto }}&docto_conta={{ docto_conta_id }}&fecha_inicio={{ fecha_inicio }}&fecha_fin={{ fecha_fin }}" class="page-link" title="Último">
+                    <i class="fas fa-angle-double-right"></i>
+                </a>
+            </li>
+        {% endif %}
+    </ul>
+</div>
+{% endif %}
+
+{% endblock %}
+

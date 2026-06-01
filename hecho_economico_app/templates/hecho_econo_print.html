@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Comprobante</title>
+    <style>
+        /* Aquí puedes agregar el estilo necesario para el formato del comprobante */
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .comprobante {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .comprobante th, .comprobante td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <h1>Comprobante N° {{ hecho_econo.numero }}</h1>
+    <p><strong>Fecha:</strong> {{ hecho_econo.fecha }}</p>
+    <p><strong>Descripción:</strong> {{ hecho_econo.descripcion }}</p>
+    <p><strong>Canal:</strong> {{ hecho_econo.canal }}</p>
+    <p><strong>Protegido:</strong> {{ hecho_econo.protegido }}</p>
+    <p><strong>Anulado:</strong> {{ hecho_econo.anulado }}</p>
+
+    <h2>Detalles</h2>
+    <table class="comprobante">
+        <thead>
+            <tr>
+                <th>Concepto</th>
+                <th>Subcuenta</th>
+                <th>Valor</th>
+                <th>Débito</th>
+                <th>Crédito</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for detalle in detalles %}
+            <tr>
+                <td>{{ detalle.item_concepto }}</td>
+                <td>{{ detalle.detalle }}</td>
+                <td>{{ detalle.valor_1 }}</td>
+                <td>{{ detalle.debito }}</td>
+                <td>{{ detalle.credito }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

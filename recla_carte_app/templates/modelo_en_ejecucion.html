@@ -1,0 +1,106 @@
+
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="container mt-4">
+  <h3>Liquidación Asiento Nº {{ numero }} de Reclasificación y Pérdida Esperada de Cartera</h3>
+  <p>Fecha de cierre del mes: <strong>{{ fecha_final }}</strong></p>
+
+  <div class="mt-4">
+    <button class="btn btn-success mx-2">
+      <i class="fas fa-cogs"></i> Generar
+    </button>
+
+    <!-- Botón Modelo: con AJAX -->
+  <button onclick="iniciarModelo()" class="btn btn-secondary mx-2">
+    <i class="fas fa-file-alt"></i> Modelo
+  </button>
+
+    <!-- Botón Cancelar: Regresa a la página anterior -->
+    <a href="{{ previous_url }}" class="btn btn-danger mx-2">
+      <i class="fas fa-arrow-left"></i> Cancelar
+    </a>
+  </div>
+
+  <div class="progress mt-4">
+    <div id="barra-progreso" class="progress-bar" role="progressbar" style="width: 0%;">0%</div>
+  </div>
+
+  <!-- Mensajes de estado -->
+  <div id="processStatus" class="mt-4"></div>
+  <div id="processTime" class="mt-4"></div>
+
+  <div id="spinner" class="text-center mt-4" style="display:none;">
+    <div class="spinner-border text-success" role="status" style="width: 3rem; height: 3rem;">
+      <span class="visually-hidden">Procesando...</span>
+    </div>
+    <p class="mt-3">Este proceso puede tomar algunos minutos. Por favor, espere...</p>
+  </div>
+  
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+  $(document).ready(function() {
+    $('#btnModelo').click(function() {
+      // Mostrar spinner y mensaje de inicio
+      $('#spinner').show();
+      $('#processStatus').html('🚀 El proceso ha comenzado, por favor espere...');
+
+      var fecha = "{{ fecha_final|date:'Y-m-d' }}";  // Obtener la fecha desde el backend
+
+      $.ajax({
+        url: '{% url "ejecutar_modelo" %}',  // Llamar a la vista que ejecuta el proceso
+        data: { 'fecha': fecha },  // Pasar la fecha como parámetro GET
+        dataType: 'json',
+        success: function(response) {
+          // Esconder spinner
+          $('#spinner').hide();
+
+          if (response.status === 'success') {
+            $('#processStatus').html(response.message);
+            $('#processTime').html('⏱️ El proceso duró: ' + response.elapsed_time + ' minutos.');
+          } else {
+            $('#processStatus').html('❌ ' + response.message);
+          }
+        },
+        error: function() {
+          $('#spinner').hide();
+          $('#processStatus').html('❌ Hubo un error al ejecutar el proceso.');
+        }
+      });
+    });
+  });
+</script>
+
+<script>
+  function iniciarModelo() {
+    const fecha = "{{ fecha_final|date:'Y-m-d' }}";
+    fetch(`/recla_carte/iniciar-modelo/?fecha=${fecha}`)
+      .then(response => response.json())
+      .then(data => {
+        const taskId = data.task_id;
+        console.log("Tarea enviada con ID:", taskId);
+        consultarProgreso(taskId);
+      });
+  }
+
+  function consultarProgreso(taskId) {
+    const barra = document.getElementById("barra-progreso");
+    const intervalo = setInterval(() => {
+      fetch(`/recla_carte/progreso-tarea/?task_id=${taskId}`)
+        .then(res => res.json())
+        .then(data => {
+          const progreso = data.progreso;
+          barra.style.width = progreso + "%";
+          barra.innerText = progreso + "%";
+          if (progreso >= 100) {
+            clearInterval(intervalo);
+            alert("¡Modelo completado!");
+          }
+        });
+    }, 1000); 
+  }
+</script>
+
+{% endblock %}

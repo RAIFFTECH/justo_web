@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+<div class="content-wrapper">
+    <div class="page-header">
+        <h2 class=" text-primary">Listado de Créditos Desesembolsados </h2>
+    </div>
+    <div class="col-md-12 grid-margin stretch-card rounded-5">
+        <div class="card rounded-5">
+            <div class="card-body">
+                <form action="{% url 'creditos_desembolsados' %}" method="post">
+                    {% csrf_token %}
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="fec_ini">Fecha Inicial:</label>
+                            <input type="date" id="fec_ini" name="fec_ini">
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="fec_fin">Fecha Final:</label>
+                            <input type="date" id="fec_fin" name="fec_fin">
+                        </div>
+                    </div>
+                    <script>
+                        // Función para establecer una fecha por defecto en un campo
+                        function setDefaultDate(fieldId, date) {
+                            document.getElementById(fieldId).value = date;
+                        }
+                        // Función para inicializar todas las fechas por defecto
+                        function initializeDates() {
+                            const today = new Date();
+                            const year = today.getFullYear();
+                            const month = String(today.getMonth() + 1).padStart(2, '0'); // MM
+                            const day = String(today.getDate()).padStart(2, '0'); // DD
+                            // Fecha actual
+                            const currentDate = `${year}-${month}-${day}`;
+                            // 1 de enero del año actual
+                            const firstDayOfYear = `${year}-01-01`;
+                            // Asignar fechas a los campos
+                            setDefaultDate('fec_ini', firstDayOfYear); // Fecha Inicial
+                            setDefaultDate('fec_fin', currentDate); // Fecha Corte
+                            // setDefaultDate('fec_com', currentDate); // Fecha Comparativo (opcional, si visible)
+                        }
+                        // Mostrar/ocultar el campo de fecha comparativo
+                        function toggleFechaField() {
+                            const comparativo = document.getElementById('comparativo').value;
+                            const fechaField = document.getElementById('fec_com-field');
+                            if (comparativo === 'S') {
+                                fechaField.style.display = 'block';
+                            } else {
+                                fechaField.style.display = 'none';
+                            }
+                        }
+                        // Llamar a la función de inicialización al cargar la página
+                        window.onload = initializeDates;
+                    </script>
+                    <!-- <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="cta_ini">Cuenta Inicial:</label>
+                            <input type="text" id="cta_ini" name="cta_ini">
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="cta_fin">Cuenta Final:</label>
+                            <input type="text" id="cta_fin" name="cta_fin">
+                        </div>
+                    </div> -->
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="estado_cre">Estado de los Créditos:</label>
+                            <select id="estado_cre" name="estado_cre">
+                                <option value="A">Activos</option>
+                                <option value="C">Cancelados</option>
+                                <option value="T">Todos</option>
+
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit" name="accion" value="imprimir" target="_blank" title="Imprimir" 
+                        class="btn btn-light rounded-pill"><i class="bi bi-printer-fill"></i> Imprimir</button>
+                    <button type="submit" name="accion" value="exportar" target="_blank" title="Exportar" 
+                        class="btn btn-light rounded-pill"><i class="bi bi-box-arrow-down"></i> Exportar</button>
+                    <button type="submit" name="accion" value="csv" target="_blank" title="CSV" 
+                        class="btn btn-light rounded-pill"><i class="bi bi-filetype-csv"></i> CSV</button>
+                </form> 
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

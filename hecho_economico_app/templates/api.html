@@ -1,0 +1,46 @@
+<<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Información de HECHO_ECONO</title>
+</head>
+<body>
+    <h1>Información de HECHO_ECONO</h1>
+    <p>ID: {{ data.id }}</p>
+    <p>Documento: {{ data.docto_conta_codigo }}</p>
+    <p>Doc_nombre: {{ data.docto_conta_nombre }}</p>
+    <p>Numero: {{ data.numero }}</p>
+    <p>Descripción: {{ data.descripcion }}</p>
+    <p>Fecha: {{ data.fecha }}</p>
+    
+    <!-- Detalles de DETALLE_PROD -->
+    <h2>Detalles de DETALLE_PROD</h2>
+    <ul>
+        {% for detalle_prod in data.detalles_prod %}
+        <li>
+            <p>Producto: {{ detalle_prod.producto }}</p>
+            <p>Concepto: {{ detalle_prod.concepto }}</p>
+            <p>Subcuenta: {{ detalle_prod.subcuenta }}</p>
+            <p>Valor: {{ detalle_prod.valor }}</p>
+            <!-- Aquí puedes mostrar más detalles de DETALLE_PROD según tus necesidades -->
+            
+            <!-- Detalles de DETALLE_ECONO -->
+            <h3>Detalles de DETALLE_ECONO</h3>
+            <ul>
+                {% for detalle_econo in detalle_prod.detalles_econo %}
+                <li>
+                    <p>Item Concepto: {{ detalle_econo.item_concepto }}</p>
+                    <p>Detalle: {{ detalle_econo.detalle }}</p>
+                    <p>Debito: {{ detalle_econo.debito }}</p>
+                    <p>credito: {{ detalle_econo.credito }}</p>
+                    <p>tercero: {{ detalle_econo.tercero.raz_soc }}</p>
+                    <!-- Aquí puedes mostrar más detalles de DETALLE_ECONO según tus necesidades -->
+                </li>
+                {% endfor %}
+            </ul>
+        </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

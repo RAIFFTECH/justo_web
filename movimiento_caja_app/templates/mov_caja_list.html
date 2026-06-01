@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<!-- <div class="container mt-5">
+    <h1>Lista de Movimientos de Caja</h1> -->
+
+<div class="content-wrapper">
+    <div class="page-header">
+        <h2 class=" text-primary">Lista de Movimientos de Caja </h2>
+    </div>
+    <a href="{% url 'mov_caja_create' %}" class="btn btn-success mb-3" target="_blank" title="Agregar" type="button" class="btn btn-light rounded-pill"><i class="bi bi-file-earmark-plus"></i>
+        Realizar Cierre</a>
+    <div class="col-md-12 grid-margin stretch-card rounded-5">
+        <div class="card rounded-5">
+            <div class="card-body">
+                <form method="get" class="mb-4">
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label for="fecha_inicio">Fecha Inicio:</label>
+                            {{ form.fecha_inicio }}
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="fecha_fin">Fecha Fin:</label>
+                            {{ form.fecha_fin }}
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="cajero">Cajero:</label>
+                            {{ form.cajero.user }}
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-filter"></i> Filtrar
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    {% if mov_cajas %}
+        <a href="{% url 'mov_caja_create' %}" class="btn btn-primary mb-3">
+            <i class="bi bi-plus-circle"></i> Crear Nuevo Movimiento
+        </a>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Foto</th>
+                    <th>Cajero</th>
+                    <th>Fecha</th>
+                    <th>Jornada</th>
+                    <th>Saldo Inicial</th>
+                    <th>Saldo Final</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for mov in mov_cajas %}
+                <tr>
+                    <td>
+                        {% if mov.cajero.user.userprofile.photo %}
+                            <img src="{{ mov.cajero.user.userprofile.photo.url }}" alt="Foto de {{ cajero.user.username }}" class="profile-photo" style="width: 40px; height: 40px; border-radius: 50%;">
+                        {% else %}
+                            No disponible
+                        {% endif %}
+                    </td>
+                    <td>{{ mov.cajero }}</td>
+                    <td>{{ mov.fecha }}</td>
+                    <td>{{ mov.jornada }}</td>
+                    <td>{{ mov.saldo_ini }}</td>
+                    <td>{{ mov.saldo_fin }}</td>
+                    <td>
+                        <a href="{% url 'mov_caja_detail' mov.pk %}" class="btn btn-info">
+                            <i class="bi bi-info-circle"></i> Ver
+                        </a>
+                        <a href="{% url 'mov_caja_update' mov.pk %}" class="btn btn-warning">
+                            <i class="bi bi-pencil-square"></i> Editar
+                        </a>
+                        <a href="{% url 'mov_caja_delete' mov.pk %}" class="btn btn-danger">
+                            <i class="bi bi-trash"></i> Eliminar
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div class="alert alert-info">No hay movimientos de caja que coincidan con los filtros.</div>
+    {% endif %}
+</div>
+{% endblock %}

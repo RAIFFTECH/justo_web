@@ -1,0 +1,143 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+
+<h3 class="text-center">Aportes de Asociados</h3>
+<style>
+    .right-align {
+        text-align: right;
+    }
+    .pagination {
+        display: flex;
+        justify-content: center;
+    }
+    .pagination a {
+        margin: 0 5px;
+        padding: 8px 16px;
+        text-decoration: none;
+        color: #333;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+    }
+    .pagination a.active {
+        background-color: #007bff;
+        color: white;
+        border: 1px solid #007bff;
+    }
+    .pagination a:hover {
+        background-color: #ddd;
+    }
+</style>
+<script>
+    function formatCurrency(value) {
+        return value.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+    }
+
+    document.addEventListener('DOMContentLoaded', (event) => {
+        const currencyElements = document.querySelectorAll('.currency');
+        currencyElements.forEach((element) => {
+            const value = parseFloat(element.textContent.replace(',', ''));
+            if (!isNaN(value)) {
+                element.textContent = formatCurrency(value);
+            }
+        });
+    });
+</script>
+<form method="GET" action="{% url 'list_apo_socio' %}" class="form-row justify-content-center">
+    <div class="row w-100">
+        <div class="form-group col-md-6">
+            <label for="filtro_texto">Código del Asociado</label>
+            <input type="text" name="filtro_cod_socio" value="{{ filtro_texto }}" placeholder="Código del Asociado" class="form-control">
+        </div>
+    </div>
+    <div class="row w-100">
+        <div class="form-group col-md-6">
+            <label for="fecha_inicio">Fecha inicio:</label>
+            <input type="date" name="fecha_inicio" id="fecha_inicio" value="{{ fecha_inicio }}" class="form-control">
+        </div>
+        <div class="form-group col-md-6">
+            <label for="fecha_fin">Fecha fin:</label>
+            <input type="date" name="fecha_final" id="fecha_final" value="{{ fecha_final }}" class="form-control">
+        </div>
+    </div>
+    <div class="form-group col-md-12 text-center">
+        <button type="submit" class="btn btn-primary">
+            <i class="fas fa-search"></i> Buscar
+        </button>
+    </div>
+</form>
+
+<table class="table table-striped mt-3">
+    <thead>
+        <tr>
+            <th>Fecha</th>
+            <th>Comprobante</th>
+            <th>Número</th>
+            <th>Concepto</th>
+            <th class="right-align">Aporte</th>
+            <th class="right-align">Retiro</th>
+            <th class="right-align">Saldo</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for hecho in context %}
+            <tr>
+                <td>{{ hecho.Fecha }}</td>
+                <td>{{ hecho.docto_conta.nombre }}</td>
+                <td>{{ hecho.Numero }}</td>
+                <td>{{ hecho.Concepto }}</td>
+                <td class="currency right-align">{{ hecho.Aporte|floatformat:2 }}</td>
+                <td class="currency right-align">{{ hecho.Retiro|floatformat:2 }}</td>
+                <td class="currency right-align">{{ hecho.Saldo|floatformat:2 }}</td>
+            </tr>
+        {% empty %}
+            <tr>
+                <td colspan="7">No se encontraron resultados.</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<div class="pagination">
+    {% if page_obj.has_previous %}
+        <a href="?page=1{% if filtro_cod_socio %}&filtro_cod_socio={{ filtro_cod_socio }}{% endif %}{% if fecha_inicio %}&fecha_inicio={{ fecha_inicio }}{% endif %}{% if fecha_final %}&fecha_final={{ fecha_final }}{% endif %}">« Primero</a>
+        <a href="?page={{ page_obj.previous_page_number }}{% if filtro_cod_socio %}&filtro_cod_socio={{ filtro_cod_socio }}{% endif %}{% if fecha_inicio %}&fecha_inicio={{ fecha_inicio }}{% endif %}{% if fecha_final %}&fecha_final={{ fecha_final }}{% endif %}">Anterior</a>
+    {% endif %}
+    {% for num in page_obj.paginator.page_range %}
+        {% if page_obj.number == num %}
+            <a href="?page={{ num }}{% if filtro_cod_socio %}&filtro_cod_socio={{ filtro_cod_socio }}{% endif %}{% if fecha_inicio %}&fecha_inicio={{ fecha_inicio }}{% endif %}{% if fecha_final %}&fecha_final={{ fecha_final }}{% endif %}" class="active">{{ num }}</a>
+        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+            <a href="?page={{ num }}{% if filtro_cod_socio %}&filtro_cod_socio={{ filtro_cod_socio }}{% endif %}{% if fecha_inicio %}&fecha_inicio={{ fecha_inicio }}{% endif %}{% if fecha_final %}&fecha_final={{ fecha_final }}{% endif %}">{{ num }}</a>
+        {% endif %}
+    {% endfor %}    
+    {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}{% if filtro_cod_socio %}&filtro_cod_socio={{ filtro_cod_socio }}{% endif %}{% if fecha_inicio %}&fecha_inicio={{ fecha_inicio }}{% endif %}{% if fecha_final %}&fecha_final={{ fecha_final }}{% endif %}">Siguiente</a>
+        <a href="?page={{ page_obj.paginator.num_pages }}{% if filtro_cod_socio %}&filtro_cod_socio={{ filtro_cod_socio }}{% endif %}{% if fecha_inicio %}&fecha_inicio={{ fecha_inicio }}{% endif %}{% if fecha_final %}&fecha_final={{ fecha_final }}{% endif %}">Último »</a>
+    {% endif %}
+</div>
+
+<script>
+    // Función para establecer una fecha por defecto en un campo
+    function setDefaultDate(fieldId, date) {
+        document.getElementById(fieldId).value = date;
+    }
+    // Función para inicializar todas las fechas por defecto
+    function initializeDates() {
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, '0'); // MM
+        const day = String(today.getDate()).padStart(2, '0'); // DD
+        // Fecha actual
+        const currentDate = `${year}-${month}-${day}`;
+        // 1 de enero del año actual
+        const firstDayOfYear = `${year}-01-01`;
+        // Asignar fechas a los campos
+        setDefaultDate('fecha_inicio', firstDayOfYear); // Fecha Inicial
+        setDefaultDate('fecha_final', currentDate); // Fecha Corte
+    }
+    // Llamar a la función de inicialización al cargar la página
+    window.onload = initializeDates;
+</script>
+
+{% endblock %}
+
+

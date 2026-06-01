@@ -1,0 +1,168 @@
+{% extends "base-pdf.html" %}
+{% block content %}
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th colspan="2" class="text-center">Información del Cliente</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <th class="txt_negrita text-start">Cliente:</th>
+            <td>{{tercero.cliente}}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Tipo Documento:</th>
+            <td>{{tercero.cla_doc}}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Número Documento:</th>
+            <td>{{tercero.doc_ide}}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Ciudad Expedición Documento:</th>
+            <td>{{tercero.cod_ciu_exp}}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Fecha Expedición Documento:</th>
+            <td>{{tercero.fec_exp_ced}}</td>
+        </tr>
+        </tbody>
+    </table>
+    <table class="table table-striped">
+    <thead>
+    <tr>
+        <th colspan="2" class="text-center">Datos Personales</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <th class="txt_negrita text-start">Primer Apellido:</th>
+        <td>{{tercero.pri_ape}}</td>
+    </tr>
+    <tr>
+        <th class="txt_negrita text-start">Segundo Apellido:</th>
+        <td>{{tercero.seg_ape}}</td>
+    </tr>
+    <tr>
+        <th class="txt_negrita text-start">Primer Nombre:</th>
+        <td>{{tercero.pri_nom}}</td>
+    </tr>
+    <tr>
+        <th class="txt_negrita text-start">Segundo Nombre:</th>
+        <td>{{tercero.seg_nom}}</td>
+    </tr>
+    <tr>
+        <th class="txt_negrita text-start">Tipo Régimen:</th>
+        <td>{{tercero.regimen}}</td>
+    </tr>
+    <tr>
+        <th class="txt_negrita text-start">Ciudad Residencia:</th>
+        <td>{{tercero.cod_ciu_res}}</td>
+    </tr>
+    <tr>
+        <th class="txt_negrita text-start">Dirección:</th>
+        <td>{{tercero.direccion}}</td>
+    </tr>
+    <tr>
+        <th class="txt_negrita text-start">Código Postal:</th>
+        <td>{{tercero.cod_pos}}</td>
+    </tr>
+    </tbody>
+    </table>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th colspan="2" class="text-center">Datos de Contacto</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <th class="txt_negrita text-start">Teléfono Oficina:</th>
+            <td>{{tercero.tel_ofi}}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Teléfono Residencia:</th>
+            <td>{{tercero.tel_res}}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Celular Principal:</th>
+            <td>{{tercero.celular1}}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Celular Secundario:</th>
+            <td>{{tercero.celular2}}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">e-mail:</th>
+            <td>{{tercero.email}}</td>
+        </tr>
+        </tbody>
+    </table>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th colspan="2" class="text-center">Información Adicional</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <th class="txt_negrita text-start">Tipo Tercero:</th>
+            <td>{{tercero.tip_ter}}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Razón Social:</th>
+            <td>{{tercero.raz_soc}}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Fax:</th>
+            <td>{{tercero.fax}}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Nit Interno:</th>
+            <td>{{tercero.nit_interno}}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">DV:</th>
+            <td>{{tercero.dig_ver}}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Nit Rápido:</th>
+            <td>{{tercero.nit_rap}}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Nombre:</th>
+            <td>{{tercero.nombre}}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Persona Expuesta PEP:</th>
+            <td>{{tercero.per_pub_exp}}</td>
+        </tr>
+        </tbody>
+    </table>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th colspan="2" class="text-center">Actualización</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <th class="txt_negrita text-start">Fecha Actualización:</th>
+            <td>{{tercero.fec_act}}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Observación:</th>
+            <td>{{tercero.observacion}}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Grupo Especial:</th>
+            <td>{{tercero.grupo_especial}}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Grupos Especiales:</th>
+            <td>{{tercero.grupos_especiales}}</td>
+        </tr>
+        </tbody>
+    </table>
+{% endblock %}

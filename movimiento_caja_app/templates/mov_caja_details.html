@@ -1,0 +1,16 @@
+<!-- movimientos_caja_app/templates/movimientos_caja_app/mov_caja_detail.html -->
+
+<h1>Detalle de Movimiento de Caja</h1>
+<p><strong>Cajero:</strong> {{ mov_caja.cajero }}</p>
+<p><strong>Fecha:</strong> {{ mov_caja.fecha }}</p>
+<p><strong>Jornada:</strong> {{ mov_caja.jornada }}</p>
+<p><strong>Saldo Inicial:</strong> {{ mov_caja.saldo_ini }}</p>
+<p><strong>Débitos:</strong> {{ mov_caja.debitos }}</p>
+<p><strong>Créditos:</strong> {{ mov_caja.creditos }}</p>
+<p><strong>Saldo Final:</strong> {{ mov_caja.saldo_fin }}</p>
+<p><strong>Diferencia:</strong> {{ mov_caja.diferencia }}</p>
+
+<div>
+    <a href="{% url 'mov_caja_list' %}" class="btn btn-secondary">Volver a la Lista</a>
+    <a href="{% url 'mov_caja_update' mov_caja.pk %}" class="btn btn-warning">Editar</a>
+</div>

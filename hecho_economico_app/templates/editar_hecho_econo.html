@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Hecho Económico</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'tu_aplicacion/css/styles1.css' %}">
+    <script src="{% static 'tu_aplicacion/js/detalle.js' %}" defer></script>
+</head>
+<body>
+    <h2>Editar Hecho Económico</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Guardar</button>
+    </form>
+    <h3>Detalles</h3>
+    <form method="get">
+        <input type="text" name="search" id="searchInput" placeholder="Buscar..." value="{{ search_text }}">
+        <button type="submit">Buscar</button>
+    </form>
+    <table id="order-listing">
+        <thead>
+            <tr>
+                <th>Producto</th>
+                <th>Subcuenta</th>
+                <th>Concepto</th>
+                <th>Valor</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for detalle in detalles %}
+                <tr data-id="{{ detalle.id }}">
+                    <td>{{ detalle.producto }}</td>
+                    <td>{{ detalle.subcuenta }}</td>
+                    <td>{{ detalle.concepto }}</td>
+                    <td>{{ detalle.valor }}</td>
+                    <td>
+                        <button onclick="editarDetalle({{ detalle.id }})">Editar</button>
+                        <button onclick="eliminarDetalle({{ detalle.id }})">Eliminar</button>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Controles de paginación -->
+    <div class="pagination">
+        <span class="step-links">
+            {% if detalles.has_previous %}
+                <a href="?page=1{% if search_text %}&search={{ search_text }}{% endif %}">&laquo; Primero</a>
+                <a href="?page={{ detalles.previous_page_number }}{% if search_text %}&search={{ search_text }}{% endif %}">Anterior</a>
+            {% endif %}
+
+            <span class="current">
+                Página {{ detalles.number }} de {{ detalles.paginator.num_pages }}.
+            </span>
+
+            {% if detalles.has_next %}
+                <a href="?page={{ detalles.next_page_number }}{% if search_text %}&search={{ search_text }}{% endif %}">Siguiente</a>
+                <a href="?page={{ detalles.paginator.num_pages }}{% if search_text %}&search={{ search_text }}{% endif %}">Último &raquo;</a>
+            {% endif %}
+        </span>
+    </div>
+
+    <button onclick="mostrarFormularioAgregar()">Agregar Detalle</button>
+    <div id="formulario-agregar" style="display:none;">
+        <h3>Agregar Detalle</h3>
+        <input type="text" id="producto" placeholder="Producto">
+        <input type="text" id="subcuenta" placeholder="Subcuenta">
+        <input type="text" id="concepto" placeholder="Concepto">
+        <input type="number" id="valor" placeholder="Valor">
+        <button onclick="agregarDetalle({{ hecho_econo.id }})">Agregar</button>
+        <button onclick="ocultarFormularioAgregar()">Cancelar</button>
+    </div>
+    <div id="page-controls"></div>
+</body>
+</html>

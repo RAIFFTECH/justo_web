@@ -1,0 +1,603 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% load crispy_forms_tags %}
+{% block content %}
+
+<div class="container mt-5">
+    <h1>{% if form.instance.pk %}Editar{% else %}Crear{% endif %} Cierre de Caja</h1>
+    <div class="col-md-12 grid-margin stretch-card rounded-5">
+        <div class="card rounded-5">
+            <div class="card-body">
+                <form id="miCierreCaja" method="post" >
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <label for="id_cajero">Cajero</label>
+                            {{ form.cajero }}
+                        </div>
+                        <!-- <div class="col-md-3 mb-3">
+                            <label for="cajero">Cajero</label>
+                            <input type=N"text" class="form-control border border-secondary rounded" id="cajero" name="cajero" placeholder="Seleccione un Cajero">
+                        </div> -->
+                        <div class="col-md-3 mb-3">
+                            <label for="id_fecha">Fecha</label>
+                            {{ form.fecha }}
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label for="jornada">Jornada</label>
+                            {{ form.jornada }}
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <label for="cierre">Cierre de Caja?</label>
+                            {{ form.cerrado }}
+                        </div>
+                        <!-- <div class="col-md-3 mb-3"> -->
+                            
+                        <!-- </div> -->
+                        <div class="col-md-3 mb-3">
+                            <label for="saldo_ini">Saldo Inicial</label>
+                            <input type="text" class="form-control border border-secondary rounded" id="saldo_ini" name="saldo_ini">
+                        </div>
+                        
+                        <script>
+                            document.addEventListener('DOMContentLoaded', function () {
+                                const saldoFinInput = document.getElementById('saldo_ini');
+                                if (saldoFinInput) {
+                                    // Formatear al escribir
+                                    saldoFinInput.addEventListener('input', function (e) {
+                                        // Eliminar caracteres no numéricos y comas
+                                        let value = this.value.replace(/[^0-9]/g, '').replace(/,/g, '');
+                                        // Si hay un valor válido, aplicar separadores de miles
+                                        if (value) {
+                                            this.value = parseInt(value, 10).toLocaleString('en-US');
+                                        } else {
+                                            this.value = ''; // Si está vacío o no válido
+                                        }
+                                    });
+                                    // Validar y limpiar el valor al perder el foco (opcional)
+                                    saldoFinInput.addEventListener('blur', function () {
+                                        let value = this.value.replace(/,/g, ''); // Eliminar comas para validación
+                                        if (isNaN(value) || value === '') {
+                                            this.value = ''; // Limpiar si no es un número válido
+                                        } else {
+                                            // Asegurar que esté formateado correctamente
+                                            this.value = parseInt(value, 10).toLocaleString('en-US');
+                                        }
+                                    });
+                                }
+                            });
+                        </script>
+                        <!-- <div class="col-md-3 mb-3">
+                            
+                        </div> -->
+                        <div class="col-md-3 mb-3">
+                            <label for="debitos">Movimientos Débito</label>
+                            <input type="text" class="form-control border border-secondary rounded" id="debitos" name="debitos">
+                        </div>
+                        
+                        <script>
+                            document.addEventListener('DOMContentLoaded', function () {
+                                const saldoFinInput = document.getElementById('debitos');
+                                if (saldoFinInput) {
+                                    // Formatear al escribir
+                                    saldoFinInput.addEventListener('input', function (e) {
+                                        // Eliminar caracteres no numéricos y comas
+                                        let value = this.value.replace(/[^0-9]/g, '').replace(/,/g, '');
+                                        // Si hay un valor válido, aplicar separadores de miles
+                                        if (value) {
+                                            this.value = parseInt(value, 10).toLocaleString('en-US');
+                                        } else {
+                                            this.value = ''; // Si está vacío o no válido
+                                        }
+                                    });
+                                    // Validar y limpiar el valor al perder el foco (opcional)
+                                    saldoFinInput.addEventListener('blur', function () {
+                                        let value = this.value.replace(/,/g, ''); // Eliminar comas para validación
+                                        if (isNaN(value) || value === '') {
+                                            this.value = ''; // Limpiar si no es un número válido
+                                        } else {
+                                            // Asegurar que esté formateado correctamente
+                                            this.value = parseInt(value, 10).toLocaleString('en-US');
+                                        }
+                                    });
+                                }
+                            });
+                        </script>
+                        <!-- <div class="col-md-3 mb-3">
+                           
+                        </div> -->
+                        <div class="col-md-3 mb-3">
+                            <label for="creditos">Movimientos Crédito</label>
+                            <input type="text" class="form-control border border-secondary rounded" id="creditos" name="creditos">
+                        </div>
+                        
+                        <script>
+                            document.addEventListener('DOMContentLoaded', function () {
+                                const saldoFinInput = document.getElementById('creditos');
+                                if (saldoFinInput) {
+                                    // Formatear al escribir
+                                    saldoFinInput.addEventListener('input', function (e) {
+                                        // Eliminar caracteres no numéricos y comas
+                                        let value = this.value.replace(/[^0-9]/g, '').replace(/,/g, '');
+                                        // Si hay un valor válido, aplicar separadores de miles
+                                        if (value) {
+                                            this.value = parseInt(value, 10).toLocaleString('en-US');
+                                        } else {
+                                            this.value = ''; // Si está vacío o no válido
+                                        }
+                                    });
+                                    // Validar y limpiar el valor al perder el foco (opcional)
+                                    saldoFinInput.addEventListener('blur', function () {
+                                        let value = this.value.replace(/,/g, ''); // Eliminar comas para validación
+                                        if (isNaN(value) || value === '') {
+                                            this.value = ''; // Limpiar si no es un número válido
+                                        } else {
+                                            // Asegurar que esté formateado correctamente
+                                            this.value = parseInt(value, 10).toLocaleString('en-US');
+                                        }
+                                    });
+                                }
+                            });
+                        </script>
+                        <!-- <div class="col-md-3 mb-3">
+                            
+                        </div> -->
+                        <div class="col-md-3 mb-3">
+                            <label for="val_che_dev">Valor Cheques Devueltos</label>
+                            <input type="text" class="form-control border border-secondary rounded" id="val_che_dev" name="val_che_dev" placeholder="Ingrese Valor Cheques Devueltos">
+                        </div>
+                        
+                        <script>
+                            document.addEventListener('DOMContentLoaded', function () {
+                                const saldoFinInput = document.getElementById('val_che_dev');
+                                if (saldoFinInput) {
+                                    // Formatear al escribir
+                                    saldoFinInput.addEventListener('input', function (e) {
+                                        // Eliminar caracteres no numéricos y comas
+                                        let value = this.value.replace(/[^0-9]/g, '').replace(/,/g, '');
+                                        // Si hay un valor válido, aplicar separadores de miles
+                                        if (value) {
+                                            this.value = parseInt(value, 10).toLocaleString('en-US');
+                                        } else {
+                                            this.value = ''; // Si está vacío o no válido
+                                        }
+                                    });
+                                    // Validar y limpiar el valor al perder el foco (opcional)
+                                    saldoFinInput.addEventListener('blur', function () {
+                                        let value = this.value.replace(/,/g, ''); // Eliminar comas para validación
+                                        if (isNaN(value) || value === '') {
+                                            this.value = ''; // Limpiar si no es un número válido
+                                        } else {
+                                            // Asegurar que esté formateado correctamente
+                                            this.value = parseInt(value, 10).toLocaleString('en-US');
+                                        }
+                                    });
+                                }
+                            });
+                        </script>
+                        <!-- <div class="col-md-3 mb-3">
+                            
+                        </div> -->
+                        <div class="col-md-3 mb-3">
+                            <label for="saldo_fin">Saldo Final</label>
+                            <input type="text" class="form-control border border-secondary rounded" id="saldo_fin" name="saldo_fin" placeholder="Ingrese saldo final">
+                        </div>
+                        
+                        <script>
+                            document.addEventListener('DOMContentLoaded', function () {
+                                const saldoFinInput = document.getElementById('saldo_fin');
+                                if (saldoFinInput) {
+                                    // Formatear al escribir
+                                    saldoFinInput.addEventListener('input', function (e) {
+                                        // Eliminar caracteres no numéricos y comas
+                                        let value = this.value.replace(/[^0-9]/g, '').replace(/,/g, '');
+                                        // Si hay un valor válido, aplicar separadores de miles
+                                        if (value) {
+                                            this.value = parseInt(value, 10).toLocaleString('en-US');
+                                        } else {
+                                            this.value = ''; // Si está vacío o no válido
+                                        }
+                                    });
+                                    // Validar y limpiar el valor al perder el foco (opcional)
+                                    saldoFinInput.addEventListener('blur', function () {
+                                        let value = this.value.replace(/,/g, ''); // Eliminar comas para validación
+                                        if (isNaN(value) || value === '') {
+                                            this.value = ''; // Limpiar si no es un número válido
+                                        } else {
+                                            // Asegurar que esté formateado correctamente
+                                            this.value = parseInt(value, 10).toLocaleString('en-US');
+                                        }
+                                    });
+                                }
+                            });
+                        </script>
+
+                        <!-- <div class="col-md-3 mb-3">
+                           
+                        </div> -->
+                        <div class="col-md-3 mb-3">
+                            <label for="diferencia">Diferencia</label>
+                            <input type="text" class="form-control border border-secondary rounded" id="diferencia" name="diferencia">
+                        </div>
+                        
+                        <script>
+                            document.addEventListener('DOMContentLoaded', function () {
+                                const saldoFinInput = document.getElementById('diferencia');
+                                if (saldoFinInput) {
+                                    // Formatear al escribir
+                                    saldoFinInput.addEventListener('input', function (e) {
+                                        // Eliminar caracteres no numéricos y comas
+                                        let value = this.value.replace(/[^0-9]/g, '').replace(/,/g, '');
+                                        // Si hay un valor válido, aplicar separadores de miles
+                                        if (value) {
+                                            this.value = parseInt(value, 10).toLocaleString('en-US');
+                                        } else {
+                                            this.value = ''; // Si está vacío o no válido
+                                        }
+                                    });
+                                    // Validar y limpiar el valor al perder el foco (opcional)
+                                    saldoFinInput.addEventListener('blur', function () {
+                                        let value = this.value.replace(/,/g, ''); // Eliminar comas para validación
+                                        if (isNaN(value) || value === '') {
+                                            this.value = ''; // Limpiar si no es un número válido
+                                        } else {
+                                            // Asegurar que esté formateado correctamente
+                                            this.value = parseInt(value, 10).toLocaleString('en-US');
+                                        }
+                                    });
+                                }
+                            });
+                        </script>
+                        <!-- <div class="col-md-3 mb-3">
+                           
+                        </div> -->
+                        <div class="col-md-3 mb-3">
+                            <label for="val_cheques">Valor Cheques</label>
+                            <input type="text" class="form-control border border-secondary rounded" id="val_cheques" name="val_cheques" placeholder="Ingrese Valor en Cheques">
+                        </div>
+                        
+                        <script>
+                            document.addEventListener('DOMContentLoaded', function () {
+                                const saldoFinInput = document.getElementById('val_cheques');
+                                if (saldoFinInput) {
+                                    // Formatear al escribir
+                                    saldoFinInput.addEventListener('input', function (e) {
+                                        // Eliminar caracteres no numéricos y comas
+                                        let value = this.value.replace(/[^0-9]/g, '').replace(/,/g, '');
+                                        // Si hay un valor válido, aplicar separadores de miles
+                                        if (value) {
+                                            this.value = parseInt(value, 10).toLocaleString('en-US');
+                                        } else {
+                                            this.value = ''; // Si está vacío o no válido
+                                        }
+                                    });
+                                    // Validar y limpiar el valor al perder el foco (opcional)
+                                    saldoFinInput.addEventListener('blur', function () {
+                                        let value = this.value.replace(/,/g, ''); // Eliminar comas para validación
+                                        if (isNaN(value) || value === '') {
+                                            this.value = ''; // Limpiar si no es un número válido
+                                        } else {
+                                            // Asegurar que esté formateado correctamente
+                                            this.value = parseInt(value, 10).toLocaleString('en-US');
+                                        }
+                                    });
+                                }
+                            });
+                        </script>
+                        <!-- <div class="col-md-3 mb-3">
+                           
+                        </div> -->
+                        <div class="col-md-3 mb-3">
+                            <label for="val_vales">Valor Vales</label>
+                            <input type="text" class="form-control border border-secondary rounded" id="val_vales" name="val_vales" placeholder="Ingrese Valor en Vales">
+                        </div>
+                        
+                        <script>
+                            document.addEventListener('DOMContentLoaded', function () {
+                                const saldoFinInput = document.getElementById('val_vales');
+                                if (saldoFinInput) {
+                                    // Formatear al escribir
+                                    saldoFinInput.addEventListener('input', function (e) {
+                                        // Eliminar caracteres no numéricos y comas
+                                        let value = this.value.replace(/[^0-9]/g, '').replace(/,/g, '');
+                                        // Si hay un valor válido, aplicar separadores de miles
+                                        if (value) {
+                                            this.value = parseInt(value, 10).toLocaleString('en-US');
+                                        } else {
+                                            this.value = ''; // Si está vacío o no válido
+                                        }
+                                    });
+                                    // Validar y limpiar el valor al perder el foco (opcional)
+                                    saldoFinInput.addEventListener('blur', function () {
+                                        let value = this.value.replace(/,/g, ''); // Eliminar comas para validación
+                                        if (isNaN(value) || value === '') {
+                                            this.value = ''; // Limpiar si no es un número válido
+                                        } else {
+                                            // Asegurar que esté formateado correctamente
+                                            this.value = parseInt(value, 10).toLocaleString('en-US');
+                                        }
+                                    });
+                                }
+                            });
+                        </script>
+
+                        <!-- Campo Dinero en Efectivo --> 
+                        <div class="col-md-6 mb-3 ">
+                            <label for="dinero-efectivo">Dinero en Efectivo</label>
+                            <table class="table table-sm table-bordered" id="dinero-efectivo">
+                                <thead>
+                                    <tr>
+                                        <th>Denominación</th>
+                                        <th>Cantidad</th>
+                                        <th>Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for denominacion in denominaciones %}
+                                    <tr>
+                                        <td>{{ denominacion|intcomma }}</td>
+                                        <td class="text-end">
+                                            <input type="number" class="form-control cantidad" data-denominacion="{{ denominacion }}" value="0" min="0" onchange="updateTotal(this)">
+                                        </td>
+                                        <td class="total text-end">0</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                                <tfoot>
+                                    <tr class="text-end">
+                                        <th colspan="2" class="text-end">Total General:</th>
+                                        <th id="total-general">0</th>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                        
+                        <!-- Campo oculto para almacenar el JSON de monedas -->
+                        <div style="display:none;">
+                            {{ form.monedas }}
+                        </div>
+                        </div>
+                        <button type="button" name="accion" value="cerrar" title="Cerrar" 
+                            class="btn btn-success btn-light rounded-pill" id="cerrarBtn">
+                            <i class="bi bi-journal-arrow-down"></i> Cerrar
+                        </button>
+                        <button type="button" class="btn btn-danger" onclick="window.location.href='{% url 'mov_caja_list' %}';"><i class="bi bi-x-square"></i> Cancelar</button>
+                        
+                        <button type="button" id="btnImprimir" title="Imprimir"
+                            class="btn btn-light rounded-pill">
+                            <i class="bi bi-printer-fill"></i> Imp. Movi
+                        </button>
+
+
+                        <button type="submit" name="accion" value="imprimir_cierre" target="_blank" title="Imprimir"
+                            class="btn btn-light rounded-pill"><i class="bi bi-printer-fill"></i> Imp. Cierre</button>
+                        <button type="submit" name="accion" value="exportar_cierre" target="_blank" title="Exportar"
+                            class="btn btn-light rounded-pill"><i class="bi bi-box-arrow-down"></i> Exp. Cierre</button>
+                        
+                        <!-- Botón para reporte de movimientos -->
+                        <a href="{% url 'reporte_caja' %}?tipo_reporte=movimientos" target="_blank" class="btn btn-light rounded-pill"><i class="bi bi-box-arrow-down"></i> Movimientos
+                        </a>
+                        
+                        <!-- Botón para reporte de cierre -->
+                        <a href="{% url 'reporte_caja' %}?tipo_reporte=cierre" target="_blank" class="btn btn-success">
+                            Generar Reporte de Cierre
+                        </a>
+                        
+                </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const fechaField = document.getElementById('id_fecha');
+        if (fechaField) {
+            fechaField.addEventListener('blur', function() {
+                const selectCajero = document.getElementById('id_cajero'); // Ajusta 'id_cajero' si es necesario
+                if (selectCajero) {
+                    const valorIdCajero = selectCajero.value;
+                    const fechaValue = fechaField.value; 
+                    let url = `${window.location.origin}/movimientos/saldos_cajero_dia/?id_cajero=${valorIdCajero}&fecha=${fechaValue}`;
+                    console.log('url ----> ',url);
+                    fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': getCookie('csrftoken')
+                        },
+                        body: JSON.stringify({ fecha: fechaValue })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Respuesta del servidor:', data);
+                        document.getElementById('saldo_ini').value = data.saldo_anterior;
+                        document.getElementById('debitos').value = data.tot_debitos;
+                        document.getElementById('creditos').value = data.tot_creditos;
+                        
+
+                    })
+                    .catch(error => console.error('Error en la solicitud:', error));
+                
+                }
+            }); // <-- Paréntesis corregido
+        }
+
+        // Función para obtener el CSRF token
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    });
+</script>
+
+
+<script>
+    // Función para agregar separador de miles
+    function formatNumber(num) {
+        return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    }
+
+    // Actualiza el total por denominación y el total general
+    function updateTotal(input) {
+        const row = input.closest('tr'); // Encuentra la fila actual
+        const denominacion = parseInt(input.getAttribute('data-denominacion')); // Obtiene la denominación
+        const cantidad = parseInt(input.value) || 0; // Obtiene la cantidad (valor por defecto 0)
+        const total = denominacion * cantidad; // Calcula el total
+        const totalCell = row.querySelector('.total'); // Encuentra la celda del total
+
+        // Actualiza el contenido de la celda con el total formateado
+        totalCell.textContent = formatNumber(total);
+
+        // Actualiza el total general
+        updateTotalGeneral();
+    }
+
+    // Calcula y actualiza el total general
+    function updateTotalGeneral() {
+        const totalCells = document.querySelectorAll('.total'); // Todas las celdas de totales
+        let totalGeneral = 0;
+
+        // Suma los valores numéricos de todas las celdas de totales
+        totalCells.forEach(cell => {
+            const total = parseInt(cell.textContent.replace(/\./g, '')) || 0; // Elimina los puntos y convierte a número
+            totalGeneral += total;
+        });
+
+        // Actualiza la celda del total general con formato
+        const totalGeneralCell = document.getElementById('total-general');
+        totalGeneralCell.textContent = formatNumber(totalGeneral);
+    }
+</script>
+
+<script>
+    $(document).ready(function() {
+        $('#cerrarBtn').on('click', function() {
+            console.log('Botón cerrar presionado');
+            const fechaField = document.getElementById('id_fecha').value;
+            const selectCajero = document.getElementById('id_cajero'); 
+            const saldo_ini = document.getElementById('saldo_ini')?.value || null;
+            const debitos = document.getElementById('debitos')?.value || null;
+            console.log('Debitos ----> ',debitos+20);
+            const creditos = document.getElementById('creditos')?.value || null;
+            const val_che_dev = document.getElementById('val_che_dev')?.value || null;
+            const saldo_fin = document.getElementById('saldo_fin')?.value || null;
+            const diferencia = document.getElementById('diferencia')?.value || null;
+            const val_cheques = document.getElementById('val_cheques')?.value || null;
+            const val_vales = document.getElementById('val_vales')?.value || null;
+
+
+            if (selectCajero) {
+                const valorIdCajero = selectCajero.value;
+                const filas = document.querySelectorAll('#dinero-efectivo tbody tr');
+                const monedas = []; 
+                filas.forEach(fila => {
+                    const denominacion = fila.querySelector('td:first-child').textContent.trim(); // Texto de la primera columna
+                    const cantidad = fila.querySelector('.cantidad').value.trim(); // Valor del input de la segunda columna
+                    monedas.push({
+                        denominacion: parseFloat(denominacion.replace(/,/g, '')) || 0, // Convertir denominación a número
+                        cantidad: parseInt(cantidad) || 0, // Convertir cantidad a número
+                    });
+                });
+                const datos = {
+                    fecha   : fechaField ,
+                    cajero  : valorIdCajero,
+                    saldo_ini : saldo_ini,
+                    debitos : debitos,
+                    creditos : creditos,
+                    val_che_dev : val_che_dev,
+                    saldo_fin : saldo_fin,
+                    diferencia : diferencia,
+                    val_cheques : val_cheques,
+                    val_vales : val_vales,
+                    monedas : monedas,
+                };
+                console.log('Datos ---> ',datos);
+                $.ajax({
+                    url: "{% url 'mov_caja_create' %}", // URL Django
+                    type: "POST", // Método de envío
+                    data: JSON.stringify(datos), // Enviar solo el arreglo como JSON
+                    contentType: "application/json", // Tipo de contenido
+                    headers: {
+                        "X-CSRFToken": "{{ csrf_token }}" // Incluir el token CSRF
+                    },
+                    success: function(response) {
+                        console.log('Respuesta exitosa:', response);
+                        // Realizar acciones adicionales con la respuesta
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error al enviar datos:', error);
+                    }
+                });
+            }
+        });
+    });
+</script>
+
+
+//   para imprimir movimientos del dia cajero
+<script>
+    document.getElementById("btnImprimir").addEventListener("click", function () {
+        console.log('Botón para imprimirMovimientos   presionado');
+        const fechaField = document.getElementById('id_fecha').value;
+        const selectCajero = document.getElementById('id_cajero'); 
+        if (selectCajero) {
+            const idCajero = selectCajero.value;
+            if (!idCajero || !fechaField) {
+                alert("Por favor, asegúrate de que los campos están completos.");
+                return;
+            }
+
+            const data = {
+                id_cajero: idCajero,
+                fecha: fechaField,
+            };
+        
+            fetch("/movimientos/reporte-caja/", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": getCSRFToken(), // Añadir el token CSRF si es necesario
+                },
+                body: JSON.stringify(data),
+            })
+            .then(response => {
+            if (!response.ok) {
+                throw new Error("Error al generar el PDF");
+            }
+            return response.blob(); // Procesa la respuesta como blob
+            })
+            .then(blob => {
+                const pdfURL = window.URL.createObjectURL(blob); // Crea una URL temporal para el PDF
+                window.open(pdfURL, "_blank"); // Abre la URL en una nueva pestaña
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                alert("Ocurrió un error al intentar generar el PDF.");
+            });
+        };
+    });
+
+    // Función para obtener el token CSRF
+    function getCSRFToken() {
+        const cookieValue = document.cookie
+            .split("; ")
+            .find(row => row.startsWith("csrftoken="))
+            ?.split("=")[1];
+        return cookieValue || "";
+    }
+</script>
+
+
+
+{% endblock %}
+

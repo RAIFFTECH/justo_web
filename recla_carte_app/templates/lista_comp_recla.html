@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+{% block content %}
+
+<style>
+  table.sin-espacio-columnas {
+    border-collapse: collapse;
+  }
+
+  table.sin-espacio-columnas td {
+    padding: 0.25rem 0.5rem; /* o ajústalo a lo que necesites */
+  }
+</style>
+
+<h3>Reclasificacion y Perdida Esperada de Cartera del año</h3>
+<div class="col-md-12 grid-margin stretch-card mb-0 rounded-5">
+		<div class="card rounded-5">
+			<div class="card-body">
+          <table class="table sin-espacio-columnas">
+            <thead>
+              <tr>
+                <th>Numero</th>
+                <th>Fecha</th>
+                <th>#Reg. Modelo</th>
+                <th>Generado</th>
+                <th>Protegido</th>
+                <th>Registros</th>
+                <th>Cuadrado</th>
+                <th>Errores</th>
+                <th>Opciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for fila in filas %}
+                <tr>
+                  <td>{{ fila.numero }}</td>  
+                  <td>{{ fila.fecha}}</td>
+                  <td>{{ fila.RegModelo }}</td>
+                  <td>{{ fila.generado }}</td>
+                  <td>{{ fila.protegido }}</td>
+                  <td>{{ fila.cantidad }}</td>
+                  <td>{{ fila.cuadrado }}</td>
+                  <td>{{ fila.errores }}</td>
+                  <td class="p-0 m-0">
+                    {% for icono in fila.iconos %}
+                      <span class="me-1">{{ icono }}</span>
+                    {% endfor %}
+                  </td>
+                  <td>
+                    <div class="d-flex justify-content-start">
+                      <a href="{% url 'liquidar_asiento' numero=fila.numero %}" class="btn btn-outline-primary btn-sm p-1 mx-1" title="Generar Comprobante">
+                        <i class="fas fa-file-invoice"></i>
+                      </a>
+                      <a href="{% url 'ver_resumen_pe' fecha=fila.fecha %}"
+                        class="btn btn-outline-info btn-sm p-1 mx-1"
+                        title="Ver Resumen">
+                        <i class="fas fa-eye"></i>
+                      </a>
+                      <a href="{% url 'deterioro_de_cartera' fecha=fila.fecha %}"
+                        class="btn btn-outline-danger btn-sm p-1 mx-1"
+                        title="Deterioro de Cartera">
+                        <i class="fas fa-chart-line" style="color: red; transform: rotate(180deg);"></i>
+                      </a>
+                      <a href="{% url 'comprobante_pe' fecha=fila.fecha %}"
+                        class="btn btn-outline-success btn-sm p-1 mx-1"
+                        title="Exportar Comprobante PE a Excel">
+                        <i class="fas fa-file-excel"></i>
+                      </a>
+                      <a href="{% url 'catego_pe' fecha=fila.fecha %}" class="btn btn-outline-warning btn-sm p-1 mx-1" title="Exportar PE">
+                        <i class="fas fa-file-download"></i>
+                      </a>
+                      <a href="{% url 'rpki_pe' fecha=fila.fecha %}" class="btn btn-outline-secondary btn-sm p-1 mx-1" title="Exportar Liquidación">
+                        <i class="fas fa-file-alt"></i>
+                      </a>
+                    </div>
+                  </td>
+
+              <!-- Iconos adicionales para cada fila (si los hay) -->
+                {% for icono in fila.iconos %}
+                  <span>{{ icono }}</span>
+                {% endfor %}
+              </td>
+
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+      </div>
+    </div>
+</div>
+{% endblock %}
+
+
+

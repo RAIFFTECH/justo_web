@@ -1,0 +1,8 @@
+<!-- detalle_prod_list.html -->
+<ul>
+    {% for detalle in object_list %}
+        <li>{{ detalle.producto }} - {{ detalle.subcuenta }} - {{ detalle.concepto }} - {{ detalle.valor }}</li>
+    {% empty %}
+        <li>No hay registros</li>
+    {% endfor %}
+</ul>

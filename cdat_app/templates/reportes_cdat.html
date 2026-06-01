@@ -1,0 +1,157 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% load humanize %}
+{% block content %}
+
+<style>
+    /* Ajustar el ancho del campo de directorio */
+    /* Asegurar que el texto no sea transparente */
+    body {
+        color: #000; /* Negro para mejor visibilidad */
+    }
+
+/* Ajustar el tamaño y el color de las etiquetas */
+    label {
+        font-size: 16px;
+        font-weight: bold;
+        color: #000; /* Asegurar que el texto es visible */
+    }
+
+/* Alinear los radio botones en la misma línea */
+    .radio-group {
+        display: flex;
+        align-items: center;
+        gap: 10px; /* Espaciado entre elementos */
+    }
+
+/* Ajustar el tamaño del campo de directorio */
+    #directorio {
+        max-width: 300px;
+    }
+
+/* Alinear los botones a la izquierda */
+    .d-flex {
+        justify-content: flex-start;
+    }
+    #reporteForm > div {
+        margin-bottom: 30px;
+    }
+    .campos-inline {
+        display: flex;
+        align-items: center;
+        gap: 10px; /* Espacio entre el label y el input */
+    }
+
+    .campos-inline label {
+        min-width: 150px; /* Ajusta el ancho del label según necesidad */   
+    }
+
+    .campos-inline input {
+        flex: 1; /* Permite que el input ocupe el espacio restante */
+        max-width: 300px; /* Limita el ancho del input */
+    }
+
+    .btn-custom {
+        border-radius: 20px; /* Hace que los botones sean ovalados */
+        background-color: #4a5568; /* Color de fondo sobrio (gris oscuro) */
+        color: white; /* Texto en blanco */
+        border: none; /* Elimina los bordes */
+        padding: 10px 20px; /* Espaciado interno */
+        font-size: 16px;
+        cursor: pointer;
+        transition: background-color 0.3s ease-in-out;
+    }
+
+    .btn-custom:hover {
+        background-color: #2d3748; /* Un tono más oscuro al pasar el mouse */
+    }
+
+</style>
+
+<div class="container">
+    <h2 class="text-center mb-4">Generación de Reportes Cdats</h2>
+
+    <!-- Formulario -->
+    <form id="reporteForm" method="POST">
+        {% csrf_token %}
+
+        <!-- Incluir el componente de fecha -->
+      
+        
+
+        <!-- Selección de formato (radio buttons) -->
+        <div class="radio-group">
+            <label>Formato:</label>
+            <input type="radio" id="pdf" name="formato" value="pdf" checked>
+            <label for="pdf">PDF</label>
+        
+            <input type="radio" id="excel" name="formato" value="xlsx">
+            <label for="excel">Excel</label>
+        </div>        
+        
+        <!-- Selección de directorio y nombre de archivo -->
+        <div class="mb-3 campos-inline">
+            <label for="directorio" class="form-label">Directorio de destino:</label>
+            <input type="text" id="directorio" class="form-control" value="C:\justo_reportes\" readonly disabled>
+            <input type="hidden" name="directorio" value="C:\justo_reportes"> <!-- Asegura que se envíe -->
+        </div>
+        
+        <!-- Campo de Nombre de Archivo -->
+        <div class="mb-3 campos-inline">
+            <label for="nombre_archivo" class="form-label">Nombre del archivo:</label>
+            <input type="text" id="nombre_archivo" name="nombre_archivo" class="form-control" placeholder="Ej: balance" required>
+        </div>
+
+        <!-- Botones alineados a la izquierda -->
+        <div class="d-flex gap-2">
+            <button type="button" class="btn-custom" onclick="enviarFormulario('vencidos')">Cdats Vencidos</button>
+            <button type="button" class="btn-custom" onclick="enviarFormulario('interes')">Comprobantes de Interés</button>
+            <button type="button" class="btn-custom" onclick="enviarFormulario('mensual')">Reporte Mensual Cdats</button>
+            <button type="button" class="btn-custom" onclick="salir()">Salir</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    function enviarFormulario(accion) {
+        let form = document.getElementById("reporteForm");
+        let nombreArchivo = document.getElementById("nombre_archivo").value.trim();
+        let formato = document.querySelector('input[name="formato"]:checked');
+        
+        if (!formato) {
+            alert("Por favor, seleccione un formato (PDF o Excel).");
+            return;
+        }
+    
+        let extension = formato.value === "pdf" ? ".pdf" : ".xlsx";
+        
+        // Asegurar que el nombre del archivo tenga la extensión correcta
+        if (!nombreArchivo.endsWith(extension)) {
+            document.getElementById("nombre_archivo").value = nombreArchivo + extension;
+        }
+
+        // Definir la URL según la acción seleccionada
+        let urls = {
+            "vencidos": "{% url 'impCdatsVencidos' %}",
+            "interes": "{% url 'impCdatsVencidos' %}",
+            "mensual": "{% url 'impCdatsVencidos' %}"
+        };
+
+        // Cambiar la acción del formulario antes de enviarlo
+        form.action = urls[accion];
+        form.submit();
+    }
+
+    function salir() {
+        if (document.referrer && document.referrer !== window.location.href) {
+            console.log("Regresando a la página anterior:", document.referrer);
+            window.location.href = document.referrer;
+        } else {
+            console.log("No hay página anterior, redirigiendo a inicio...");
+            window.location.href = "{% url 'listar_cdats' %}"; 
+        }
+    }
+</script>
+    
+{% endblock %}

@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+<div class="content-wrapper">
+    <div class="page-header">
+        <h2 class=" text-primary">Estado de Resultados </h2>
+    </div>
+    <div class="col-md-12 grid-margin stretch-card rounded-5">
+        <div class="card rounded-5">
+            <div class="card-body">
+                <form action="{% url 'estado_resultados' %}" method="post">
+                    {% csrf_token %}
+                    <!-- <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="fec_ini">Fecha Inicial:</label>
+                            <input type="date" id="fec_ini" name="fec_ini">
+                        </div>
+                    </div> -->
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="fec_fin">Fecha Final:</label>
+                            <input type="date" id="fec_fin" name="fec_fin">
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="cta_ini">Cuenta Inicial:</label>
+                            <input type="text" id="cta_ini" name="cta_ini">
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="cta_fin">Cuenta Final:</label>
+                            <input type="text" id="cta_fin" name="cta_fin">
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="con_cierre">Con Cierre:</label>
+                            <select id="con_cierre" name="con_cierre">
+                                <option value="S">Sí</option>
+                                <option value="N">No</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit" name="accion" value="imprimir" target="_blank" title="Imprimir" 
+                        class="btn btn-light rounded-pill"><i class="bi bi-printer-fill"></i> Imprimir</button>
+                    <button type="submit" name="accion" value="exportar" target="_blank" title="Exportar" 
+                        class="btn btn-light rounded-pill"><i class="bi bi-box-arrow-down"></i> Exportar</button>
+                    <button type="submit" name="accion" value="csv" target="_blank" title="CSV" 
+                        class="btn btn-light rounded-pill"><i class="bi bi-filetype-csv"></i> CSV</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

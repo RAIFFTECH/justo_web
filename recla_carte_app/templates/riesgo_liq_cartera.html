@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="content-wrapper">
+    <div class="page-header">
+        <h2 class="text-primary">Riesgo de Liquidez de Cartera</h2>
+    </div>
+
+    <div class="col-md-12 grid-margin stretch-card rounded-5">
+        <div class="card rounded-5 shadow-sm">
+            <div class="card-body">
+                <form id="riego-form" action="{% url 'rie_liq_cartera' %}" method="post" target="_blank">
+                    {% csrf_token %}
+                    <div class="row mb-3 align-items-end">
+                        <div class="col-md-3">
+                            <label for="fecha_corte" class="form-label fw-bold">Fecha de Corte:</label>
+                            <input type="date" id="fecha_corte" name="fecha_corte" class="form-control" required>
+                        </div>
+
+                        <div class="col-md-3">
+                            <div class="form-check mt-4">
+                                <input class="form-check-input" type="checkbox" value="1" id="por_semanas" name="por_semanas">
+                                <label class="form-check-label" for="por_semanas">
+                                    Por Semanas
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-4">
+                        <div class="col-md-12 d-flex gap-3">
+                            <!-- Botón para resumen PDF -->
+                            <button type="submit" class="btn btn-success rounded-pill" name="accion" value="pdf">
+                                <i class="bi bi-file-earmark-pdf"></i> Resumen PDF
+                            </button>
+
+                            <!-- Botón para detallado Excel -->
+                            <button type="submit" class="btn btn-primary rounded-pill" name="accion" value="excel">
+                                <i class="bi bi-file-earmark-excel"></i> Detallado Excel
+                            </button>
+
+                            <!-- Botón para retornar -->
+                            <a href="javascript:history.back()" class="btn btn-secondary rounded-pill">
+                                <i class="bi bi-arrow-left-circle"></i> Retornar
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="row mt-3">
+                        <div class="col-md-12">
+                            <div id="mensaje-espera" class="alert alert-info d-none" role="alert">
+                                <i class="bi bi-hourglass-split"></i> Procesando... Por favor espere mientras generamos su reporte.
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    window.onload = function () {
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('fecha_corte').value = today;
+    };
+
+    document.getElementById("riego-form").addEventListener("submit", function () {
+        document.getElementById("mensaje-espera").classList.remove("d-none");
+    });
+</script>
+{% endblock %}

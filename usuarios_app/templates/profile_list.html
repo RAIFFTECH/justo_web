@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Lista de Perfiles{% endblock %}
+{% block content %}
+
+<style>
+    .profile-photo {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+</style>
+<div class="container">
+    <h2><i class="fas fa-users"></i> Lista de Perfiles de Usuario</h2>
+    <a href="{% url 'profile_create' %}" class="btn btn-success"><i class="fas fa-user-plus"></i> Crear nuevo perfil</a>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Foto</th>
+                <th>Usuario</th>
+                <th>Oficina</th>
+                <th>Bio</th>
+                <th>Fecha de nacimiento</th>
+                <th>Activo</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for profile in profiles %}
+            <tr>
+                <td>
+                    {% if profile.photo %}
+                        <img src="{{ profile.photo.url }}" alt="Foto de {{ profile.user.username }}" class="profile-photo">
+                    {% else %}
+                        <i class="fas fa-user-circle fa-2x"></i> <!-- Icono de usuario en caso de no tener foto -->
+                    {% endif %}
+                </td>
+                <td>{{ profile.user.username }}</td>
+                <td>{{ profile.oficina }}</td>
+                <td>{{ profile.bio|truncatewords:10 }}</td>
+                <td>{{ profile.birth_date }}</td>
+                <td>{{ profile.get_activo_display }}</td>
+                <td>
+                    <a href="{% url 'profile_update' profile.pk %}" class="btn btn-primary"><i class="fas fa-edit"></i> Editar</a>
+                    <a href="{% url 'profile_delete' profile.pk %}" class="btn btn-danger"><i class="fas fa-trash-alt"></i> Eliminar</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

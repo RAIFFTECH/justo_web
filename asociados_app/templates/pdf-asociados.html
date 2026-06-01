@@ -1,0 +1,432 @@
+{% extends "base-pdf.html" %}
+{% block content %}
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th colspan="2" class="text-center">Datos del Asociado</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <th class="txt_negrita text-start">Tipo Documento:</th>
+            <td>{{ asociado.tercero.cla_doc }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Número Documento:</th>
+            <td>{{ asociado.tercero.doc_ide }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">DV:</th>
+            <td>{{ asociado.tercero.dig_ver }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Nit Rápido:</th>
+            <td>{{ asociado.tercero.nit_rap }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Ciudad Expedición Documento:</th>
+            <td>{{ asociado.tercero.cod_ciu_exp.nombre }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Ciudad Residencia:</th>
+            <td>{{ asociado.tercero.cod_ciu_res.nombre }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Tipo Régimen:</th>
+            <td>{{ asociado.tercero.regimen }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Fecha Expedición Documento:</th>
+            <td>{{ asociado.tercero.fec_exp_ced }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Tipo Tercero:</th>
+            <td>{{ asociado.tercero.tip_ter }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Primer Apellido:</th>
+            <td>{{ asociado.tercero.pri_ape }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Segundo Apellido:</th>
+            <td>{{ asociado.tercero.seg_ape }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Primer Nombre:</th>
+            <td>{{ asociado.tercero.pri_nom }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Segundo Nombre:</th>
+            <td>{{ asociado.tercero.seg_nom }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Fecha Nacimiento:</th>
+            <td>{{ asociado.fec_nac }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Sexo:</th>
+            <td>{{ asociado.sexo }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Estado Civil:</th>
+            <td>{{ asociado.est_civ }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Código Asociado:</th>
+            <td>{{ asociado.cod_aso }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Oficina:</th>
+            <td>{{ asociado.oficina }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Tercero:</th>
+            <td>{{ asociado.tercero }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Estado:</th>
+            <td>{{ asociado.estado }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Ocupación Código:</th>
+            <td>{{ asociado.ocupacion_cod }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Zona:</th>
+            <td>{{ asociado.zona }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Profesión:</th>
+            <td>{{ asociado.profesion }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Ocupación:</th>
+            <td>{{ asociado.ocupacion }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Estrato:</th>
+            <td>{{ asociado.estrato }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Nivel de Estudio:</th>
+            <td>{{ asociado.niv_est }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Cabeza de Familia:</th>
+            <td>{{ asociado.cab_fam }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Fecha de Afiliación:</th>
+            <td>{{ asociado.fec_afi }}</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th colspan="2" class="text-center">Información Familiar</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <th class="txt_negrita text-start">Personas a Cargo</th>
+            <td>{{ asociado.per_a_cargo }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Número Hijos Menores</th>
+            <td>{{ asociado.num_hij_men }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Número Hijos Mayores</th>
+            <td>{{ asociado.num_hij_may }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Tipo de Vivienda</th>
+            <td>{{ asociado.tip_viv }}</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th colspan="2" class="text-center">Empresa</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <th class="txt_negrita text-start">Empresa Nominadora</th>
+            <td>{{ asociado.id_pag }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Cargo en la Empresa</th>
+            <td>{{ asociado.cargo_emp }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Tiempo en la Ciudad</th>
+            <td>{{ asociado.tie_en_ciu }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">med_con</th>
+            <td>{{ asociado.med_con }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Fecha Ingreso Trabajo</th>
+            <td>{{ asociado.fec_ing_tra }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Teléfono Trabajo</th>
+            <td>{{ asociado.tel_tra }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Tipo de Salario</th>
+            <td>{{ asociado.tip_sal }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Ciudad de Trabajo</th>
+            <td>{{ asociado.ciu_tra }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Actividad Económica</th>
+            <td>{{ asociado.act_eco }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Código CIIU</th>
+            <td>{{ asociado.cod_ciiu }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Tipo Contrato</th>
+            <td>{{ asociado.tip_con }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Nombre Empresa</th>
+            <td>{{ asociado.nom_emp }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Nit Empresa</th>
+            <td>{{ asociado.nit_emp }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Dirección Empresa</th>
+            <td>{{ asociado.dir_emp }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">e-mail Empresa</th>
+            <td>{{ asociado.email_emp }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Sector Empresa</th>
+            <td>{{ asociado.sector_emp }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Empresa Anterior</th>
+            <td>{{ asociado.empresa_ant }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Numero Empleados</th>
+            <td>{{ asociado.emp_num_emp }}</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th colspan="2" class="text-center">Negocio propio</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <th class="txt_negrita text-start">Negocio Propio?</th>
+            <td>{{ asociado.negocio_pro }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Teléfono Negocio</th>
+            <td>{{ asociado.negocio_tel }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Nombre Negocio</th>
+            <td>{{ asociado.negocio_nom }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Local Propio?</th>
+            <td>{{ asociado.negocio_loc_pro }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Tiene Cámara Comercio?</th>
+            <td>{{ asociado.negocio_cam_com }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Antiguedad Negocio</th>
+            <td>{{ asociado.negocio_ant }}</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th colspan="2" class="text-center">Pensión</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <th class="txt_negrita text-start">Entidad de Pensión</th>
+            <td>{{ asociado.pension_ent }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Tiene Pension</th>
+            <td>{{ asociado.pension_tie }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Otra Pensión?</th>
+            <td>{{ asociado.pension_otr }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Entidad Otra Pensión</th>
+            <td>{{ asociado.pension_ent_otr }}</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th colspan="2" class="text-center">Persona políticamente expuesta</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <th class="txt_negrita text-start">Tiene Familiar PEP?</th>
+            <td>{{ asociado.pep_es_fam }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Parentesco Familiar PEP</th>
+            <td>{{ asociado.pep_fam_par }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Nombre Familiar PEP</th>
+            <td>{{ asociado.pep_fam_nom }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Tiene Cargo Público PEP?</th>
+            <td>{{ asociado.pep_car_pub }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Cargo PEP</th>
+            <td>{{ asociado.pep_cargo }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">PEP Eje Pod?</th>
+            <td>{{ asociado.pep_eje_pod }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Administra Recursos del Estado PEP?</th>
+            <td>{{ asociado.pep_adm_rec_est }}</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th colspan="2" class="text-center">Datos extranjeros</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <th class="txt_negrita text-start">Tiene Gre Car?</th>
+            <td>{{ asociado.tie_gre_car }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Recibe Pagos del Extranjero?</th>
+            <td>{{ asociado.recibe_pag_ext }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Recibe Extranjero +186?</th>
+            <td>{{ asociado.recide_ext_mas_186 }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Recibe Ingresos Extranjeros?</th>
+            <td>{{ asociado.recibe_ing_ext }}</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th colspan="2" class="text-center">Conyuge</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <th class="txt_negrita text-start">Nombre Conyuge</th>
+            <td>{{ asociado.conyuge_nombre }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Doc_ide Conyuge</th>
+            <td>{{ asociado.conyuge_doc_ide }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">conyuge Trabaja?</th>
+            <td>{{ asociado.conyuge_trabaja }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Ingresos por Honoarios</th>
+            <td>{{ asociado.conyuge_ingresos }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">conyuge Trabaja?</th>
+            <td>{{ asociado.conyuge_ciudad }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Ocupacion Conyuge</th>
+            <td>{{ asociado.conyuge_ocupacion }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Telefono Conyuge</th>
+            <td>{{ asociado.conyuge_telefono }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Empresa Conyuge</th>
+            <td>{{ asociado.conyuge_empresa }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Empresa Conyuge</th>
+            <td>{{ asociado.conyuge_dir_empresa }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Telefono Conyuge</th>
+            <td>{{ asociado.conyuge_cargo }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">agno ing empresas</th>
+            <td>{{ asociado.conyuge_fec_ing_emp }}</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th colspan="2" class="text-center">Otros</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <th class="txt_negrita text-start">Estado Anteia</th>
+            <td>{{ asociado.estado_anteia }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Negocio Pro Local</th>
+            <td>{{ asociado.negocio_pro_local }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Barrio Asociado</th>
+            <td>{{ asociado.barrio_aso }}</td>
+        </tr>
+        </tbody>
+    </table>
+{% endblock %}

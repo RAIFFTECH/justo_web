@@ -1,0 +1,9 @@
+<!-- movimientos_caja_app/templates/movimientos_caja_app/mov_caja_confirm_delete.html -->
+
+<h1>Confirmar Eliminación de Movimiento de Caja</h1>
+<p>¿Estás seguro de que deseas eliminar este movimiento de caja?</p>
+<form method="post">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">Eliminar</button>
+    <a href="{% url 'mov_caja_list' %}" class="btn btn-secondary">Cancelar</a>
+</form>

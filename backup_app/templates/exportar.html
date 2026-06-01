@@ -1,0 +1,50 @@
+<!-- templates/exportar.html -->
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Exportar</title>
+</head>
+
+<body>
+    <h2>Seleccione el tipo de exportación y el modelo:</h2>
+    <form method="post" action="{% url 'exportar' %}">
+        {% csrf_token %}
+        <select name="export_type">
+            <option value="pdf">PDF</option>
+            <option value="excel">Excel</option>
+            <option value="csv">CSV</option>
+        </select>
+        <select name="modelo_id">
+            {% for modelo in modelos %}
+            <option value="{{ modelo.model_name }}">{{ modelo.model_name }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit">Exportar</button>
+    </form>
+</body>
+
+</html>
+
+<!-- templates/exportar.html -->
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Exportar</title>
+</head>
+
+<body>
+    <h2>Seleccione el tipo de exportación:</h2>
+    <form method="post" action="{% url 'exportar' %}">
+        {% csrf_token %}
+        <select name="export_type">
+            <option value="pdf">PDF</option>
+            <option value="excel">Excel</option>
+            <option value="csv">CSV</option>
+        </select>
+        <button type="submit">Exportar</button>
+    </form>
+</body>
+
+</html>

@@ -1,0 +1,182 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+<!-- <link rel="stylesheet" href="{% static 'vendors/mdi/css/materialdesignicons.min.css' %}"> -->
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+<!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+	integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous"> -->
+
+<div class="content-wrapper">
+	<div class="page-header">
+		<h2 class=" text-primary">Crear Documento </h3>
+			<a href="{% url 'listar_documentos' %}" class="btn btn-inverse-primary rounded-pill">
+				<i class="mdi mdi-arrow-left mx-2"></i>
+				Volver
+			</a>
+	</div>
+
+	<div class="col-md-12 grid-margin stretch-card rounded-5">
+		<div class="card rounded-5">
+			<div class="card-body">
+				<!-- <div class="grid-margin stretch-card mb-0"> -->
+				<form class="formulario_contacto" method="post" enctype="multipart/form-data" class="row gx-4">
+					<!-- Token de seguridad para poder crear un nuevo registro -->
+					{% csrf_token %}
+					<div class="col-md-12">
+						<div class="form-group">
+							{{ form.oficina|as_crispy_field }}
+							{% if form.oficina.help_text %}
+							<small class="form-text text-muted">{{ form.oficina.help_text }}</small>
+							{% endif %}
+							{% if form.oficina.errors %}
+							<div class="text-danger">
+								{% for error in form.oficina.errors %}
+								{{ error }}
+								{% endfor %}
+							</div>
+							{% endif %}
+						</div>
+					</div>
+					<div class="col-md-12">
+						<div class="form-group">
+							{{ form.per_con|as_crispy_field }}
+							{% if form.per_con.help_text %}
+							<small class="form-text text-muted">{{ form.per_con.help_text }}</small>
+							{% endif %}
+							{% if form.per_con.errors %}
+							<div class="text-danger">
+								{% for error in form.per_con.errors %}
+								{{ error }}
+								{% endfor %}
+							</div>
+							{% endif %}
+						</div>
+					</div>
+					<div class="col-md-12">
+						<div class="form-group">
+							{{ form.codigo|as_crispy_field }}
+							{% if form.codigo.help_text %}
+							<small class="form-text text-muted">{{ form.codigo.help_text }}</small>
+							{% endif %}
+							{% if form.codigo.errors %}
+							<div class="text-danger">
+								{% for error in form.codigo.errors %}
+								{{ error }}
+								{% endfor %}
+							</div>
+							{% endif %}
+						</div>
+					</div>
+					<div class="col-md-12">
+						<div class="form-group">
+							{{ form.nom_cto|as_crispy_field }}
+							{% if form.nom_cto.help_text %}
+							<small class="form-text text-muted">{{ form.nom_cto.help_text }}</small>
+							{% endif %}
+							{% if form.nom_cto.errors %}
+							<div class="text-danger">
+								{% for error in form.nom_cto.errors %}
+								{{ error }}
+								{% endfor %}
+							</div>
+							{% endif %}
+						</div>
+					</div>
+					<div class="col-md-12">
+						<div class="form-group">
+							{{ form.nombre|as_crispy_field }}
+							{% if form.nombre.help_text %}
+							<small class="form-text text-muted">{{ form.nombre.help_text }}</small>
+							{% endif %}
+							{% if form.nombre.errors %}
+							<div class="text-danger">
+								{% for error in form.nombre.errors %}
+								{{ error }}
+								{% endfor %}
+							</div>
+							{% endif %}
+						</div>
+					</div>
+					<div class="col-md-12">
+						<div class="form-group">
+							{{ form.doc_admin|as_crispy_field }}
+							{% if form.doc_admin.help_text %}
+							<small class="form-text text-muted">{{ form.doc_admin.help_text }}</small>
+							{% endif %}
+							{% if form.doc_admin.errors %}
+							<div class="text-danger">
+								{% for error in form.doc_admin.errors %}
+								{{ error }}
+								{% endfor %}
+							</div>
+							{% endif %}
+						</div>
+					</div>
+					<div class="col-md-12">
+						<div class="form-group">
+							{{ form.doc_caja|as_crispy_field }}
+							{% if form.doc_caja.help_text %}
+							<small class="form-text text-muted">{{ form.doc_caja.help_text }}</small>
+							{% endif %}
+							{% if form.doc_caja.errors %}
+							<div class="text-danger">
+								{% for error in form.doc_caja.errors %}
+								{{ error }}
+								{% endfor %}
+							</div>
+							{% endif %}
+						</div>
+					</div>
+					<div class="col-md-12">
+						<div class="form-group">
+							{{ form.inicio_nuevo_per|as_crispy_field }}
+							{% if form.inicio_nuevo_per.help_text %}
+							<small class="form-text text-muted">{{ form.inicio_nuevo_per.help_text }}</small>
+							{% endif %}
+							{% if form.inicio_nuevo_per.errors %}
+							<div class="text-danger">
+								{% for error in form.inicio_nuevo_per.errors %}
+								{{ error }}
+								{% endfor %}
+							</div>
+							{% endif %}
+						</div>
+					</div>
+					<div class="col-md-12">
+						<div class="form-group">
+							{{ form.consecutivo|as_crispy_field }}
+							{% if form.consecutivo.help_text %}
+							<small class="form-text text-muted">{{ form.consecutivo.help_text }}</small>
+							{% endif %}
+							{% if form.consecutivo.errors %}
+							<div class="text-danger">
+								{% for error in form.consecutivo.errors %}
+								{{ error }}
+								{% endfor %}
+							</div>
+							{% endif %}
+						</div>
+					</div>
+					<button type="submit" title="Guardar" class="btn btn-light rounded-pill"><i
+							class="bi bi-floppy"></i> Guardar</button>
+					<a href="../lista" title="Cancelar" type="submit" class="btn btn-light rounded-pill"><i
+							class="bi bi-x-square"></i> Cancelar</a>
+			</div>
+
+			</form>
+		</div>
+	</div>
+
+	<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"
+		integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p"
+		crossorigin="anonymous"></script>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js"
+		integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF"
+		crossorigin="anonymous"></script>
+
+</div>
+{% endblock %}

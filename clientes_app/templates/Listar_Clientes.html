@@ -1,0 +1,56 @@
+
+{% block content %}
+<h1> Lista de Clientes</h1>
+
+<ul>
+    {% for Lista in Lista %}
+    <li>
+        <a href="{% url 'Listar_Clientes' %}">
+            <h1>{{Lista.codigo}}</h1>
+            <!-- <p>{{Lista.nombre }}</p> -->
+            <p>{{Lista.sigla}}</p>
+            <!-- <p>{{Lista.codigo}}</p>
+            <p>{{Lista.doc_ide}}</p>
+            <p>{{Lista.dv}}</p>
+            <p>{{Lista.sigla}}</p>
+            <p>{{Lista.nombre}}</p>
+            <p>{{Lista.direccion}}</p></p>
+            <p>{{Lista.telefono}}</p>
+            <p>{{Lista.celular}}</p>
+            <p>{{Lista.ciudad}}</p>
+            <p>{{Lista.email}}</p>
+            <p>{{Lista.dominio}}</p>
+            <p>{{Lista.nit_ger}}</p>
+            <p>{{Lista.nom_ger}}</p>
+            <p>{{Lista.nit_con}}</p>
+            <p>{{Lista.nom_con}}</p>
+            <p>{{Lista.tp_con}}</p>
+            <p>{{Lista.nit_rev_fis}}</p>
+            <p>{{Lista.nom_rev_fis}}</p>
+            <p>{{Lista.tp_rev_fis}}</p>
+            <p>{{Lista.age_ret}}</p>
+            <p>{{Lista.ret_iva}}</p>
+            <p>{{Lista.aut_ret}}</p>
+            <p>{{Lista.logo}}</p>
+            <p>{{Lista.num_lic}}</p>
+            <p>{{Lista.lic_act}}</p>
+            <p>{{Lista.ini_lic}}</p>
+            <p>{{Lista.fin_lic}}</p> -->
+            
+        </a>
+    <!-- </li>
+    <label for="exampleDataList" class="form-label">Datalist example</label>
+    <input class="form-control" list={{Lista.cliente}} id="exampleDataList" placeholder="Escribe para buscar...">
+    <datalist id={{Lista.cliente}}>
+        <a href="{% url 'Listar_Clientes'%}">
+            <p>{{Lista.cliente}}</p>
+        </a>
+        <option value="San Francisco">
+            <option value="New York">
+            <option value="Seattle">
+            <option value="Los Angeles">
+            <option value="Chicago"> -->
+    <!-- </datalist> -->
+    {% endfor%}
+</ul>
+{% endblock %}

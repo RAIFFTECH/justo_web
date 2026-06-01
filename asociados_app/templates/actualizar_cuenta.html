@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+{% load crispy_forms_tags %}
+{#<nav class="navbar navbar-expand-lg navbar-light bg-light">#}
+{#    <div class="container-fluid">#}
+{#        <!--Botón que sustituye al menú en dispositivos móviles -->#}
+{#        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menu_principal" aria-controls="menu_principal" aria-expanded="false" aria-label="Menú">#}
+{#            <span class="navbar-toggler-icon"></span>#}
+{#        </button>#}
+{##}
+{#        <!-- Logotipo y siglas -->#}
+{#        <a class="navbar-brand" href="{% url 'listar_cuenta' %}">#}
+{#            <img alt="Cuentas Contables - JustoWare" style="background-color:#06153C;" src="{% static 'Iconos/JustoWare.gif'%}" width="100" height="50" class="d-inline-block align-text-center"/>#}
+{#            <span>Cuentas Contables</span>#}
+{#        </a>#}
+{##}
+{#        <div class="collapse navbar-collapse" id="menu_principal">#}
+{#            <ul class="navbar-nav me-auto mb-2 mb-lg-0">#}
+{#                <li class="nav-item dropdown">#}
+{#                    <a class="nav-link dropdown-toggle" href="/" id="submenu_principal" role="button" data-bs-toggle="dropdown"#}
+{#                       aria-expanded="false">#}
+{#                        <i class="glyphicon glyphicon-time"></i>#}
+{#                        .</a>#}
+{#                    <!-- Iniciamos principio del grupo (menú) -->#}
+{#                    <ul class="dropdown-menu" aria-labelledby="submenu_principal">#}
+{#                        <li><a class="dropdown-item" href="../" width="30" height="30"#}
+{#                               class="d-inline-block align-text-center">#}
+{#                            <i class="glyphicon glyphicon-th-list"></i>#}
+{#                            Listado</a>#}
+{#                        </li>#}
+{#                        <li><a class="dropdown-item" href="../">#}
+{#                            <i class="glyphicon glyphicon-plus"></i>#}
+{#                            Nuevo</a>#}
+{#                        </li>#}
+{#                    </ul> <!-- Cierra la lista de submenús del grupo -->#}
+{#                </li> <!-- Cierra el grupo de submenús del menú principal -->#}
+{#            </ul> <!-- Cierra el menú principal con los menús y submenús -->#}
+{#        </div> <!-- container para menús diferentes (principal con grupos y submenus) -->#}
+{#        <!-- Menú derecha para usuario y cierre de sesión -->#}
+{#        <div class="collapse navbar-collapse" id="menu_principal">#}
+{#            <ul class="navbar-nav me-auto mb-2 mb-lg-0">#}
+{#                <li class="nav-item dropdown">#}
+{#                    <a class="nav-link dropdown-toggle" href="#" id="submenu_principal" role="button" data-bs-toggle="dropdown" aria-expanded="false">#}
+{#                        <i class="fas fa-user"> Sesion</i>#}
+{#                    </a>#}
+{#                    <ul class="dropdown-menu" aria-labelledby="submenu_principal">#}
+{#                        <li><a class="nav-link disabled"><i class="fa fa-asterisk"></i>#}
+{#                            administrador						</a></li>#}
+{#                        <li><hr class="dropdown-divider"></li>#}
+{#                        <li><a class="nav-link disabled">Configuración</a></li>#}
+{#                        <li><a class="nav-link disabled">Perfil</a></li>#}
+{#                        <li><hr class="dropdown-divider"></li>#}
+{#                        <li><a class="dropdown-item" href="Cerrar_Sesion"><i class="fa fa-window-close"></i> Cerrar sesión</a></li>#}
+{#                    </ul>#}
+{#                </li>#}
+{#            </ul>#}
+{#        </div>#}
+{#    </div> <!-- del container fluid de los elementos del menú -->#}
+{#</nav>#}
+    <div class="content-wrapper">
+        <div class="page-header">
+            <h2 class=" text-primary">Actualizar Cuenta Contable </h2>
+            <a href="{% url 'listar_cuenta' %}" class="btn btn-inverse-primary rounded-pill">
+                <i class="mdi mdi-arrow-left mx-2"></i>
+                Volver
+            </a>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card rounded-5">
+                    <div class="card-body">
+                        <form method="post" enctype="multipart/form-data">
+
+                            <!-- Token de seguridad para poder crear un nuevo registro -->
+                            {% csrf_token %}
+                            <div class="row">
+                                {% for tag in form %}
+                                    <div class="col-md-6">
+                                        {{ tag|as_crispy_field }}
+                                    </div>
+                                {% endfor %}
+                                <div class="col-md-12 text-center">
+                                    <button type="submit" title="Guardar" class="btn btn-light rounded-pill"><i
+                                            class="bi bi-floppy"></i> Guardar</button>
+                                    <a href="../lista" title="Cancelar" type="submit" class="btn btn-light rounded-pill"><i
+                                            class="bi bi-x-square"></i> Cancelar</a>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

@@ -1,0 +1,243 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+
+<div class="container mt-5">
+    <p>Operation: {{ operation }}</p>
+    <h1>{% if operation == 'update' %}Modificar Cajero{% else %}Crear Cajero{% endif %}</h1>
+    <div class="col-md-12 grid-margin stretch-card rounded-5" >
+        <div class="card rounded-5">
+            <div class="card-body">
+                <form id="miFor_cajero" method="post" class="row g-3">
+                    {% csrf_token %}
+                    <div class="col-md-6">
+                        <!-- <lab}el for="{{ form.user.id_for_label }}" class="form-label">{{ form.user.label }}</lab> -->
+                        {{ form.user }}
+                    </div>
+                    <div class="col-md-6">
+                        <label for="{{ form.oficina.id_for_label }}" class="form-label">{{ form.oficina.label }}</label>
+                        {{ form.oficina }}
+                    </div>
+                    <div class="col-md-6">
+                        <label for="doc_ide" class="form-label">Documento Identidad</label>
+                        <input 
+                            type="text" 
+                            id="doc_ide" 
+                            name="doc_ide" 
+                            class="form-control" 
+                            value="{{ doc_ide }}" 
+                            required>
+                    </div>
+                    
+                    <!-- Nombre del Tercero -->
+                    <div class="col-md-6">
+                        <label for="nombre_tercero" class="form-label">Nombre del Tercero</label>
+                        <input 
+                            type="text" 
+                            id="nombre_tercero" 
+                            name="nombre_tercero" 
+                            class="form-control" 
+                            value="{{ nombre_tercero }}" 
+                            readonly>
+                    </div>
+
+                    <!-- Fecha Ingreso -->
+                    <div class="col-md-6">
+                        <label for="{{ form.fecha_ingreso.id_for_label }}" class="form-label">{{ form.fecha_ingreso.label }}</label>
+                        {{ form.fecha_ingreso }}
+                    </div>
+
+                    <!-- Fecha Retiro -->
+                    <div class="col-md-6">
+                        <label for="{{ form.fecha_retiro.id_for_label }}" class="form-label">{{ form.fecha_retiro.label }}</label>
+                        {{ form.fecha_retiro }}
+                    </div>
+
+                    <!-- Activo -->
+                    <div class="col-md-6">
+                        <label for="{{ form.activo.id_for_label }}" class="form-label">{{ form.activo.label }}</label>
+                        {{ form.activo }}
+                    </div>
+
+                    <!-- Cta Contable Caja -->
+                    <div class="col-md-6">
+                        <label for="{{ form.cta_con_caja.id_for_label }}" class="form-label">{{ form.cta_con_caja.label }}</label>
+                        {{ form.cta_con_caja }}
+                    </div>
+
+                    <!-- Cta Contable Acreedores -->
+                    <div class="col-md-6">
+                        <label for="{{ form.cta_con_acre.id_for_label }}" class="form-label">{{ form.cta_con_acre.label }}</label>
+                        {{ form.cta_con_acre }}
+                    </div>
+
+                    <!-- Botones -->
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary">Guardar</button>
+                        <a href="{% url 'cajeros_list' %}" class="btn btn-secondary">Cancelar</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Pasa la URL base de creación desde Django
+    var createUrl = "{% url 'cajeros_create' %}";  // URL de creación
+    var updateUrlBase = "{% url 'cajeros_update' pk=0 %}";  // URL base de actualización, sin el ID
+</script>
+
+<script>
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                // Verificar si el nombre de la cookie es el buscado
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    const csrftoken = getCookie('csrftoken');
+
+    $.ajaxSetup({
+        beforeSend: function(xhr, settings) {
+            if (!this.crossDomain) {
+                xhr.setRequestHeader("X-CSRFToken", csrftoken);
+            }
+        }
+    });
+
+    function convertDateToISO(dateString) {
+        let parts = dateString.split('-');
+        return `${parts[2]}-${parts[1]}-${parts[0]}`; // Convierte DD-MM-YYYY a YYYY-MM-DD
+    }
+
+    function formatCurrency(value) {
+        const number = parseFloat(value);
+        return isNaN(number) ? '' : `$${number.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+    }
+</script>
+
+<script>
+    $(document).ready(function() {
+        $('#miFor_cajero').on('submit', function(e) {
+            console.log('Entra a enviar formulario de cajero');
+            e.preventDefault();  // Evitar el envío del formulario por defecto
+        // Validaciones
+            if (!$('#id_oficina').val()) {
+                alert('Por favor, seleccione una opción en el campo Oficina.');
+                $('#id_oficina').focus();
+                return;
+            }
+            if (!$('#id_user').val()) {
+                alert('Por favor, seleccione una opción en el campo Usuario.');
+                $('#id_user').focus();
+                return;
+            }
+           
+            if (!$('#doc_ide').val()) {
+                alert('Por favor, seleccione una opción en el campo Documento de Identidad.');
+                $('#doc_ide').focus();
+                return;
+            }
+
+
+            console.log('user --------------->', $('select[name="user"]').val())
+            console.log('oficina------------->', $('select[name="oficina"]').val())
+            var formData = {
+                'user': $('select[name="user"]').val(),
+                'oficina': $('select[name="oficina"]').val(),
+                'doc_ide': $('#doc_ide').val(),
+                'fecha_ingreso': $('input[name="fecha_ingreso"]').val(),
+                'fecha_retiro': $('input[name="fecha_retiro"]').val(),
+                'activo': $('input[name="activo"]').val(),
+                'cta_con_caja': $('input[name="cta_con_caja"]').val(),
+                'cta_con_acre': $('input[name="cta_con_acre"]').val(),
+            };
+            let url;
+            let operation = "{{ operation }}";
+            let creditoId = "{{ credito.id|default:'' }}";  // Obtén el ID del crédito si está disponible
+            console.log('Operacion ',operation)
+            if (operation === 'update' && creditoId) {
+                url = updateUrlBase.replace('0', creditoId);
+                console.log('Url Actualizar Credito ',url)
+            } else {
+                url = createUrl;
+            }
+            $.ajax({
+                url: url,  // La URL de la vista que recibirá los datos
+                type: 'POST',
+                contentType: 'application/json',  // Enviamos los datos como JSON
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                data: JSON.stringify(formData),  // Convertimos los datos a JSON
+                success: function(response) {
+                    if (response.success) {
+                        alert(response.message);
+                        document.getElementById("id_grabar").disabled = true;
+                    } else {
+                        let errorMessage = "Errores en el formulario:\n";
+                        for (let key in response.errors) {
+                            errorMessage += `${key}: ${response.errors[key].join(', ')}\n`;
+                        }
+                        alert(errorMessage);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.log('Respuesta del servidor:', xhr.responseText);
+                    alert('Errores en el formulario .'+ xhr.responseText);
+                }
+            });
+        });
+    });
+</script>
+
+<script>
+    $(document).ready(function() {
+        $('#doc_ide').on('blur', function() {
+            console.log('Ejecutando búsqueda de tercero');
+            const docIdeInput = document.getElementById('doc_ide');
+            const nombreTerceroInput = document.getElementById('nombre_tercero');
+            const docIde = docIdeInput.value.trim(); // Valor del documento ingresado
+            console.log('Doc_ide ------------------------> ',docIde)
+            if (docIde) {
+                // Realizar la solicitud AJAX
+                $.ajax({
+                    url: "{% url 'buscar_tercero' %}", // URL del endpoint Django
+                    data: { 'doc_ide': docIde }, // Parámetro enviado
+                    dataType: 'json', // Espera respuesta JSON
+                    success: function(data) {
+                        console.log('data---------------------->',data);
+                        if (data && data.nombre) {
+                            // Si se encuentra el tercero, mostrar el nombre
+                            nombreTerceroInput.value = data.nombre;
+                        } else {
+                            // Si no se encuentra, limpiar el campo y mostrar mensaje
+                            nombreTerceroInput.value = '';
+                            alert("No se ha encontrado un tercero con el documento proporcionado.");
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        alert("Error en la búsqueda del tercero.");
+                    }
+                });
+            } else {
+                nombreTerceroInput.value = '';
+            }
+        });
+    });
+</script>
+
+{% endblock %}
+

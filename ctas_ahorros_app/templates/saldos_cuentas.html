@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Listado de Cuentas de Ahorros</title>
+</head>
+<body>
+    <h1>Ahorros a una Fecha</h1>
+    <form id="liquidacion-form" action="{% url 'saldos_ahorros_fecha' %}" method="post">
+        {% csrf_token %}
+        <label for="fecha_corte">Fecha de Corte:</label>
+        <input type="date" id="fecha_corte" name="fecha_corte" required><br><br>
+    
+        <label for="nombre_archivo">Nombre del Archivo:</label>
+        <input type="text" id="nombre_archivo" name="nombre_archivo" required><br><br>
+
+        <button type="submit">Iniciar Liquidación</button>
+    </form>
+</body>
+</html>
+
+{% endblock %}

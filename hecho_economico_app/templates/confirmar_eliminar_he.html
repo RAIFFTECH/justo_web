@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 100vh;">
+    <div class="card p-4 shadow" style="max-width: 400px; width: 100%;">
+        <h2 class="display-5 text-danger text-center mb-4">Confirmar Eliminación</h2>
+        
+        <!-- Mensajes de error -->
+        {% if errors %}
+            <div class="alert alert-danger">
+                <h4>No se pudo eliminar debido a los siguientes problemas:</h4>
+                <ul>
+                    {% for key, message in errors.items %}
+                        <li>{{ key }}: {{ message }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+
+        <!-- Contenido principal -->
+        <p class="text-center">¿Estás seguro de que deseas eliminar el Comprobante <strong>{{ hecho_econo.numero }}</strong>?</p>
+        <form method="post" class="text-center mt-4">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger mr-2">
+                <i class="fas fa-trash-alt"></i> Eliminar
+            </button>
+            <a href="{% url 'buscar_hechos_econo' %}" class="btn btn-secondary">
+                <i class="fas fa-times"></i> Cancelar
+            </a>
+        </form>
+    </div>
+</div>
+{% endblock %}
+

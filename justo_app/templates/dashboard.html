@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="card body">
+
+<h3>  📊 Control de Producción</h3>
+
+<div>
+    {% if messages %}
+    <ul class="messages list-group mb-3">
+        {% for message in messages %}
+        <li {% if message.tags %} class="{{ message.tags }} list-group-item list-group-item-primary" {% endif %}>{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+</div>
+
+<form method="GET" class="row g-2 mb-3">
+
+    <div class="col">
+        <label>Fecha inicial</label>
+        <input type="date" id="fecha_inicial" name="fecha_inicial" value="{{ fecha_inicial|date:'Y-m-d' }}"
+            class="form-control">
+    </div>
+
+    <div class="col">
+        <label>Fecha final</label>
+        <input type="date" id="fecha_final" name="fecha_final" value="{{ fecha_final|date:'Y-m-d' }}"
+            class="form-control">
+    </div>
+
+    <div class="col">
+        <button class="btn-ui btn-aceptar">Filtrar</button>
+    </div>
+
+</form>
+
+
+<script>
+    function formatDate(d) {
+        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    }
+
+    function getMonday(date) {
+        const d = new Date(date);
+        const day = d.getDay();
+
+        // 🔥 si ya es lunes → no cambiar
+        if (day === 1) return d;
+
+        const diff = (day === 0 ? -6 : 1) - day;
+        d.setDate(d.getDate() + diff);
+        return d;
+    }
+
+    function initializeDates() {
+
+        const inputFinal = document.getElementById('fecha_final');
+        const inputInicial = document.getElementById('fecha_inicial');
+
+        // 🔥 SOLO si está vacío (primera carga)
+        if (!inputFinal.value || inputFinal.value.trim() === "") {
+            const today = new Date();
+            inputFinal.value = formatDate(today);
+        }
+
+        // 🔥 usar la fecha que tenga el usuario
+        const fechaFinal = new Date(inputFinal.value);
+
+        const monday = getMonday(fechaFinal);
+
+        inputInicial.value = formatDate(monday);
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+
+        initializeDates();
+
+        // 🔥 recalcular SOLO cuando cambie fecha_final
+        document.getElementById('fecha_final').addEventListener('change', function () {
+            initializeDates();
+        });
+
+    });
+</script>
+
+
+<canvas id="grafico"></canvas>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+new Chart(document.getElementById('grafico'), {
+    type: 'bar',
+    data: {
+        labels: {{ labels|safe }},
+        datasets: [{
+            label: 'Producción $',
+            data: {{ valores|safe }},
+        }]
+    }
+});
+</script>
+</div>
+{% endblock %}

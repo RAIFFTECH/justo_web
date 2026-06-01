@@ -1,0 +1,43 @@
+<!-- hecho_econo_detail.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+  <h1>Detalles de HECHO_ECONO</h1>
+  <p>Documento: {{ object.docto_conta }}</p>
+  <p>Per_Con: {{ object.docto_conta.per_con }}</p>
+  <p>Concecutivo: {{ object.docto_conta.consecutivo }}</p>
+  <p>Numero: {{ object.numero }}</p>
+  <p>Fecha: {{ object.fecha }}</p>
+  <p>Descripción: {{ object.descripcion }}</p>
+  
+  <h2>Detalles asociados</h2>
+
+
+
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>concepto</th>
+        <th>subcuenta</th>
+        <th>valor</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for detalle_prod in detalle_prod_list %}
+      <tr>
+        <td>{{ detalle_prod.id }}</td>
+        <td>{{ detalle_prod.concepto }}</td>
+        <td>{{ detalle_prod.subcuenta }}</td>
+        <td>{{ detalle_prod.valor }}</td>
+        <td>
+          <a href="">Detalles</a>
+          <a href="">Editar</a>
+          <a href="">Eliminar</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}

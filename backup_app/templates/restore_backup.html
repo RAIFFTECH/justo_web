@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% block content %}
+
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>Restaurar Copia de Seguridad</title>
+</head>
+
+<body>
+	<h2>Restaurar Copia de Seguridad</h2>
+	<form method="post" enctype="multipart/form-data">
+		{% csrf_token %}
+		<label for="backup_filename">Selecciona la copia de seguridad a restaurar:</label><br>
+		<div class="d-flex gap-2">
+			<select name="backup_filename" class="form-control">
+				{% for backup in backups %}
+				<option value="{{ backup.filename }}">{{ backup.filename }}</option>
+				{% endfor %}
+			</select>
+			<button type="submit" class="btn-ui btn-importar"><i class="fas fa-database"></i>Restaurar</button>
+		</div>
+	</form>
+</body>
+
+</html>
+
+<!-- <form method="POST">
+	{% csrf_token %}
+
+	<select name="backup_filename" class="form-control">
+		{% for b in backups %}
+		<option value="{{ b.filename }}">{{ b.filename }}</option>
+		{% endfor %}
+	</select>
+
+	<button type="submit" class="btn btn-danger mt-2">
+		Restaurar Backup
+	</button>
+</form> -->
+
+{% endblock %}

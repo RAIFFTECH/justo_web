@@ -1,0 +1,580 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+<!-- <link rel="stylesheet" href="{% static 'vendors/mdi/css/materialdesignicons.min.css' %}"> -->
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+<!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+	integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous"> -->
+
+<div class="content-wrapper">
+	<div class="page-header">
+		<h2 class=" text-primary">Crear Cliente </h3>
+			<a href="{% url 'listar_clientes' %}" class="btn btn-inverse-primary rounded-pill">
+				<i class="mdi mdi-arrow-left mx-2"></i>
+				Volver
+			</a>
+	</div>
+
+	<div class="col-md-12 grid-margin stretch-card rounded-5">
+		<div class="card rounded-5">
+			<div class="card-body">
+				<!-- <div class="grid-margin stretch-card mb-0"> -->
+				<form class="formulario_contacto" method="post" enctype="multipart/form-data" class="row gx-4">
+					<!-- Token de seguridad para poder crear un nuevo registro -->
+					{% csrf_token %}
+					<div class="row">
+					<div class="col-md-6">
+						<div class="form-group">
+							{{ form.codigo|as_crispy_field }}
+							{% if form.codigo.help_text %}
+							<small class="form-text text-muted">{{ form.codigo.help_text }}</small>
+							{% endif %}
+							{% if form.codigo.errors %}
+							<div class="text-danger">
+								{% for error in form.codigo.errors %}
+								{{ error }}
+								{% endfor %}
+							</div>
+							{% endif %}
+						</div>
+					</div>
+					<div class="col-md-6">
+						<div class="form-group">
+							{{ form.doc_ide|as_crispy_field }}
+							<!-- {% if form.doc_ide.help_text %}
+							<small class="form-text text-muted">{{ form.doc_ide.help_text }}</small>
+							{% endif %} -->
+							{% if form.doc_ide.errors %}
+							<div class="text-danger">
+								{% for error in form.doc_ide.errors %}
+								{{ error }}
+								{% endfor %}
+							</div>
+							{% endif %}
+						</div>
+					</div>
+					<div class="col-md-6">
+						<div class="form-group">
+							{{ form.dv|as_crispy_field }}
+							{% if form.dv.help_text %}
+							<small class="form-text text-muted">{{ form.dv.help_text }}</small>
+							{% endif %}
+							{% if form.dv.errors %}
+							<div class="text-danger">
+								{% for error in form.dv.errors %}
+								{{ error }}
+								{% endfor %}
+							</div>
+							{% endif %}
+						</div>
+					</div>
+					<div class="col-md-6">
+						<div class="form-group">
+							{{ form.sigla|as_crispy_field }}
+							{% if form.sigla.help_text %}
+							<small class="form-text text-muted">{{ form.sigla.help_text }}</small>
+							{% endif %}
+							{% if form.sigla.errors %}
+							<div class="text-danger">
+								{% for error in form.sigla.errors %}
+								{{ error }}
+								{% endfor %}
+							</div>
+							{% endif %}
+						</div>
+					</div>
+					<div class="col-md-6">
+						<div class="form-group">
+							{{ form.nombre|as_crispy_field }}
+							{% if form.nombre.help_text %}
+							<small class="form-text text-muted">{{ form.nombre.help_text }}</small>
+							{% endif %}
+							{% if form.nombre.errors %}
+							<div class="text-danger">
+								{% for error in form.nombre.errors %}
+								{{ error }}
+								{% endfor %}
+							</div>
+							{% endif %}
+						</div>
+					</div>
+					<div class="col-md-6">
+						<div class="form-group">
+							{{ form.direccion|as_crispy_field }}
+							{% if form.direccion.help_text %}
+							<small class="form-text text-muted">{{ form.direccion.help_text }}</small>
+							{% endif %}
+							{% if form.direccion.errors %}
+							<div class="text-danger">
+								{% for error in form.direccion.errors %}
+								{{ error }}
+								{% endfor %}
+							</div>
+							{% endif %}
+						</div>
+					</div>
+					<div class="col-md-6">
+						<div class="form-group">
+							{{ form.celular|as_crispy_field }}
+							<!-- {% if form.celular.help_text %}
+							<small class="form-text text-muted">{{ form.celular.help_text }}</small>
+							{% endif %} -->
+							{% if form.celular.errors %}
+							<div class="text-danger">
+								{% for error in form.celular.errors %}
+								{{ error }}
+								{% endfor %}
+							</div>
+							{% endif %}
+						</div>
+					</div>
+					<div class="col-md-6">
+						<div class="form-group">
+							{{ form.telefono|as_crispy_field }}
+							<!-- {% if form.telefono.help_text %}
+							<small class="form-text text-muted">{{ form.telefono.help_text }}</small>
+							{% endif %} -->
+							{% if form.telefono.errors %}
+							<div class="text-danger">
+								{% for error in form.telefono.errors %}
+								{{ error }}
+								{% endfor %}
+							</div>
+							{% endif %}
+						</div>
+					</div>
+					<div class="col-md-6">
+						<div class="form-group">
+							{{ form.email|as_crispy_field }}
+							{% if form.email.help_text %}
+							<small class="form-text text-muted">{{ form.email.help_text }}</small>
+							{% endif %}
+							{% if form.email.errors %}
+							<div class="text-danger">
+								{% for error in form.email.errors %}
+								{{ error }}
+								{% endfor %}
+							</div>
+							{% endif %}
+						</div>
+					</div>
+					<div class="col-md-6">
+						<div class="form-group">
+							{{ form.clase_coop|as_crispy_field }}
+							{% if form.clase_coop.help_text %}
+							<small class="form-text text-muted">{{ form.clase_coop.help_text }}</small>
+							{% endif %}
+							{% if form.clase_coop.errors %}
+							<div class="text-danger">
+								{% for error in form.clase_coop.errors %}
+								{{ error }}
+								{% endfor %}
+							</div>
+							{% endif %}
+						</div>
+					</div>
+					<div class="col-md-6">
+						<div class="form-group">
+							{{ form.ciudad|as_crispy_field }}
+							{% if form.ciudad.help_text %}
+							<small class="form-text text-muted">{{ form.ciudad.help_text }}</small>
+							{% endif %}
+							{% if form.ciudad.errors %}
+							<div class="text-danger">
+								{% for error in form.ciudad.errors %}
+								{{ error }}
+								{% endfor %}
+							</div>
+							{% endif %}
+						</div>
+					</div>
+					<div class="col-md-6">
+						<div class="form-group">
+							{{ form.dominio|as_crispy_field }}
+							{% if form.dominio.help_text %}
+							<small class="form-text text-muted">{{ form.dominio.help_text }}</small>
+							{% endif %}
+							{% if form.dominio.errors %}
+							<div class="text-danger">
+								{% for error in form.dominio.errors %}
+								{{ error }}
+								{% endfor %}
+							</div>
+							{% endif %}
+						</div>
+					</div>
+					<div class="col-md-6">
+						<div class="form-group">
+							{{ form.nit_ger|as_crispy_field }}
+							<!-- {% if form.nit_ger.help_text %}
+							<small class="form-text text-muted">{{ form.nit_ger.help_text }}</small>
+							{% endif %} -->
+							{% if form.nit_ger.errors %}
+							<div class="text-danger">
+								{% for error in form.nit_ger.errors %}
+								{{ error }}
+								{% endfor %}
+							</div>
+							{% endif %}
+						</div>
+					</div>
+					<div class="col-md-6">
+						<div class="form-group">
+							{{ form.nom_ger|as_crispy_field }}
+							{% if form.nom_ger.help_text %}
+							<small class="form-text text-muted">{{ form.nom_ger.help_text }}</small>
+							{% endif %}
+							{% if form.nom_ger.errors %}
+							<div class="text-danger">
+								{% for error in form.nom_ger.errors %}
+								{{ error }}
+								{% endfor %}
+							</div>
+							{% endif %}
+						</div>
+					</div>
+					<div class="col-md-6">
+						<div class="form-group">
+							{{ form.nit_con|as_crispy_field }}
+							<!-- {% if form.nit_con.help_text %}
+							<small class="form-text text-muted">{{ form.nit_con.help_text }}</small>
+							{% endif %} -->
+							{% if form.nit_con.errors %}
+							<div class="text-danger">
+								{% for error in form.nit_con.errors %}
+								{{ error }}
+								{% endfor %}
+							</div>
+							{% endif %}
+						</div>
+					</div>
+					<div class="col-md-6">
+						<div class="form-group">
+							{{ form.nom_con|as_crispy_field }}
+							{% if form.nom_con.help_text %}
+							<small class="form-text text-muted">{{ form.nom_con.help_text }}</small>
+							{% endif %}
+							{% if form.nom_con.errors %}
+							<div class="text-danger">
+								{% for error in form.nom_con.errors %}
+								{{ error }}
+								{% endfor %}
+							</div>
+							{% endif %}
+						</div>
+					</div>
+					<div class="col-md-6">
+						<div class="form-group">
+							{{ form.tp_con|as_crispy_field }}
+							{% if form.tp_con.help_text %}
+							<small class="form-text text-muted">{{ form.tp_con.help_text }}</small>
+							{% endif %}
+							{% if form.tp_con.errors %}
+							<div class="text-danger">
+								{% for error in form.tp_con.errors %}
+								{{ error }}
+								{% endfor %}
+							</div>
+							{% endif %}
+						</div>
+					</div>
+					<div class="col-md-6">
+						<div class="form-group">
+							{{ form.nit_rev_fis|as_crispy_field }}
+							<!-- {% if form.nit_rev_fis.help_text %}
+							<small class="form-text text-muted">{{ form.nit_rev_fis.help_text }}</small>
+							{% endif %} -->
+							{% if form.nit_rev_fis.errors %}
+							<div class="text-danger">
+								{% for error in form.nit_rev_fis.errors %}
+								{{ error }}
+								{% endfor %}
+							</div>
+							{% endif %}
+						</div>
+					</div>
+					<div class="col-md-6">
+						<div class="form-group">
+							{{ form.nom_rev_fis|as_crispy_field }}
+							{% if form.nom_rev_fis.help_text %}
+							<small class="form-text text-muted">{{ form.nom_rev_fis.help_text }}</small>
+							{% endif %}
+							{% if form.nom_rev_fis.errors %}
+							<div class="text-danger">
+								{% for error in form.nom_rev_fis.errors %}
+								{{ error }}
+								{% endfor %}
+							</div>
+							{% endif %}
+						</div>
+					</div>
+					<div class="col-md-6">
+						<div class="form-group">
+							{{ form.tp_rev_fis|as_crispy_field }}
+							{% if form.tp_rev_fis.help_text %}
+							<small class="form-text text-muted">{{ form.tp_rev_fis.help_text }}</small>
+							{% endif %}
+							{% if form.tp_rev_fis.errors %}
+							<div class="text-danger">
+								{% for error in form.tp_rev_fis.errors %}
+								{{ error }}
+								{% endfor %}
+							</div>
+							{% endif %}
+						</div>
+					</div>
+					<div class="col-md-6">
+						<div class="form-group">
+							{{ form.age_ret|as_crispy_field }}
+							{% if form.age_ret.help_text %}
+							<small class="form-text text-muted">{{ form.age_ret.help_text }}</small>
+							{% endif %}
+							{% if form.age_ret.errors %}
+							<div class="text-danger">
+								{% for error in form.age_ret.errors %}
+								{{ error }}
+								{% endfor %}
+							</div>
+							{% endif %}
+						</div>
+					</div>
+					<div class="col-md-6">
+						<div class="form-group">
+							{{ form.ret_iva|as_crispy_field }}
+							{% if form.ret_iva.help_text %}
+							<small class="form-text text-muted">{{ form.ret_iva.help_text }}</small>
+							{% endif %}
+							{% if form.ret_iva.errors %}
+							<div class="text-danger">
+								{% for error in form.ret_iva.errors %}
+								{{ error }}
+								{% endfor %}
+							</div>
+							{% endif %}
+						</div>
+					</div>
+					<div class="col-md-6">
+						<div class="form-group">
+							{{ form.aut_ret|as_crispy_field }}
+							{% if form.aut_ret.help_text %}
+							<small class="form-text text-muted">{{ form.aut_ret.help_text }}</small>
+							{% endif %}
+							{% if form.aut_ret.errors %}
+							<div class="text-danger">
+								{% for error in form.aut_ret.errors %}
+								{{ error }}
+								{% endfor %}
+							</div>
+							{% endif %}
+						</div>
+					</div>
+					<div class="col-md-6">
+						<div class="form-group">
+							{{ form.logo|as_crispy_field }}
+							{% if form.logo.help_text %}
+							<small class="form-text text-muted">{{ form.logo.help_text }}</small>
+							{% endif %}
+							{% if form.logo.errors %}
+							<div class="text-danger">
+								{% for error in form.logo.errors %}
+								{{ error }}
+								{% endfor %}
+							</div>
+							{% endif %}
+						</div>
+					</div>
+					<div class="col-md-6">
+						<div class="form-group">
+							{{ form.num_lic|as_crispy_field }}
+							{% if form.num_lic.help_text %}
+							<small class="form-text text-muted">{{ form.num_lic.help_text }}</small>
+							{% endif %}
+							{% if form.num_lic.errors %}
+							<div class="text-danger">
+								{% for error in form.num_lic.errors %}
+								{{ error }}
+								{% endfor %}
+							</div>
+							{% endif %}
+						</div>
+					</div>
+					<div class="col-md-6">
+						<div class="form-group">
+							{{ form.lic_act|as_crispy_field }}
+							{% if form.lic_act.help_text %}
+							<small class="form-text text-muted">{{ form.lic_act.help_text }}</small>
+							{% endif %}
+							{% if form.lic_act.errors %}
+							<div class="text-danger">
+								{% for error in form.lic_act.errors %}
+								{{ error }}
+								{% endfor %}
+							</div>
+							{% endif %}
+						</div>
+					</div>
+					<div class="col-md-6">
+						<div class="form-group">
+							{{ form.ini_lic|as_crispy_field }}
+							{% if form.ini_lic.help_text %}
+							<small class="form-text text-muted">{{ form.ini_lic.help_text }}</small>
+							{% endif %}
+							{% if form.ini_lic.errors %}
+							<div class="text-danger">
+								{% for error in form.ini_lic.errors %}
+								{{ error }}
+								{% endfor %}
+							</div>
+							{% endif %}
+						</div>
+					</div>
+					<div class="col-md-6">
+						<div class="form-group">
+							{{ form.fin_lic|as_crispy_field }}
+							{% if form.fin_lic.help_text %}
+							<small class="form-text text-muted">{{ form.fin_lic.help_text }}</small>
+							{% endif %}
+							{% if form.fin_lic.errors %}
+							<div class="text-danger">
+								{% for error in form.fin_lic.errors %}
+								{{ error }}
+								{% endfor %}
+							</div>
+							{% endif %}
+						</div>
+					</div>
+					<!-- <div class="form-row field-fin_lic">
+						<div>
+							<div class="flex-container">
+								<label class="required" for="id_fin_lic">Fecha Fin Licencia:</label>
+								<p class="date">
+									<input type="text" name="fin_lic" class="vDateField" size="10" required="" id="id_fin_lic">
+									<span class="datetimeshortcuts">&nbsp;
+										<a href="#">Hoy</a>&nbsp;|&nbsp;<a href="#" id="calendarlink1">
+											<span class="date-icon" title="Elija una Fecha"></span>
+										</a>
+									</span>
+								<div class="help timezonewarning">Nota: Usted va 5 horas por detrás de la hora del servidor.</div>
+								</p>
+							</div>
+						</div>
+					</div> -->
+					</div>
+					<button type="submit" title="Guardar" class="btn btn-light rounded-pill"><i
+							class="bi bi-floppy"></i> Guardar</button>
+					<a href="../lista" title="Cancelar" type="submit" class="btn btn-light rounded-pill"><i
+							class="bi bi-x-square"></i> Cancelar</a>
+			</div>
+
+			</form>
+		</div>
+	</div>
+
+	<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"
+		integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p"
+		crossorigin="anonymous"></script>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js"
+		integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF"
+		crossorigin="anonymous"></script>
+
+</div>
+{% endblock %}
+
+
+
+
+<div class="row">
+	<div class="col-md-6">
+		<div class="form-group">
+			{{ form.codigo|as_crispy_field }}
+			{% if form.codigo.help_text %}
+			<small class="form-text text-muted">{{ form.codigo.help_text }}</small>
+			{% endif %}
+			{% if form.codigo.errors %}
+			<div class="text-danger">
+				{% for error in form.codigo.errors %}
+				{{ error }}
+				{% endfor %}
+			</div>
+			{% endif %}
+		</div>
+		<div class="form-group">
+			{{ form.doc_ide|as_crispy_field }}
+			{% if form.doc_ide.errors %}
+			<div class="text-danger">
+				{% for error in form.doc_ide.errors %}
+				{{ error }}
+				{% endfor %}
+			</div>
+			{% endif %}
+		</div>
+		<div class="form-group">
+			{{ form.dv|as_crispy_field }}
+			{% if form.dv.help_text %}
+			<small class="form-text text-muted">{{ form.dv.help_text }}</small>
+			{% endif %}
+			{% if form.dv.errors %}
+			<div class="text-danger">
+				{% for error in form.dv.errors %}
+				{{ error }}
+				{% endfor %}
+			</div>
+			{% endif %}
+		</div>
+	</div>
+	<div class="col-md-6">
+		<div class="form-group">
+			{{ form.sigla|as_crispy_field }}
+			{% if form.sigla.help_text %}
+			<small class="form-text text-muted">{{ form.sigla.help_text }}</small>
+			{% endif %}
+			{% if form.sigla.errors %}
+			<div class="text-danger">
+				{% for error in form.sigla.errors %}
+				{{ error }}
+				{% endfor %}
+			</div>
+			{% endif %}
+		</div>
+		<div class="form-group">
+			{{ form.nombre|as_crispy_field }}
+			{% if form.nombre.help_text %}
+			<small class="form-text text-muted">{{ form.nombre.help_text }}</small>
+			{% endif %}
+			{% if form.nombre.errors %}
+			<div class="text-danger">
+				{% for error in form.nombre.errors %}
+				{{ error }}
+				{% endfor %}
+			</div>
+			{% endif %}
+		</div>
+		<div class="form-group">
+			{{ form.direccion|as_crispy_field }}
+			{% if form.direccion.help_text %}
+			<small class="form-text text-muted">{{ form.direccion.help_text }}</small>
+			{% endif %}
+			{% if form.direccion.errors %}
+			<div class="text-danger">
+				{% for error in form.direccion.errors %}
+				{{ error }}
+				{% endfor %}
+			</div>
+			{% endif %}
+		</div>
+		<div class="form-group">
+			{{ form.celular|as_crispy_field }}
+			{% if form.celular.errors %}
+			<div class="text-danger">
+				{% for error in form.celular.errors %}
+				{{ error }}
+				{% endfor %}
+			</div>
+			{% endif %}
+		</div>
+	</div>
+</div>

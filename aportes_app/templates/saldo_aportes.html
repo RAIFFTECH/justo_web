@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="content-wrapper">
+    <div class="page-header">
+        <h2 class=" text-primary">Saldo de Aportes</h2>
+    </div>
+    <div class="col-md-12 grid-margin stretch-card rounded-5">
+        <div class="card rounded-5">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <form id="saldos-form" action="{% url 'saldo_aportes' %}" method="post">
+                            {% csrf_token %}
+                            <label for="fecha_corte">Fecha de Corte:</label>
+                            <input type="date" id="fecha_corte" name="fecha_corte" ><br><br>
+                        
+                            <!-- <label for="nombre_archivo">Nombre del Archivo:</label>
+                            <input type="text" id="nombre_archivo" name="nombre_archivo" ><br><br> -->
+
+                            <!-- <div class="form-group col-md-12 text-center"> -->
+                                <!-- <button type="submit" name="accion" value="imprimir" target="_blank" title="Imprimir"
+                                    class="btn btn-light rounded-pill"><i class="bi bi-printer-fill"></i> Imprimir</button> -->
+                                <button type="submit" name="accion" value="exportar" target="_blank" title="Exportar" class="btn btn-light rounded-pill">
+                                    <i class="bi bi-box-arrow-down"></i> Exportar</button>
+                                <button type="submit" name="accion" value="csv" target="_blank" title="CSV" class="btn btn-light rounded-pill">
+                                    <i class="bi bi-filetype-csv"></i> CSV</button>
+                            <!-- </div> -->
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Función para establecer una fecha por defecto en un campo
+    function setDefaultDate(fieldId, date) {
+        document.getElementById(fieldId).value = date;
+    }
+    // Función para inicializar todas las fechas por defecto
+    function initializeDates() {
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, '0'); // MM
+        const day = String(today.getDate()).padStart(2, '0'); // DD
+        // Fecha actual
+        const currentDate = `${year}-${month}-${day}`;
+        // 1 de enero del año actual
+        const firstDayOfYear = `${year}-01-01`;
+        // Asignar fechas a los campos
+        // setDefaultDate('fecha_inicial', firstDayOfYear); // Fecha Inicial
+        setDefaultDate('fecha_corte', currentDate); // Fecha Corte
+        setDefaultDate('fecha_corte1', currentDate); // Fecha Corte1
+    }
+    // Llamar a la función de inicialización al cargar la página
+    window.onload = initializeDates;
+
+    document.getElementById("nombre_archivo").addEventListener("click", function () {
+            const contenido = "Este es un archivo generado en el navegador.";
+            const blob = new Blob([contenido], { type: "text/plain" });
+            const url = URL.createObjectURL(blob);
+
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = "mi_archivo.xls";  // Nombre del archivo a descargar
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        });
+
+
+</script>
+
+{% endblock %}

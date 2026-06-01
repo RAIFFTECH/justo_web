@@ -1,0 +1,836 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Créditos</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> <!-- Carga de jQuery -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.rawgit.com/customd/jquery-number/master/jquery.number.min.js"></script>
+
+    <style>
+        .highlight-field {
+            background-color: #ffff99; /* Color de fondo resaltado */
+            border: 1px solid #cccccc; /* Opcional: borde para mayor visibilidad */
+            padding: 5px; /* Opcional: espaciado interno */
+        }
+        .btn {
+            background-color: #007bff; /* Color azul */
+            color: white;
+            padding: 10px 20px;
+            margin: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .btn i {
+            margin-right: 8px;
+        }
+
+        .btn:disabled {
+            background-color: #c0c0c0; /* Color gris cuando está deshabilitado */
+            cursor: not-allowed;
+        }
+
+        .btn:hover:not(:disabled) {
+            background-color: #0056b3; /* Azul más oscuro al pasar el mouse si no está deshabilitado */
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: flex-start; /* Alinea los botones a la izquierda */
+            gap: 10px; /* Añade un pequeño espacio entre los botones */
+        }
+        
+        form {
+            text-align: left; /* Asegura que el contenido dentro del formulario esté alineado a la izquierda */
+        }
+        .custom-background {
+            background-color: #f8f9fa; /* Cambia este color según tus necesidades */
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <p>Operation: {{ operation }}</p>
+        <h1>{% if operation == 'update' %}Modificar Crédito{% else %}Crear Crédito{% endif %}</h1>
+        <form id="miFormulario" method="post">
+            {% csrf_token %}
+            <div class="row mb-3 align-items-center">
+                <div class="col-md-3">
+                    <div style="width: 120px; display: inline-block;">
+                        {{ form.cod_cre|as_crispy_field }}
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="input-group">
+                        <!-- Botón con ícono de búsqueda -->
+                        <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#buscarSocioModal">
+                            <i class="fas fa-search"></i> Socio
+                        </button>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div style="width: 140px; display: inline-block;">
+                        {{ form.doc_ide|as_crispy_field }}
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div style="width: 360px; display: inline-block;">
+                        {{ form.nom_soc|as_crispy_field }}
+                    </div>
+                </div>
+            </div>            
+            <div class="tab-content" id="myTabContent">
+                <!-- Navegación de pestañas -->
+                <ul class="nav nav-tabs" id="myTab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="liquidacion-tab" data-bs-toggle="tab" data-bs-target="#liquidacion" type="button" role="tab" aria-controls="liquidacion" aria-selected="true">Datos para Liquidación</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="credito-tab" data-bs-toggle="tab" data-bs-target="#credito" type="button" role="tab" aria-controls="credito" aria-selected="false">Datos del Crédito</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="vitacora-tab" data-bs-toggle="tab" data-bs-target="#vitacora" type="button" role="tab" aria-controls="vitacora" aria-selected="false">Vitácora del Crédito</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="codeudores-tab" data-bs-toggle="tab" data-bs-target="#codeudores" type="button" role="tab" aria-controls="codeudores" aria-selected="false">Codeudores</button>
+                    </li>
+
+                </ul>
+                <!-- Liquidación -->
+                <div class="tab-pane fade show active" id="liquidacion" role="tabpanel" aria-labelledby="liquidacion-tab">
+                    <div class="row">
+                        <div class="col-md-4">
+                            {{ form.cap_ini|as_crispy_field }}
+                            {{ form.num_cuo_ini|as_crispy_field }}
+                            {{ form.tian_ic_ini|as_crispy_field }}
+                            {{ form.num_cuo_gra|as_crispy_field }}
+                        </div>
+
+                        <div class="col-md-4">
+                            {{ form.cod_lin_cre|as_crispy_field }}
+                            {{ form.fec_des|as_crispy_field }}
+                            {{ form.tian_pol_seg|as_crispy_field }}
+                            {{ form.decreciente|as_crispy_field }}                      
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.per_ano|as_crispy_field }}
+                            {{ form.fec_pag_ini|as_crispy_field }}
+                            {{ form.tian_im|as_crispy_field }}
+                            <div style="width: 140px; display: inline-block;">
+                                {{ form.val_cuo_ini|as_crispy_field }}
+                            </div>                            
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="credito" role="tabpanel" aria-labelledby="credito-tab">
+                    <div class="row">
+                        <div class="col-md-4">
+                            {{ form.imputacion|as_crispy_field }}
+                            {{ form.libranza|as_crispy_field }}
+                            {{ form.pagare|as_crispy_field }}
+
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.termino|as_crispy_field }}
+                            {{ form.for_pag|as_crispy_field }}
+                            {{ form.tip_gar|as_crispy_field }}                      
+                            {{ form.por_des_pro_pag|as_crispy_field }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.estado|as_crispy_field }}
+                            {{ form.est_jur|as_crispy_field }}
+                            {{ form.rep_cen_rie|as_crispy_field }}
+                            {{ form.figarantias|as_crispy_field }}
+                        </div>
+                    </div>
+                </div>
+                <!-- Vitácora del Crédito -->
+                <div class="tab-pane fade" id="vitacora" role="tabpanel" aria-labelledby="vitacora-tab">
+                    <div class="row">
+                        <div class="col-md-4">
+                            {{ form.fec_ult_pag|as_crispy_field }}
+                            {{ form.num_cuo_act|as_crispy_field }}
+                            {{ form.val_cuo_act|as_crispy_field }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.val_gar_hip|as_crispy_field }}
+                            {{ form.mat_inm_gar|as_crispy_field }}
+                            {{ form.num_pol_gar_hip|as_crispy_field }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.cat_nue|as_crispy_field }}
+                            {{ form.prima|as_crispy_field }}
+                            {{ form.porcentaje_prima|as_crispy_field }}
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="codeudores" role="tabpanel" aria-labelledby="codeudores-tab">
+                    <h3>Lista de Codeudores</h3>
+                    <div class="mb-3 d-flex align-items-center flex-row flex-nowrap">
+                        <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#buscarCodeudorModal">
+                            <i class="fas fa-search"></i> Codeudor
+                        </button>
+                        <div class="form-group d-flex align-items-center col-auto">
+                            <label for="doc_ide_cod" class="me-2">Doc. Ident. del Codeudor: </label>
+                            <input type="text" id="doc_ide_cod" name="doc_ide_cod" class="form-control" style="width: 150px;">
+                        </div>
+                        <div class="form-group d-inline-flex align-items-center me-3 col-auto">
+                            <label for="nombre_tercero" class="me-2">Nombre Codeudor: </label>
+                            <input type="text" id="nombre_tercero" name="nombre_tercero" class="form-control" readonly style="width: 400px;">
+                        </div>
+                        <button type="button" title="Agregar Item" id="agregarCodeudorBtn" class="btn btn-info btn-sm detalles-btn d-flex align-items-center me-2">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                    <table class="table table-bordered" id="codeudores-table">
+                        <thead>
+                            <tr>
+                                <th>Documento</th>
+                                <th>Nombre</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if operation == 'update' %}
+                                <!-- Si es una actualización, cargamos los codeudores desde el contexto -->
+                                {% for codeudor in codeudores %}
+                                    <tr>
+                                        <td>{{ codeudor.tercero.doc_ide }}</td>
+                                        <td>{{ codeudor.tercero.nombre }}</td>
+                                        <td>
+                                            <button type="button" class="btn btn-danger btn-sm eliminarCodeudor">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                {% empty %}
+                                
+                                {% endfor %}
+
+                            {% endif %}
+                        </tbody>
+                    </table>
+                    <input type="hidden" name="codeudores" id="codeudoresCampo">
+                </div>                
+            </div>
+            <form>
+                <div class="button-group">
+                    <button type="submit" id="id_grabar" class="btn">
+                        <i class="fas fa-paper-plane"></i> Grabar
+                    </button>
+                    <button type="button" id="planAmortizacionBtn" class="btn" disabled onclick="openPlanAmortizacion()">
+                        <i class="fas fa-print"></i> Plan de Amortizacion
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="window.history.back();">Retornar</button>
+                </div>
+            </form>
+            <!-- Modal -->
+            <div class="modal fade" id="buscarSocioModal" tabindex="-1" aria-labelledby="buscarSocioLabel" aria-hidden="true">               
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="buscarSocioLabel" style="background-color: #0c67f0; color: white; padding: 10px;">Buscar Socio   </|h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label for="inputBuscarSocio" class="form-label">criterio de búsqueda --> Nombre:</label>
+                                <input type="text" class="form-control" id="inputBuscarSocio" placeholder="Ingrese nombre, documento, etc.">
+                            </div>
+                            <!-- Resultados de la búsqueda -->
+                            <div id="resultadosBusqueda" class="list-group mt-3">
+                                <!-- Aquí se insertarán dinámicamente los resultados de la búsqueda -->
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal fade" id="buscarCodeudorModal" tabindex="-1" aria-labelledby="buscarCdeudorLabel" aria-hidden="true">               
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="buscarCodeudorLabel" style="background-color: #0c67f0; color: white; padding: 10px;">Buscar Codeudor   </|h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label for="inputBuscarCodeudor" class="form-label">criterio de búsqueda --> Nombre:</label>
+                                <input type="text" class="form-control" id="inputBuscarCodeudor" placeholder="Ingrese nombre o documento o celular">
+                            </div>
+                            <!-- Resultados de la búsqueda -->
+                            <div id="resultadosBusquedaCod" class="list-group mt-3">
+                                <!-- Aquí se insertarán dinámicamente los resultados de la búsqueda -->
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div id="resultadosBusqueda"></div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Se ejecuta document.addEventListener');
+            var docIdeField = document.querySelector('input[name="doc_ide"]');
+            var nomSocField = document.querySelector('input[name="nom_soc"]');
+            /*var selectLinCre = document.getElementById('id_cod_lin_cre');*/
+            var selectLinCre = document.querySelector('input[name="cod_lin_cre"]');
+           
+            var tasIntCorField = document.querySelector('input[name="tian_ic_ini"]');
+            var tasPolSegField = document.querySelector('input[name="tian_pol_seg"]');
+            var tasIntMorField = document.querySelector('input[name="tian_im"]');
+            if (selectLinCre) {
+                const selectedValue = selectLinCre.value;
+            } 
+            if (event.target && event.target.id === 'id_cod_lin_cre') {
+                const selectedValue = event.target.value;
+                if (selectedValue) {
+                    const url = window.location.origin + "/linea_creditos/obtener_lc/" + encodeURIComponent(selectedValue);
+                    fetch(url, {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Datos recibidos:', data);
+                        // Asigna los valores a los campos correspondientes
+                        tasIntCorField.value = data.tas_int_cor;
+                        tasIntMorField.value = data.tas_int_mor;
+                        tasPolSegField.value = data.tas_por_pol;
+                    })
+                    .catch(error => {
+                        console.error('Error al hacer la solicitud:', error);
+                    });
+                }
+            }
+
+            // Maneja el evento 'blur' para el campo 'doc_ide'
+            if (docIdeField && nomSocField) {
+                console.log('Campos docIdeField y nomSocField encontrados');
+                docIdeField.addEventListener('blur', function() {
+                    var docIde = this.value.trim();
+                    if (docIde) {
+                        console.log('Consultando el socio en URL: ', window.location.origin + "/asociados/obtener/" + encodeURIComponent(docIde));
+                        fetch(window.location.origin + "/asociados/obtener/" + encodeURIComponent(docIde))
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.nombre) {
+                                    nomSocField.value = data.nombre;
+                                } else if (data.error) {
+                                    console.error('Error:', data.error);
+                                    nomSocField.value = '';
+                                }
+                            })
+                            .catch(error => console.error('Error:', error));
+                    } else {
+                        nomSocField.value = '';
+                    }
+                });
+            }
+            
+            const form = document.querySelector('form');
+            if (form) {
+                form.addEventListener('submit', function(event) {
+                    const fecDesInput = document.querySelector('input[name="fec_des"]');
+                    console.log('Fecha enviada:', fecDesInput.value);  // Imprime el valor del campo fec_des
+                });
+            }
+        });
+    </script>
+    <script>
+        $(document).ready(function() {
+            $('#inputBuscarSocio').on('input', function() {
+                var query = $(this).val();
+                console.log('query ', query);
+                var url = window.location.origin + "/comprobantes/subcuenta/?cod_con=APOR&filtro=" + encodeURIComponent(query);
+                console.log('url ', url);    
+                $.ajax({
+                    url: url,
+                    success: function(data) {
+                        var resultadosHtml = '<table class="table table-striped">';
+                        resultadosHtml += '<thead><tr><th>Subcuenta</th><th>Nombre</th><th>Fecha</th><th>Estado</th></tr></thead><tbody>';
+                        console.log('item Ok ', data);
+                        
+                        data.forEach(function(item) {
+                            resultadosHtml += '<tr class="resultado-socio" data-subcuenta="' + item.subcuenta + '" data-nombre="' + item.nombre + '">' +
+                                '<td>' + item.subcuenta + '</td>' +
+                                '<td>' + item.nombre + '</td>' +
+                                '</tr>';
+                        });
+                        resultadosHtml += '</tbody></table>';
+                        $('#resultadosBusqueda').html(resultadosHtml);
+                    },
+                    error: function(xhr, status, error) {
+                        console.log('Error en la solicitud: ', error);
+                    }
+                });
+            });
+    
+            $('#resultadosBusqueda').on('click', '.resultado-socio', function() {
+                var subcuenta = $(this).data('subcuenta');
+                var nombre = $(this).data('nombre');
+                $('#form_doc_ide').val(subcuenta);
+                $('#form_nom_soc').val(nombre);
+                var myModal = bootstrap.Modal.getInstance(document.getElementById('buscarSocioModal'));
+                myModal.hide();
+                $('.modal-backdrop').remove();
+            });
+        });
+    </script>   
+        
+    <script>
+        $(document).ready(function() {
+            $('#inputBuscarCodeudor').on('input', function() {
+                var query = $(this).val();
+                var url = window.location.origin + "/terceros/lista/buscarter_query/" + encodeURIComponent(query); 
+                $.ajax({
+                    url: url,
+                    success: function(data) {
+                        var resultadosHtml = '<table class="table table-striped">';
+                        resultadosHtml += '<thead><tr><th>Subcuenta</th><th>Nombre</th><th>Fecha</th><th>Estado</th></tr></thead><tbody>';
+                        console.log('item Ok ', data);    
+                        data.forEach(function(item) {
+                            resultadosHtml += '<tr class="resultado-socio" data-doc_ide="' + item.doc_ide + '" data-nombre="' + item.nombre + '">' +
+                                '<td>' + item.doc_ide + '</td>' +
+                                '<td>' + item.nombre + '</td>' +
+                                '</tr>';
+                        });
+                        resultadosHtml += '</tbody></table>';
+                        $('#resultadosBusquedaCod').html(resultadosHtml);
+                    },
+                    error: function(xhr, status, error) {
+                        console.log('Error en la solicitud: ', error);
+                    }
+                });
+            });
+            $('#resultadosBusquedaCod').on('click', '.resultado-socio', function() {
+                var doc_ide = $(this).data('doc_ide');
+                var nombre = $(this).data('nombre');
+                console.log('cod_ide .... ',doc_ide);
+                $('#doc_ide_cod').val(doc_ide); // Usar el id correcto
+                $('#nombre_tercero').val(nombre); // Usar el id correcto
+                var myModal = bootstrap.Modal.getInstance(document.getElementById('buscarCodeudorModal'));
+                myModal.hide();
+                $('.modal-backdrop').remove();
+            });
+        });
+    </script>
+
+    <script>
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    // Verificar si el nombre de la cookie es el buscado
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        const csrftoken = getCookie('csrftoken');
+
+        $.ajaxSetup({
+            beforeSend: function(xhr, settings) {
+                if (!this.crossDomain) {
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                }
+            }
+        });
+
+        function convertDateToISO(dateString) {
+            let parts = dateString.split('-');
+            return `${parts[2]}-${parts[1]}-${parts[0]}`; // Convierte DD-MM-YYYY a YYYY-MM-DD
+        }
+
+        function formatCurrency(value) {
+            const number = parseFloat(value);
+            return isNaN(number) ? '' : `$${number.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+        }
+
+
+        $(document).ready(function() {
+            $('input').on('change', function() {
+                console.log('entrada a calculo cuota');
+
+                let fec_des = $('#id_fec_des').val();
+                let fec_pag_ini = $('#id_fec_pag_ini').val();
+                
+                let ian_ic_ini = parseFloat($('#id_tian_ic_ini').val().replace(/[^0-9.-]+/g, '')) || 0;
+                let ian_cap_ini = parseFloat($('#id_cap_ini').val().replace(/[^0-9.-]+/g, '')) || 0;
+                let inum_cuo_ini = parseInt($('#id_num_cuo_ini').val()) || 0;
+                if (fec_des) {
+                    fec_des = convertDateToISO(fec_des); // Convierte a YYYY-MM-DD
+                }
+                if (fec_pag_ini) {
+                    fec_pag_ini = convertDateToISO(fec_pag_ini); // Convierte a YYYY-MM-DD
+                }
+                if (fec_des && fec_pag_ini && ian_ic_ini > 0 && ian_cap_ini > 0 && inum_cuo_ini > 0) {
+                    let data = {
+                        'cap_ini': ian_cap_ini,
+                        'num_cuo_ini': $('#id_num_cuo_ini').val(),
+                        'num_cuo_gra': $('#id_num_cuo_gra').val(),
+                        'tian_ic_ini': ian_ic_ini,
+                        'fec_des': fec_des,
+                        'decreciente': $('#id_decreciente').val(),
+                        'per_ano': $('#id_per_ano').val(),
+                        'fec_pag_ini': fec_pag_ini,
+                        'val_cuo_ini': $('#id_val_cuo_ini').val(),
+                        'tian_im': $('#id_tian_im').val()
+                    };
+                    $.ajax({
+                        url: "{% url 'calculo_cuota' %}",
+                        type: 'POST',
+                        data: data,
+                        success: function(response) {
+                            $('input[name="val_cuo_ini"]').val(formatCurrency(response.cuota));
+                            $('input[name="val_cuo_act"]').val(formatCurrency(response.cuota));
+                            document.getElementById("planAmortizacionBtn").disabled = false;
+                        }
+                    });
+                }
+            });
+        });
+
+
+        function openPlanAmortizacion() {
+            console.log('Plan Amortizacion ')
+            let cod_cre = $('input[name="cod_cre"]').val();
+            let nom_deu = $('input[name="nom_soc"]').val();
+            let fec_des = $('#id_fec_des').val();
+            let fec_pag_ini = $('#id_fec_pag_ini').val();
+            let ian_ic_ini = $('#id_tian_ic_ini').val();
+            let ian_cap_ini = $('#id_cap_ini').val();
+            let inum_cuo_ini = $('#id_num_cuo_ini').val();
+            if (fec_des) {
+                fec_des = convertDateToISO(fec_des); // Convierte a YYYY-MM-DD
+            }
+            if (fec_pag_ini) {
+                fec_pag_ini = convertDateToISO(fec_pag_ini); // Convierte a YYYY-MM-DD
+            }
+            ian_cap_ini = ian_cap_ini.replace(/[^0-9.,-]/g, "");
+            ian_cap_ini = ian_cap_ini.replace(/,/g, "");
+            ian_cap_ini = parseFloat(ian_cap_ini);
+
+            console.log("cod_cre:", $('#id_cod_lin_cre option:selected').text());
+            console.log("fec_des:", fec_des);
+            console.log("fec_pag_ini:", fec_pag_ini);
+            console.log("ian_ic_ini:", ian_ic_ini);
+            console.log("ian_cap_ini:", ian_cap_ini);
+            console.log("inum_cuo_ini:", inum_cuo_ini);
+
+            if (fec_des && fec_pag_ini && ian_ic_ini > 0 && ian_cap_ini > 0 && inum_cuo_ini > 0) {
+                console.log('Plan Amortizacion Pasa Validaciones ....')
+                let data = {
+                    'cod_cre': cod_cre,
+                    'nom_deu': nom_deu,
+                    'cap_ini': ian_cap_ini,
+                    'num_cuo_ini': $('#id_num_cuo_ini').val(),
+                    'num_cuo_gra': $('#id_num_cuo_gra').val(),
+                    'tian_ic_ini': ian_ic_ini,
+                    'fec_des': fec_des,
+                    'decreciente': $('#id_decreciente').val(),
+                    'per_ano': $('#id_per_ano').val(),
+                    'fec_pag_ini': fec_pag_ini,
+                    'val_cuo_ini': $('#id_val_cuo_ini').val(),
+                    'tian_im': $('#id_tian_im').val(),
+                    'for_pag': $('#id_for_pag option:selected').text(),
+                    'cod_lin_cre': $('#id_cod_lin_cre option:selected').text(),
+                };    
+                $.ajax({
+                    url: "{% url 'imp_plan_amortizacion' %}",
+                    type: 'POST',
+                    data: data,
+                    xhrFields: {
+                        responseType: 'blob' // Especifica que esperas un Blob (PDF)
+                    },
+                    success: function(data) {
+                        const url = window.URL.createObjectURL(data);
+                        window.open(url); // Abre el PDF en una nueva pestaña
+                        window.URL.revokeObjectURL(url); // Libera el objeto URL
+                    },
+                    error: function() {
+                        console.log('Error en la generación del plan de amortización.');
+                    }
+                });
+            }
+        }
+    </script>
+
+<script>
+    // Pasa la URL base de creación desde Django
+    var createUrl = "{% url 'crear_credito_justo' %}";  // URL de creación
+    var updateUrlBase = "{% url 'actualizar_credito' pk=0 %}";  // URL base de actualización, sin el ID
+</script>
+
+<script>
+    $(document).ready(function() {
+        $('#miFormulario').on('submit', function(e) {
+            console.log('Entra a Mi Formulario');
+            e.preventDefault();  // Evitar el envío del formulario por defecto
+        // Validaciones
+            let cap_ini = parseInt($('#id_cap_ini').val()) || 0;
+            let num_cuo_ini = $('#id_num_cuo_ini').val();
+            let val_cuo_ini = parseInt($('#id_val_cuo_ini').val()) || 0;
+            let val_cuo_act = parseInt($('#id_val_cuo_act').val()) || 0;
+            if (num_cuo_ini <= 0) {
+                alert('El valor del número de cuotas debe ser mayor a 0.');
+                $('#id_num_cuo_ini').focus();
+                return;
+            }
+            if (!$('#id_cod_lin_cre').val()) {
+                alert('Por favor, seleccione una opción en el campo de línea de crédito.');
+                $('#id_cod_lin_cre').focus();
+                return;
+            }
+            if (!$('#id_imputacion').val()) {
+                alert('Por favor, seleccione una opción en el campo imputación.');
+                $('a[href="#credito"]').tab('show');
+                $('#id_imputacion').focus();
+                return;
+            }
+            let codeudores = [];
+            $('#codeudores-table tbody tr').each(function() {
+                let docIde = $(this).find('td').eq(0).text(); // Obtén el documento de identidad
+                let nombreCodeudor = $(this).find('td').eq(1).text(); // Obtén el nombre del codeudor
+                let idCodeudor = $(this).data('id');  // Obtén el ID del codeudor desde el data-id
+                if (idCodeudor === undefined || idCodeudor <= 0) {
+                    idCodeudor = -Math.abs(idCodeudor) - 1; // Asignar un ID negativo
+                }
+                codeudores.push({
+                    id: idCodeudor,  // Enviar el ID (negativo si es nuevo)
+                    doc_ide: docIde,
+                });
+            });
+            console.log('Val_cuo_ini ', $('#id_val_cuo_ini').val(),)
+            var formData = {
+                'cod_cre': $('input[name="cod_cre"]').val(),
+                'doc_ide': $('input[name="doc_ide"]').val(),
+                'cap_ini': cap_ini,
+                'num_cuo_ini': num_cuo_ini,
+                'num_cuo_gra': $('#id_num_cuo_gra').val(),
+                'tian_ic_ini': $('#id_tian_ic_ini').val(),
+                'cod_lin_cre': $('#id_cod_lin_cre').val(),
+                'fec_des': $('#id_fec_des').val(),
+                'decreciente': $('#id_decreciente').val(),
+                'tian_pol_seg': $('#id_tian_pol_seg').val(),
+                'per_ano': $('#id_per_ano').val(),
+                'fec_pag_ini': $('#id_fec_pag_ini').val(),
+                'val_cuo_ini': val_cuo_ini,
+                'val_cuo_act': val_cuo_act,
+                'tian_im': $('#id_tian_im').val(),
+                'imputacion': $('#id_imputacion').val(),
+                'libranza': $('#id_libranza').val(),
+                'pagare': $('#id_pagare').val(),
+                'termino': $('#id_termino').val(),
+                'for_pag': $('#id_for_pag').val(),
+                'tip_gar': $('#id_tip_gar').val(),
+                'por_des_pro_pag': $('#id_por_des_pro_pag').val(),
+                'estado': $('#id_estado').val(),
+                'est_jur': $('#id_est_jur').val(),
+                'rep_cen_rie': $('#id_rep_cen_rie').val(),
+                'figarantias': $('#id_figarantias').val(),
+                'fec_ult_pag': $('#id_fec_ult_pag').val(),
+                'num_cuo_act': $('#id_num_cuo_act').val(),
+                'val_gar_hip': $('#id_val_gar_hip').val(),
+                'mat_inm_gar': $('#id_mat_inm_gar_hip').val(),
+                'num_pol_gar_hip': $('#id_num_pol_gar_hip').val(),
+                'cat_nue': $('#id_cat_nue').val(),
+                'dia_con_int_mor': $('#id_dia_con_int_mor').val(),
+                'prima': $('#id_prima').val(),
+                'porcentaje_prima': $('#id_porcentaje_prima').val(),
+                'codeudores': codeudores,
+            };
+            let url;
+            let operation = "{{ operation }}";
+            let creditoId = "{{ credito.id|default:'' }}";  // Obtén el ID del crédito si está disponible
+            console.log('Operacion ',operation)
+            if (operation === 'update' && creditoId) {
+                // En actualización, construimos la URL reemplazando el pk con el creditoId
+                url = updateUrlBase.replace('0', creditoId);
+                console.log('Url Actualizar Credito ',url)
+            } else {
+                // En creación, usamos la URL de creación
+                url = createUrl;
+            }
+            $.ajax({
+                url: url,  // La URL de la vista que recibirá los datos
+                type: 'POST',
+                contentType: 'application/json',  // Enviamos los datos como JSON
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                data: JSON.stringify(formData),  // Convertimos los datos a JSON
+                success: function(response) {
+                    if (response.success) {
+                        alert(response.message+' con el Credito Numero --> '+response.Numero);
+                        document.getElementById("id_grabar").disabled = true;
+                    } else {
+                        let errorMessage = "Errores en el formulario:\n";
+                        for (let key in response.errors) {
+                            errorMessage += `${key}: ${response.errors[key].join(', ')}\n`;
+                        }
+                        alert(errorMessage);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.log('Respuesta del servidor:', xhr.responseText);
+                    alert('Errores en el formulario .'+ xhr.responseText);
+                }
+            });
+        });
+    });
+</script>
+
+<script>
+    $(document).ready(function() {
+        $('#doc_ide_cod').on('blur', function() {
+            let docIde = $(this).val();
+            console.log('Buscando Documento ',docIde);
+            if (docIde) {
+                $.ajax({
+                    url: "{% url 'buscar_tercero' %}",
+                    data: {
+                        'doc_ide': docIde
+                    },
+                    dataType: 'json',
+                    success: function(data) {
+                        if (data.exists) {
+                            $('#nombre_tercero').val(data.nombre);
+                            $('#mensaje_error').text('');
+                        } else {
+                            $('#nombre_tercero').val('');
+                            $('#mensaje_error').text('El tercero no existe.');
+                        }
+                    },
+                    error: function() {
+                        $('#nombre_tercero').val('');
+                        $('#mensaje_error').text('Error al buscar el tercero.');
+                    }
+                });
+            } else {
+                $('#nombre_tercero').val('');
+                $('#mensaje_error').text('Debe ingresar un documento de identificación.');
+            }
+        });
+    });
+</script>
+
+<script>
+    $('#agregarCodeudorBtn').on('click', function() {
+        var docIde = $('#doc_ide_cod').val();  // Obtener documento del codeudor
+        var nombre = $('#nombre_tercero').val();  // Obtener nombre del codeudor
+        let idCodeudor = Math.floor(Math.random() * -1000); 
+        if (docIde && nombre) {
+            var existe = false;
+            $('#codeudores-table tbody tr').each(function() {
+                var docExistente = $(this).find('td:first').text().trim();
+                if (docExistente === docIde) {
+                    existe = true;
+                    return false;  // Salir del ciclo si se encuentra duplicado
+                }
+            });
+            if (!existe) {
+                var newCodeudor = `
+                    <tr data-id="${idCodeudor}">
+                        <td>${docIde}</td>
+                        <td>${nombre}</td>
+                        <td>
+                            <button type="button" class="btn btn-danger btn-sm eliminarCodeudor">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+                $('#codeudores-table tbody').append(newCodeudor);
+                $('#doc_ide_cod').val('');
+                $('#nombre_tercero').val('');
+            } else {
+                alert('El codeudor con este documento de identificación ya ha sido agregado.');
+            }
+        } else {
+            alert('Por favor, complete los datos del codeudor.');
+        }
+    });
+
+    $(document).on('click', '.eliminarCodeudor', function() {
+        $(this).closest('tr').remove();
+    });
+
+    function recolectarCodeudores() {
+        var codeudores = [];
+        $('#codeudores-table tbody tr').each(function() {
+            var docIde = $(this).find('td:first').text().trim();  // Obtener el documento
+            var nombre = $(this).find('td:nth-child(2)').text().trim();  // Obtener el nombre
+            codeudores.push({ doc_ide: docIde, nombre: nombre });
+        });
+        $('#codeudoresCampo').val(JSON.stringify(codeudores));
+    }
+
+    $('#submit-button').on('click', function(e) {
+        recolectarCodeudores();  // Recolectar los codeudores antes de enviar
+    });
+</script>
+
+
+
+<script>
+    $(document).ready(function() {
+        $('#id_cod_lin_cre').change(function() {
+            var codLinCreId = $(this).val();  // Obtener el ID seleccionado
+            console.log('que imprimne aqui  --->',codLinCreId)
+            if (codLinCreId) {
+                $.ajax({
+                    url: `/linea_creditos/obtener_det_lc/${codLinCreId}`,  // Ruta de la vista
+                    type: 'GET',
+                    success: function(data) {
+                        // Actualizar los campos con los valores obtenidos
+                        $('#id_tian_ic_ini').val(data.tas_int_cor);
+                        $('#id_tian_pol_seg').val(data.por_pol);
+                        $('#id_tian_im').val(data.tas_int_mor);
+                        $('#id_por_des_pro_pag').val(data.por_des_pp);
+                        // $('#id_dia_con_int_mor').val(data.dia_con_int_mor)                    
+                    },
+                    error: function() {
+                        alert('Error al obtener los detalles Geinner.');
+                    }
+                });
+            }
+        });
+    });
+</script>
+
+</body>
+</html>
+{% endblock %}  

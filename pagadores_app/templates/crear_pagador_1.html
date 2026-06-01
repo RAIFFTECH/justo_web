@@ -1,0 +1,470 @@
+{% extends 'Base.html' %}
+{% block content %}
+
+<div class="content-wrapper">
+	<div class="page-header">
+		<h2 class=" text-primary">Crear Pagador </h3>
+			<a href="{% url 'listar' %}" class="btn btn-primary rounded-pill">
+				<i class="mdi mdi-arrow-left mx-2"></i>
+				Volver
+			</a>
+	</div>
+	<div class="col-md-12 grid-margin stretch-card rounded-5">
+		<div class="card rounded-5">
+			<div class="card-body">
+				<h4 class="card-title">Formulario predeterminado</h4>
+				<p class="card-description">Diseño de formulario básico</p>
+				{{error}}
+				<form action="/pagadores/crear/" method="POST" class="forms-sample">
+					<div class="row gx-4">
+						{% csrf_token %}
+						<div class="col-md-3">
+							<div class="form-group">
+								<label for="{{ form.cliente.id_for_label }}">{{ form.cliente.label }}</label>
+								{{ form.cliente }}
+								{% if form.cliente.help_text %}
+								<small class="form-text text-muted">{{ form.cliente.help_text }}</small>
+								{% endif %}
+								{% if form.cliente.errors %}
+								<div class="text-danger">
+									{% for error in form.cliente.errors %}
+									{{ error }}
+									{% endfor %}
+								</div>
+								{% endif %}
+							</div>
+						</div>
+						<div class="col-md-3">
+							<div class="form-group">
+								<label for="{{ form.codigo.id_for_label }}">{{ form.codigo.label }}</label>
+								{{ form.codigo }}
+								{% if form.codigo.help_text %}
+								<small class="form-text text-muted">{{ form.codigo.help_text }}</small>
+								{% endif %}
+								{% if form.codigo.errors %}
+								<div class="text-danger">
+									{% for error in form.codigo.errors %}
+									{{ error }}
+									{% endfor %}
+								</div>
+								{% endif %}
+							</div>
+						</div>
+						<div class="col-md-3">
+							<div class="form-group">
+								<label for="{{ form.dv.id_for_label }}">{{ form.dv.label }}</label>
+								{{ form.dv }}
+								{% if form.dv.help_text %}
+								<small class="form-text text-muted">{{ form.dv.help_text }}</small>
+								{% endif %}
+								{% if form.dv.errors %}
+								<div class="text-danger">
+									{% for error in form.dv.errors %}
+									{{ error }}
+									{% endfor %}
+								</div>
+								{% endif %}
+							</div>
+						</div>
+						<div class="col-md-3">
+							<div class="form-group">
+								<label for="{{ form.sigla.id_for_label }}">{{ form.sigla.label }}</label>
+								{{ form.sigla }}
+								{% if form.sigla.help_text %}
+								<small class="form-text text-muted">{{ form.sigla.help_text }}</small>
+								{% endif %}
+								{% if form.sigla.errors %}
+								<div class="text-danger">
+									{% for error in form.sigla.errors %}
+									{{ error }}
+									{% endfor %}
+								</div>
+								{% endif %}
+							</div>
+						</div>
+						<div class="col-md-6">
+							<div class="form-group">
+								<label for="{{ form.nombre.id_for_label }}">{{ form.nombre.label }}</label>
+								{{ form.nombre }}
+								{% if form.nombre.help_text %}
+								<small class="form-text text-muted">{{ form.nombre.help_text }}</small>
+								{% endif %}
+								{% if form.nombre.errors %}
+								<div class="text-danger">
+									{% for error in form.nombre.errors %}
+									{{ error }}
+									{% endfor %}
+								</div>
+								{% endif %}
+							</div>
+						</div>
+						<div class="col-md-6">
+							<div class="form-group">
+								<label for="{{ form.direccion.id_for_label }}">{{ form.direccion.label }}</label>
+								{{ form.direccion }}
+								{% if form.direccion.help_text %}
+								<small class="form-text text-muted">{{ form.direccion.help_text }}</small>
+								{% endif %}
+								{% if form.direccion.errors %}
+								<div class="text-danger">
+									{% for error in form.direccion.errors %}
+									{{ error }}
+									{% endfor %}
+								</div>
+								{% endif %}
+							</div>
+						</div>
+						<div class="col-md-4">
+							<div class="form-group">
+								<label for="{{ form.celular.id_for_label }}">{{ form.celular.label }}</label>
+								{{ form.celular }}
+								{% if form.celular.help_text %}
+								<small class="form-text text-muted">{{ form.celular.help_text }}</small>
+								{% endif %}
+								{% if form.celular.errors %}
+								<div class="text-danger">
+									{% for error in form.celular.errors %}
+									{{ error }}
+									{% endfor %}
+								</div>
+								{% endif %}
+							</div>
+						</div>
+						<div class="col-md-4">
+							<div class="form-group">
+								<label for="{{ form.telefono.id_for_label }}">{{ form.telefono.label }}</label>
+								{{ form.telefono }}
+								{% if form.telefono.help_text %}
+								<small class="form-text text-muted">{{ form.telefono.help_text }}</small>
+								{% endif %}
+								{% if form.telefono.errors %}
+								<div class="text-danger">
+									{% for error in form.telefono.errors %}
+									{{ error }}
+									{% endfor %}
+								</div>
+								{% endif %}
+							</div>
+						</div>
+						<div class="col-md-4">
+							<div class="form-group">
+								<label for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
+								{{ form.email }}
+								{% if form.email.help_text %}
+								<small class="form-text text-muted">{{ form.email.help_text }}</small>
+								{% endif %}
+								{% if form.email.errors %}
+								<div class="text-danger">
+									{% for error in form.email.errors %}
+									{{ error }}
+									{% endfor %}
+								</div>
+								{% endif %}
+							</div>
+						</div>
+						<div class="col-md-6">
+							<div class="form-group">
+								<label for="{{ form.ciudad.id_for_label }}">{{ form.ciudad.label }}</label>
+								{{ form.ciudad }}
+								{% if form.ciudad.help_text %}
+								<small class="form-text text-muted">{{ form.ciudad.help_text }}</small>
+								{% endif %}
+								{% if form.ciudad.errors %}
+								<div class="text-danger">
+									{% for error in form.ciudad.errors %}
+									{{ error }}
+									{% endfor %}
+								</div>
+								{% endif %}
+							</div>
+						</div>
+						<div class="col-md-6">
+							<div class="form-group">
+								<label for="{{ form.dominio.id_for_label }}">{{ form.dominio.label }}</label>
+								{{ form.dominio }}
+								{% if form.dominio.help_text %}
+								<small class="form-text text-muted">{{ form.dominio.help_text }}</small>
+								{% endif %}
+								{% if form.dominio.errors %}
+								<div class="text-danger">
+									{% for error in form.dominio.errors %}
+									{{ error }}
+									{% endfor %}
+								</div>
+								{% endif %}
+							</div>
+						</div>
+						<div class="col-md-6">
+							<div class="form-group">
+								<label for="{{ form.nit_ger.id_for_label }}">{{ form.nit_ger.label }}</label>
+								{{ form.nit_ger }}
+								{% if form.nit_ger.help_text %}
+								<small class="form-text text-muted">{{ form.nit_ger.help_text }}</small>
+								{% endif %}
+								{% if form.nit_ger.errors %}
+								<div class="text-danger">
+									{% for error in form.nit_ger.errors %}
+									{{ error }}
+									{% endfor %}
+								</div>
+								{% endif %}
+							</div>
+						</div>
+						<div class="col-md-6">
+							<div class="form-group">
+								<label for="{{ form.nom_ger.id_for_label }}">{{ form.nom_ger.label }}</label>
+								{{ form.nom_ger }}
+								{% if form.nom_ger.help_text %}
+								<small class="form-text text-muted">{{ form.nom_ger.help_text }}</small>
+								{% endif %}
+								{% if form.nom_ger.errors %}
+								<div class="text-danger">
+									{% for error in form.nom_ger.errors %}
+									{{ error }}
+									{% endfor %}
+								</div>
+								{% endif %}
+							</div>
+						</div>
+						<div class="col-md-6">
+							<div class="form-group">
+								<label for="{{ form.nit_con.id_for_label }}">{{ form.nit_con.label }}</label>
+								{{ form.nit_con }}
+								{% if form.nit_con.help_text %}
+								<small class="form-text text-muted">{{ form.nit_con.help_text }}</small>
+								{% endif %}
+								{% if form.nit_con.errors %}
+								<div class="text-danger">
+									{% for error in form.nit_con.errors %}
+									{{ error }}
+									{% endfor %}
+								</div>
+								{% endif %}
+							</div>
+						</div>
+						<div class="col-md-6">
+							<div class="form-group">
+								<label for="{{ form.nom_con.id_for_label }}">{{ form.nom_con.label }}</label>
+								{{ form.nom_con }}
+								{% if form.nom_con.help_text %}
+								<small class="form-text text-muted">{{ form.nom_con.help_text }}</small>
+								{% endif %}
+								{% if form.nom_con.errors %}
+								<div class="text-danger">
+									{% for error in form.nom_con.errors %}
+									{{ error }}
+									{% endfor %}
+								</div>
+								{% endif %}
+							</div>
+						</div>
+						<div class="col-md-6">
+							<div class="form-group">
+								<label for="{{ form.tp_con.id_for_label }}">{{ form.tp_con.label }}</label>
+								{{ form.tp_con }}
+								{% if form.tp_con.help_text %}
+								<small class="form-text text-muted">{{ form.tp_con.help_text }}</small>
+								{% endif %}
+								{% if form.tp_con.errors %}
+								<div class="text-danger">
+									{% for error in form.tp_con.errors %}
+									{{ error }}
+									{% endfor %}
+								</div>
+								{% endif %}
+							</div>
+						</div>
+						<div class="col-md-6">
+							<div class="form-group">
+								<label for="{{ form.nit_rev_fis.id_for_label }}">{{ form.nit_rev_fis.label }}</label>
+								{{ form.nit_rev_fis }}
+								{% if form.nit_rev_fis.help_text %}
+								<small class="form-text text-muted">{{ form.nit_rev_fis.help_text }}</small>
+								{% endif %}
+								{% if form.nit_rev_fis.errors %}
+								<div class="text-danger">
+									{% for error in form.nit_rev_fis.errors %}
+									{{ error }}
+									{% endfor %}
+								</div>
+								{% endif %}
+							</div>
+						</div>
+
+						<div class="col-md-6">
+							<div class="form-group">
+								<label for="{{ form.nom_rev_fis.id_for_label }}">{{ form.nom_rev_fis.label }}</label>
+								{{ form.nom_rev_fis }}
+								{% if form.nom_rev_fis.help_text %}
+								<small class="form-text text-muted">{{ form.nom_rev_fis.help_text }}</small>
+								{% endif %}
+								{% if form.nom_rev_fis.errors %}
+								<div class="text-danger">
+									{% for error in form.nom_rev_fis.errors %}
+									{{ error }}
+									{% endfor %}
+								</div>
+								{% endif %}
+							</div>
+						</div>
+						<div class="col-md-6">
+							<div class="form-group">
+								<label for="{{ form.tp_rev_fis.id_for_label }}">{{ form.tp_rev_fis.label }}</label>
+								{{ form.tp_rev_fis }}
+								{% if form.tp_rev_fis.help_text %}
+								<small class="form-text text-muted">{{ form.tp_rev_fis.help_text }}</small>
+								{% endif %}
+								{% if form.tp_rev_fis.errors %}
+								<div class="text-danger">
+									{% for error in form.tp_rev_fis.errors %}
+									{{ error }}
+									{% endfor %}
+								</div>
+								{% endif %}
+							</div>
+						</div>
+						<div class="col-md-6">
+							<div class="form-group">
+								<label for="{{ form.age_ret.id_for_label }}">{{ form.age_ret.label }}</label>
+								{{ form.age_ret }}
+								{% if form.age_ret.help_text %}
+								<small class="form-text text-muted">{{ form.age_ret.help_text }}</small>
+								{% endif %}
+								{% if form.age_ret.errors %}
+								<div class="text-danger">
+									{% for error in form.age_ret.errors %}
+									{{ error }}
+									{% endfor %}
+								</div>
+								{% endif %}
+							</div>
+						</div>
+						<div class="col-md-6">
+							<div class="form-group">
+								<label for="{{ form.ret_iva.id_for_label }}">{{ form.ret_iva.label }}</label>
+								{{ form.ret_iva }}
+								{% if form.ret_iva.help_text %}
+								<small class="form-text text-muted">{{ form.ret_iva.help_text }}</small>
+								{% endif %}
+								{% if form.ret_iva.errors %}
+								<div class="text-danger">
+									{% for error in form.ret_iva.errors %}
+									{{ error }}
+									{% endfor %}
+								</div>
+								{% endif %}
+							</div>
+						</div>
+						<div class="col-md-6">
+							<div class="form-group">
+								<label for="{{ form.aut_ret.id_for_label }}">{{ form.aut_ret.label }}</label>
+								{{ form.aut_ret }}
+								{% if form.aut_ret.help_text %}
+								<small class="form-text text-muted">{{ form.aut_ret.help_text }}</small>
+								{% endif %}
+								{% if form.aut_ret.errors %}
+								<div class="text-danger">
+									{% for error in form.aut_ret.errors %}
+									{{ error }}
+									{% endfor %}
+								</div>
+								{% endif %}
+							</div>
+						</div>
+						<div class="col-md-6">
+							<div class="form-group">
+								<label for="{{ form.logo.id_for_label }}">{{ form.logo.label }}</label>
+								{{ form.logo }}
+								{% if form.logo.help_text %}
+								<small class="form-text text-muted">{{ form.logo.help_text }}</small>
+								{% endif %}
+								{% if form.logo.errors %}
+								<div class="text-danger">
+									{% for error in form.logo.errors %}
+									{{ error }}
+									{% endfor %}
+								</div>
+								{% endif %}
+							</div>
+						</div>
+						<div class="col-md-6">
+							<div class="form-group">
+								<label for="{{ form.num_lic.id_for_label }}">{{ form.num_lic.label }}</label>
+								{{ form.num_lic }}
+								{% if form.num_lic.help_text %}
+								<small class="form-text text-muted">{{ form.num_lic.help_text }}</small>
+								{% endif %}
+								{% if form.num_lic.errors %}
+								<div class="text-danger">
+									{% for error in form.num_lic.errors %}
+									{{ error }}
+									{% endfor %}
+								</div>
+								{% endif %}
+							</div>
+						</div>
+						<div class="col-md-6">
+							<div class="form-group">
+								<label for="{{ form.lic_act.id_for_label }}">{{ form.lic_act.label }}</label>
+								{{ form.lic_act }}
+								{% if form.lic_act.help_text %}
+								<small class="form-text text-muted">{{ form.lic_act.help_text }}</small>
+								{% endif %}
+								{% if form.lic_act.errors %}
+								<div class="text-danger">
+									{% for error in form.lic_act.errors %}
+									{{ error }}
+									{% endfor %}
+								</div>
+								{% endif %}
+							</div>
+						</div>
+						<div class="col-md-6">
+							<div class="form-group">
+								<label for="{{ form.ini_lic.id_for_label }}">{{ form.ini_lic.label }}</label>
+								{{ form.ini_lic }}
+								{% if form.ini_lic.help_text %}
+								<small class="form-text text-muted">{{ form.ini_lic.help_text }}</small>
+								{% endif %}
+								{% if form.ini_lic.errors %}
+								<div class="text-danger">
+									{% for error in form.ini_lic.errors %}
+									{{ error }}
+									{% endfor %}
+								</div>
+								{% endif %}
+							</div>
+						</div>
+						<div class="col-md-6">
+							<div class="form-group">
+								<label for="{{ form.fin_lic.id_for_label }}">{{ form.fin_lic.label }}</label>
+								{{ form.fin_lic }}
+								{% if form.fin_lic.help_text %}
+								<small class="form-text text-muted">{{ form.fin_lic.help_text }}</small>
+								{% endif %}
+								{% if form.fin_lic.errors %}
+								<div class="text-danger">
+									{% for error in form.fin_lic.errors %}
+									{{ error }}
+									{% endfor %}
+								</div>
+								{% endif %}
+							</div>
+						</div>
+
+						<div class="col-md-12 text-center">
+							<button type="submit" class="btn btn-primary rounded-pill">
+								Guardar
+							</button>
+						</div>
+					</div>
+
+
+					<!-- {{form.as_p}} -->
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+<div class="content-wrapper">
+    <div class="page-header">
+        <h2 class=" text-primary">Reporte a la Central de Información Financiera </h2>
+    </div>
+    <div class="col-md-12 grid-margin stretch-card rounded-5">
+        <div class="card rounded-5">
+            <div class="card-body">
+                <form action="{% url 'cifin' %}" method="post">
+                    {% csrf_token %}
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="fec_ini">Fecha de Proceso:</label>
+                            <input type="date" id="fec_ini" name="fec_ini">
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="fec_cor">Fecha de Corte:</label>
+                            <input type="date" id="fec_cor" name="fec_cor">
+                        </div>
+                    </div>
+                    <script>
+                        // Función para establecer una fecha por defecto en un campo
+                        function setDefaultDate(fieldId, date) {
+                            document.getElementById(fieldId).value = date;
+                        }
+                        // Función para inicializar todas las fechas por defecto
+                        function initializeDates() {
+                            const today = new Date();
+                            const year = today.getFullYear();
+                            const month = String(today.getMonth() + 1).padStart(2, '0'); // MM
+                            const day = String(today.getDate()).padStart(2, '0'); // DD
+                            // Fecha actual
+                            const currentDate = `${year}-${month}-${day}`;
+                            // 1 de enero del año actual
+                            const firstDayOfYear = `${year}-01-01`;
+                            // último día del mes anterior
+                            const lastDayPreviousMonth = new Date(year, month-1, 0);
+                            const lastDayFormatted = `${lastDayPreviousMonth.getFullYear()}-${String(lastDayPreviousMonth.getMonth() + 1).padStart(2, '0')}-${String(lastDayPreviousMonth.getDate()).padStart(2, '0')}`;
+                            // Asignar fechas a los campos
+                            setDefaultDate('fec_ini', currentDate); // Fecha Inicial
+                            setDefaultDate('fec_cor', lastDayFormatted); // Fecha Corte
+                            // setDefaultDate('fec_com', currentDate); // Fecha Comparativo (opcional, si visible)
+                        }
+                        // Mostrar/ocultar el campo de fecha comparativo
+                        function toggleFechaField() {
+                            const comparativo = document.getElementById('comparativo').value;
+                            const fechaField = document.getElementById('fec_com-field');
+                            if (comparativo === 'S') {
+                                fechaField.style.display = 'block';
+                            } else {
+                                fechaField.style.display = 'none';
+                            }
+                        }
+                        // Llamar a la función de inicialización al cargar la página
+                        window.onload = initializeDates;
+                    </script>
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="reporte_entrega">Reporte a Entregar:</label>
+                            <select id="reporte_entrega" name="reporte_entrega">
+                                <option value="1">Primera Entrega</option>
+                                <option value="2" selected>Segunda Entrega</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit" name="accion" value="imprimir" target="_blank" title="Imprimir" 
+                        class="btn btn-light rounded-pill"><i class="bi bi-printer-fill"></i> Imprimir</button>
+                    <button type="submit" name="accion" value="exportar" target="_blank" title="Exportar" 
+                        class="btn btn-light rounded-pill"><i class="bi bi-box-arrow-down"></i> Exportar</button>
+                    <button type="submit" name="accion" value="csv" target="_blank" title="CSV" 
+                        class="btn btn-light rounded-pill"><i class="bi bi-filetype-csv"></i> CSV</button>
+                </form> 
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

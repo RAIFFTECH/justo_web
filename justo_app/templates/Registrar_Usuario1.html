@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+{% load crispy_forms_tags %}
+<html lang="es">
+<div class="row flex-grow">
+    <div class="col-lg-12 mx-auto">
+        <div class="container">
+            <div class="row d-flex justify-content-center">
+                <div class="col-md-5">
+                    <form action="" method="POST" class="card card-body">
+                        <img style="background-color:#06153C;" src="{% static 'Iconos/JustoWare.gif'%}" class="d-inline-block img-fluid align-text-center"/>
+                        <h1 class="text-center">Registrar Usuario</h1>
+                        {{error|crispy}}
+                        {% csrf_token %}
+                        <!-- <div class="mb-3">
+                            <label for="username">Nombre de usuario:</label>
+                            <input type="text" name="username" id="username" class="form-control" placeholder="Ingrese el nombre del usuario">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="password1">Contraseña:</label>
+                            <input type="password" name="password1" id="password1" class="form-control"
+                                placeholder="Ingrese la contraseña">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="password2">Confirme su contraseña:</label>
+                            <input type="password" name="password2" id="password2"  class="form-control"
+                                placeholder="Confirme su contraseña">
+                        </div>  -->
+
+                        {{form|crispy}}
+                        <div class="text-center">
+                            <button class="btn btn-success">
+                            Registrar
+                            </button>
+                            <a class="btn btn-primary" href="{% url 'iniciar_sesion' %}">
+                            Iniciar Sesión
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

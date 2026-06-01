@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 100vh;">
+    <div class="card p-4 shadow" style="max-width: 400px; width: 100%;">
+        <h2 class="display-5 text-danger text-center mb-4">Confirmar Eliminación</h2>
+        <p class="text-center">¿Estás seguro de que deseas eliminar el crédito <strong>{{ credito.cod_cre }}</strong>?</p>
+        <form method="post" class="text-center mt-4">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger mr-2">
+                <i class="fas fa-trash-alt"></i> Eliminar
+            </button>
+            <a href="{% url 'creditos_list' %}" class="btn btn-secondary">
+                <i class="fas fa-times"></i> Cancelar
+            </a>
+        </form>
+    </div>
+</div>
+{% endblock %}

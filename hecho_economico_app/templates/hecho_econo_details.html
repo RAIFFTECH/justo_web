@@ -1,0 +1,231 @@
+
+
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+{% if operation == 'create' %}
+    <h4 class="text-center" style="background-color: #3498db; color: white;">Nuevo Comprobante Justo</h4>
+{% elif operation == 'update' %}
+    <h4 class="text-center" style="background-color: #3498db; color: white;">Modificación Comprobante Justo</h4>
+{% endif %}
+
+{% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+            <li class="{{ message.tags }}">{{ message }}</li>
+        {% endfor %}
+    </ul>
+{% endif %}
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Tabla</title>
+    <!-- Enlace al CSS de DataTables -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap4.min.css">
+</head>
+
+<form method="POST" id='form_Comprobante'>
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-md-4">
+            <div class="form-group">
+                {{ form.docto_conta|as_crispy_field }}
+            </div>
+        </div>                
+        <div class="col-md-1"> 
+            <div class="form-group">
+                {{ form.numero|as_crispy_field }}  
+            </div>
+        </div>
+        <div class="col-md-1"> 
+            <div class="form-group">
+                {{ form.fecha|as_crispy_field }}  
+            </div>
+        </div>
+        <div class="col-md-2"> 
+            <div class="form-group">
+                {{ form.canal|as_crispy_field }}  
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            <div class="form-group">
+                {{ form.banco|as_crispy_field }}
+            </div>
+        </div>                
+        <div class="col-md-1">
+            <div class="form-group">
+                <label for="id_cheque">Núm. Cheque</label>
+                <input type="text" name="cheque" id="id_cheque" class="form-control" pattern="[0-9]*" inputmode="numeric" title="Solo se permiten números">
+            </div>
+        </div>
+        <div class="col-md-1"> 
+            <div class="form-group">
+                {{ form.beneficiario|as_crispy_field }}  
+            </div>
+        </div>
+        <div class="col-md-2"> 
+            <div class="form-group">
+                <label for="id_ciudad">Ciudad</label>
+                {{ form.ciudad }}  <!-- Esto ya no tendrá la etiqueta -->
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            <div class="form-group">
+                {{ form.descripcion|as_crispy_field }}
+            </div>
+        </div>
+        <div class="col-md-1"> 
+            <div class="form-group">
+                {{ form.protegido|as_crispy_field }}  
+            </div>
+        </div>
+        <div class="col-md-1"> 
+            <div class="form-group">
+                {{ form.anulado|as_crispy_field }}  
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="form-group">
+                {% if operation == 'create' %}
+                    <button type="submit" class="btn btn-info btn-sm detalles-btn" id="guardar" data-url="{% url 'hecho_econo_create' %}">Guardar</button>
+                {% elif operation == 'update' %}
+                    <button type="submit" class="btn btn-info btn-sm detalles-btn" id="modificar" data-url="{% url 'hecho_econo_update' pk=object.pk %}">Modificar</button>
+                {% elif operation == 'delete' %}
+                    <button type="button" class="btn btn-danger btn-sm eliminar-btn" id="eliminar" data-url="{% url 'hecho_econo_delete' pk=object.pk %}">Eliminar</button>
+                {% endif %}
+                <a href="{% url 'buscar_hechos_econo' %}" class="btn btn-info btn-sm detalles-btn" id="cancelar">Cancelar</a>
+            </div>
+        </div>
+    </div>        
+    <div id="mensaje" style="display: none;">Item agregado correctamente</div>
+</form>
+
+<div class="recuadro border p-3 rounded" style="background-color: #f8f9fa;">
+    <div class="row align-items-center">
+        <div class="col-md-auto">
+            <label for="txtConcepto" style="vertical-align: middle;">Conce.</label>
+            <input title="Concepto" type="text" id="txtConcepto" class="form-control d-inline-block" style="width: 100px;">
+            <button id="busConcepto" class="btn btn-info btn-sm detalles-btn"><i class="fas fa-search"></i></button>
+        </div>
+        <div id="conceptoModal" class="modal">
+            <div class="modal-content">
+                <h3>Codigo-Concepto</h3>
+                <span id="closeConcepto" class="close">&times;</span>
+                <input type="text" id="filterConceptoInput" class="searchResults" placeholder="Buscar Concepto...">
+                <div id="searchResultsConcepto"></div>            
+            </div>
+        </div>
+
+        <div class="col-md-auto">
+            <label for="txtSubCuenta" style="vertical-align: middle;">SubCuenta.</label>
+            <input title="Subcuenta" type="text" id="txtSubCuenta" class="form-control d-inline-block" style="width: 150px;">
+            <button id="busSubcuenta" class="btn btn-info btn-sm detalles-btn"><i class="fas fa-search"></i></button>
+            <div id="subcuentaModal" class="modal">
+                <div class="modal-content">
+                    <h3>subcuenta-nombre</h3>
+                    <span id="closeSubcuenta" class="close">&times;</span>
+                    <input type="text" id="filterSubcuentaInput" class="searchResults" placeholder="Buscar SubCuenta..">
+                    <div id="searchResultsSubcuenta"></div>            
+                </div>
+            </div>        
+        </div>
+
+        <div class="col-md-auto">
+            <label for="txtDebito" style="vertical-align: middle;">Débit.</label>
+            <input type="text" id="txtDebito" class="form-control d-inline-block navigate" pattern="\d+(\.\d{2})?" title="Valor Débito" style="width: 150px; text-align: right;">
+        </div>
+
+        <div class="col-md-auto">
+            <label for="txtCredito" style="vertical-align: middle;">Crédi.</label>
+            <input type="text" id="txtCredito" class="form-control d-inline-block navigate" pattern="\d+(\.\d{2})?" title="Valor Crédito" style="width: 150px; text-align: right;">
+        </div>
+
+        <div class="col-md-auto">
+            <button title="Agregar Item" id="Agregar" class="btn btn-info btn-sm detalles-btn"><i class="fas fa-plus"></i></button>
+            <button title="Limpiar Item" id="Limpiar" class="btn btn-info btn-sm detalles-btn"><i class="fas fa-trash"></i></button>
+            <button type="submit" class="btn btn-info btn-sm detalles-btn" id="Cuadrar">Cuadre</button>
+        </div>
+    </div>
+
+    <div class="row align-items-center mt-3">
+        <div class="col-md-auto">
+            <label for="txtValor1" style="vertical-align: middle;">Valor 1</label>
+            <input type="text" id="txtValor1" class="form-control d-inline-block navigate" pattern="\d+(\.\d{2})?" title="Valor 1" style="width: 150px; text-align: right;">
+        </div>
+
+        <div class="col-md-auto">
+            <label for="txtValor2" style="vertical-align: middle;">Valor 2</label>
+            <input type="text" id="txtValor2" class="form-control d-inline-block navigate" pattern="\d+(\.\d{2})?" title="Valor 2" style="width: 150px; text-align: right;">
+        </div>
+
+        <div class="col-md-auto">
+            <label for="txtDetalle" style="vertical-align: middle;">Detalle</label>
+            <input title="Detal." type="text" id="txtDetalle" class="form-control navigate" style="width: 900px;">
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="table-responsive mt-4">
+            <table id="tableDetalles" class="table table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th>Conce.</th>
+                        <th>SubCuenta</th>
+                        <th>Débito</th>
+                        <th>Crédito</th>
+                        <th>Detalle</th>
+                        <th style="width: 100px;">Eliminar</th>
+                    </tr>
+                </thead>
+                <tbody id="tbodyDetalles">
+                    <!-- Aquí se agregarán las filas dinámicamente -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="confirmationModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmación</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>¿Estás seguro de que deseas eliminar este elemento?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-danger" id="confirmDelete">Eliminar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{% static 'js/jquery-3.6.0.min.js' %}"></script>
+<script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'js/dataTables.bootstrap4.min.js' %}"></script>
+<script src="{% static 'js/hecho_econo.js' %}"></script>
+
+
+<script>
+    $(document).ready(function() {
+        console.log("jQuery Loaded:", typeof $);
+        console.log("DataTable Loaded:", typeof $.fn.DataTable);
+        $('#tableDetalles').DataTable({
+        });
+
+        // Aquí puedes incluir más código para la lógica de tu aplicación
+    });
+</script>
+{% endblock %}

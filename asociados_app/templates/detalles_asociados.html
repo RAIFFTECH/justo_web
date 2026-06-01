@@ -1,0 +1,485 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+{% load crispy_forms_tags %}
+<div class="content-wrapper">
+	<div class="page-header">
+		<h2 class=" text-primary">Detalles Asociado </h2>
+			<a href="{% url 'listar_asociados' %}" class="btn btn-primary rounded-4">
+				<i class="mdi mdi-arrow-left mx-2"></i>
+				Volver
+			</a>
+	</div>
+    <div class="row g-3">
+        <div class="col-md-12">
+            <div class="card rounded-5">
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-12">
+                            <table class="table table-bordered table-striped">
+                                <thead>
+                                <tr>
+                                    <th colspan="2" class="text-start">Datos del Asociado</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <th class="txt_negrita text-start">Tipo Documento:</th>
+                                    <td>{{ object.tercero.cla_doc }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="txt_negrita text-start">Número Documento:</th>
+                                    <td>{{ object.tercero.doc_ide }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="txt_negrita text-start">DV:</th>
+                                    <td>{{ object.tercero.dig_ver }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="txt_negrita text-start">Nit Rápido:</th>
+                                    <td>{{ object.tercero.nit_rap }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="txt_negrita text-start">Ciudad Expedición Documento:</th>
+                                    <td>{{ object.tercero.cod_ciu_exp.nombre }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="txt_negrita text-start">Ciudad Residencia:</th>
+                                    <td>{{ object.tercero.cod_ciu_res.nombre }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="txt_negrita text-start">Tipo Régimen:</th>
+                                    <td>{{ object.tercero.regimen }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="txt_negrita text-start">Fecha Expedición Documento:</th>
+                                    <td>{{ object.tercero.fec_exp_ced }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="txt_negrita text-start">Tipo Tercero:</th>
+                                    <td>{{ object.tercero.tip_ter }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="txt_negrita text-start">Primer Apellido:</th>
+                                    <td>{{ object.tercero.pri_ape }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="txt_negrita text-start">Segundo Apellido:</th>
+                                    <td>{{ object.tercero.seg_ape }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="txt_negrita text-start">Primer Nombre:</th>
+                                    <td>{{ object.tercero.pri_nom }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="txt_negrita text-start">Segundo Nombre:</th>
+                                    <td>{{ object.tercero.seg_nom }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="txt_negrita text-start">Fecha Nacimiento:</th>
+                                    <td>{{ object.fec_nac }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="txt_negrita text-start">Sexo:</th>
+                                    <td>{{ object.sexo }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="txt_negrita text-start">Estado Civil:</th>
+                                    <td>{{ object.est_civ }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="txt_negrita text-start">Código Asociado:</th>
+                                    <td>{{ object.cod_aso }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="txt_negrita text-start">Oficina:</th>
+                                    <td>{{ object.oficina }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="txt_negrita text-start">Tercero:</th>
+                                    <td>{{ object.tercero }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="txt_negrita text-start">Estado:</th>
+                                    <td>{{ object.estado }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="txt_negrita text-start">Empleado de la Entidad:</th>
+                                    <td>{{ object.emp_ent }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="txt_negrita text-start">Ocupación Código:</th>
+                                    <td>{{ object.ocupacion_cod }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="txt_negrita text-start">Zona:</th>
+                                    <td>{{ object.zona }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="txt_negrita text-start">Profesión:</th>
+                                    <td>{{ object.profesion }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="txt_negrita text-start">Ocupación:</th>
+                                    <td>{{ object.ocupacion }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="txt_negrita text-start">Estrato:</th>
+                                    <td>{{ object.estrato }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="txt_negrita text-start">Nivel de Estudio:</th>
+                                    <td>{{ object.niv_est }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="txt_negrita text-start">Cabeza de Familia:</th>
+                                    <td>{{ object.cab_fam }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="txt_negrita text-start">Fecha de Afiliación:</th>
+                                    <td>{{ object.fec_afi }}</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="col-md-12">
+                            <table class="table table-bordered table-striped">
+                                <thead>
+                                <tr>
+                                    <th colspan="2" class="text-start">Información Familiar</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <th class="txt_negrita text-start">Personas a Cargo</th>
+                                    <td>{{ object.per_a_cargo }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="txt_negrita text-start">Número Hijos Menores</th>
+                                    <td>{{ object.num_hij_men }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="txt_negrita text-start">Número Hijos Mayores</th>
+                                    <td>{{ object.num_hij_may }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="txt_negrita text-start">Tipo de Vivienda</th>
+                                    <td>{{ object.tip_viv }}</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="col-md-12">
+                            <table class="table table-bordered table-striped">
+                                <thead>
+                                <tr>
+                                    <th colspan="2" class="text-start">Empresa</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <th class="txt_negrita text-start">Empresa Nominadora</th>
+                                    <td>{{ object.id_pag }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="txt_negrita text-start">Cargo en la Empresa</th>
+                                    <td>{{ object.cargo_emp }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="txt_negrita text-start">Tiempo en la Ciudad</th>
+                                    <td>{{ object.tie_en_ciu }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="txt_negrita text-start">med_con</th>
+                                    <td>{{ object.med_con }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="txt_negrita text-start">Fecha Ingreso Trabajo</th>
+                                    <td>{{ object.fec_ing_tra }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="txt_negrita text-start">Teléfono Trabajo</th>
+                                    <td>{{ object.tel_tra }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="txt_negrita text-start">Tipo de Salario</th>
+                                    <td>{{ object.tip_sal }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="txt_negrita text-start">Ciudad de Trabajo</th>
+                                    <td>{{ object.ciu_tra }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="txt_negrita text-start">Actividad Económica</th>
+                                    <td>{{ object.act_eco }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="txt_negrita text-start">Código CIIU</th>
+                                    <td>{{ object.cod_ciiu }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="txt_negrita text-start">Tipo Contrato</th>
+                                    <td>{{ object.tip_con }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="txt_negrita text-start">Nombre Empresa</th>
+                                    <td>{{ object.nom_emp }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="txt_negrita text-start">Nit Empresa</th>
+                                    <td>{{ object.nit_emp }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="txt_negrita text-start">Dirección Empresa</th>
+                                    <td>{{ object.dir_emp }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="txt_negrita text-start">e-mail Empresa</th>
+                                    <td>{{ object.email_emp }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="txt_negrita text-start">Sector Empresa</th>
+                                    <td>{{ object.sector_emp }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="txt_negrita text-start">Empresa Anterior</th>
+                                    <td>{{ object.empresa_ant }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="txt_negrita text-start">Numero Empleados</th>
+                                    <td>{{ object.emp_num_emp }}</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="col-md-12">
+                            <table class="table table-bordered table-striped">
+                                <thead>
+                                <tr>
+                                    <th colspan="2" class="text-start">Negocio propio</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <th class="txt_negrita text-start">Negocio Propio?</th>
+                                    <td>{{ object.negocio_pro }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="txt_negrita text-start">Teléfono Negocio</th>
+                                    <td>{{ object.negocio_tel }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="txt_negrita text-start">Nombre Negocio</th>
+                                    <td>{{ object.negocio_nom }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="txt_negrita text-start">Local Propio?</th>
+                                    <td>{{ object.negocio_loc_pro }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="txt_negrita text-start">Tiene Cámara Comercio?</th>
+                                    <td>{{ object.negocio_cam_com }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="txt_negrita text-start">Antiguedad Negocio</th>
+                                    <td>{{ object.negocio_ant }}</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="col-md-12">
+                            <table class="table table-bordered table-striped">
+                                <thead>
+                                <tr>
+                                    <th colspan="2" class="text-start">Pensión</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <th class="txt_negrita text-start">Entidad de Pensión</th>
+                                    <td>{{ object.pension_ent }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="txt_negrita text-start">Tiene Pension</th>
+                                    <td>{{ object.pension_tie }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="txt_negrita text-start">Otra Pensión?</th>
+                                    <td>{{ object.pension_otr }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="txt_negrita text-start">Entidad Otra Pensión</th>
+                                    <td>{{ object.pension_ent_otr }}</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="col-md-12">
+                            <table class="table table-bordered table-striped">
+                                <thead>
+                                <tr>
+                                    <th colspan="2" class="text-start">Persona políticamente expuesta</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <th class="txt_negrita text-start">Tiene Familiar PEP?</th>
+                                    <td>{{ object.pep_es_fam }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="txt_negrita text-start">Parentesco Familiar PEP</th>
+                                    <td>{{ object.pep_fam_par }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="txt_negrita text-start">Nombre Familiar PEP</th>
+                                    <td>{{ object.pep_fam_nom }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="txt_negrita text-start">Tiene Cargo Público PEP?</th>
+                                    <td>{{ object.pep_car_pub }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="txt_negrita text-start">Cargo PEP</th>
+                                    <td>{{ object.pep_cargo }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="txt_negrita text-start">PEP Eje Pod?</th>
+                                    <td>{{ object.pep_eje_pod }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="txt_negrita text-start">Administra Recursos del Estado PEP?</th>
+                                    <td>{{ object.pep_adm_rec_est }}</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="col-md-12">
+                            <table class="table table-bordered table-striped">
+                                <thead>
+                                <tr>
+                                    <th colspan="2" class="text-start">Datos extranjeros</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <th class="txt_negrita text-start">Tiene Gre Car?</th>
+                                    <td>{{ object.tie_gre_car }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="txt_negrita text-start">Recibe Pagos del Extranjero?</th>
+                                    <td>{{ object.recibe_pag_ext }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="txt_negrita text-start">Recibe Extranjero +186?</th>
+                                    <td>{{ object.recide_ext_mas_186 }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="txt_negrita text-start">Recibe Ingresos Extranjeros?</th>
+                                    <td>{{ object.recibe_ing_ext }}</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="col-md-12">
+                            <table class="table table-bordered table-striped">
+                                <thead>
+                                <tr>
+                                    <th colspan="2" class="text-start">Conyuge</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <th class="txt_negrita text-start">Nombre Conyuge</th>
+                                    <td>{{ object.conyuge_nombre }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="txt_negrita text-start">Doc_ide Conyuge</th>
+                                    <td>{{ object.conyuge_doc_ide }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="txt_negrita text-start">conyuge Trabaja?</th>
+                                    <td>{{ object.conyuge_trabaja }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="txt_negrita text-start">Ingresos por Honoarios</th>
+                                    <td>{{ object.conyuge_ingresos }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="txt_negrita text-start">conyuge Trabaja?</th>
+                                    <td>{{ object.conyuge_ciudad }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="txt_negrita text-start">Ocupacion Conyuge</th>
+                                    <td>{{ object.conyuge_ocupacion }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="txt_negrita text-start">Telefono Conyuge</th>
+                                    <td>{{ object.conyuge_telefono }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="txt_negrita text-start">Empresa Conyuge</th>
+                                    <td>{{ object.conyuge_empresa }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="txt_negrita text-start">Empresa Conyuge</th>
+                                    <td>{{ object.conyuge_dir_empresa }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="txt_negrita text-start">Telefono Conyuge</th>
+                                    <td>{{ object.conyuge_cargo }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="txt_negrita text-start">agno ing empresas</th>
+                                    <td>{{ object.conyuge_fec_ing_emp }}</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="col-md-12">
+                            <table class="table table-bordered table-striped">
+                                <thead>
+                                <tr>
+                                    <th colspan="2" class="text-start">Otros</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <th class="txt_negrita text-start">Estado Anteia</th>
+                                    <td>{{ object.estado_anteia }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="txt_negrita text-start">Negocio Pro Local</th>
+                                    <td>{{ object.negocio_pro_local }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="txt_negrita text-start">Barrio Asociado</th>
+                                    <td>{{ object.barrio_aso }}</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12 text-center">
+            <!-- Botón para volver a la vista principal (Home) -->
+            <a href="{% url 'exportar_pdf_asociado' object.id %}" target="_blank" title="Imprimir" type="button"
+               class="btn btn-primary rounded-4"><i class="bi bi-printer-fill"></i>
+                Imprimir
+            </a>
+            <!-- <a href="../" type="submit" class="btn btn-secondary">Volver</a> -->
+        </div>
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"
+	integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous">
+	</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js"
+	integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous">
+	</script>
+
+{% endblock %}

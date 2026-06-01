@@ -1,0 +1,149 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+{% load humanize %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movimientos de Creditos</title>
+    <style>
+        .text-right {
+            text-align: right;
+        }
+
+        .total-row {
+            background-color: #f0f0f0;
+            font-weight: bold;
+        }
+        .header-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .header-table th, .header-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+        .header-table th {
+            background-color: #f2f2f2;
+            text-align: left;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        tr:hover {
+            background-color: #ddd;
+        }
+        .pagination {
+            display: flex;
+            justify-content: center;
+        }
+        .pagination a {
+            margin: 0 5px;
+            padding: 8px 16px;
+            text-decoration: none;
+            color: #333;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .pagination a.active {
+            background-color: #007bff;
+            color: white;
+            border: 1px solid #007bff;
+        }
+        .pagination a:hover {
+            background-color: #ddd;
+        }
+    </style>
+</head>
+<body>
+    <h1>Pagos del Credito</h1>
+ <table class="header-table">
+        <tr>
+            <td>Credito: {{ credito.cod_cre }}</td>
+            <td>Fecha Desembolso: {{ credito.fec_des|date:"d F Y" }}</td>
+            <td>Fecha Pago Inicial: {{ credito.fec_pag_ini|date:"d F Y" }}</td>
+            <td class="right-align">{{ credito.val_cuo_act|intcomma }}</td>
+        </tr>
+        <tr>
+            <td>Cuotas Pactadas: {{ credito.num_cuo_act }}</td>
+            <td>forma de pago: {{ credito.for_pag}}</td>
+            <td>fecha ult pago: {{ credito.fec_ult_pag }}</td>
+            <td>Estado : {{ credito.estado }}</td>
+        </tr>
+    </table>
+    
+    <table>
+        <thead>
+            <tr>
+                {% for column in columns %}
+                    <th>{{ column }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <table>
+            <thead>
+                <tr>
+                    {% for column in columns %}
+                        <th>{{ column }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in page_obj %}
+                <tr class="{% if row.0 == 'Total' %}total-row{% endif %}">
+                    {% for value in row %}
+                        <td class="text-right">
+                            {% if value %}
+                                {{ value|intcomma }}
+                            {% else %}
+                                {{ value }}
+                            {% endif %}
+                        </td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>        
+    </table>
+    
+    <div class="pagination">
+        {% if page_obj.has_previous %}
+            <a href="?page=1">&laquo; Primero</a>
+            <a href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+        {% endif %}
+        {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
+                <a href="?page={{ num }}" class="active">{{ num }}</a>
+            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                <a href="?page={{ num }}">{{ num }}</a>
+            {% endif %}
+        {% endfor %}
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}">Siguiente</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}">Último &raquo;</a>
+        {% endif %}
+    </div>
+</body>
+</html>
+
+
+{% endblock %}

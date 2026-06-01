@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+  <h3>Liquidación Asiento Nº {{ numero }} de Reclasificación y Pérdida Esperada de Cartera</h3>
+  <p>Fecha de cierre del mes: <strong>{{ fecha_final }}</strong></p>
+
+  <div class="mt-4">
+    <!-- Botón Generar -->
+    <button onclick="ejecutarRec_PE()" class="btn btn-success mx-2">
+      <i class="fas fa-cogs"></i> Generar
+    </button>
+
+    <!-- Botón Modelo -->
+    <button onclick="ejecutarModelo()" class="btn btn-secondary mx-2">
+      <i class="fas fa-file-alt"></i> Modelo
+    </button>
+
+    <a href="{{ previous_url }}" class="btn btn-danger mx-2">
+      <i class="fas fa-arrow-left"></i> Cancelar
+    </a>
+  </div>
+
+  <!-- Barra de progreso -->
+  <div class="progress mt-3" style="height: 25px;">
+    <div id="barraProgreso" class="progress-bar progress-bar-striped progress-bar-animated" 
+         role="progressbar" style="width: 0%">0%</div>
+  </div>
+  <div id="mensajeModelo" class="mt-3"></div>
+</div>
+
+<!-- Script: ejecutarModelo -->
+<script>
+function ejecutarModelo() {
+  console.log('entra a ejecutarModelo');
+  const barra = document.getElementById('barraProgreso');
+  const mensaje = document.getElementById('mensajeModelo');
+
+  // Reinicia barra y mensaje
+  barra.classList.remove('bg-success', 'bg-danger');
+  barra.classList.add('progress-bar-animated');
+  barra.style.width = '100%';
+  barra.innerText = 'Procesando...';
+
+  mensaje.innerHTML = `<div class="alert alert-info">Ejecutando modelo, por favor espera...</div>`;
+
+  fetch("{% url 'ejecutar_modelo' %}?fecha={{ fecha_final|date:'Y-m-d' }}")
+    .then(response => response.json())
+    .then(data => {
+      barra.classList.remove('progress-bar-animated');
+
+      if (data.status === 'success') {
+        barra.classList.add('bg-success');
+        barra.innerText = '100%';
+
+        mensaje.innerHTML = `
+          <div class="alert alert-success">
+            ✅ ${data.message}<br>
+            ⏱ Tiempo de ejecución: ${data.elapsed_time} segundos.
+          </div>`;
+      } else {
+        barra.classList.add('bg-danger');
+        barra.innerText = 'Error';
+        mensaje.innerHTML = `<div class="alert alert-danger">❌ ${data.message}</div>`;
+      }
+    })
+    .catch(error => {
+      barra.classList.remove('progress-bar-animated');
+      barra.classList.add('bg-danger');
+      barra.innerText = 'Error';
+
+      mensaje.innerHTML = `<div class="alert alert-danger">❌ Error inesperado: ${error}</div>`;
+    });
+}
+</script>
+
+<!-- Script: ejecutarRec_PE -->
+<script>
+function ejecutarRec_PE() {
+  const barra = document.getElementById('barraProgreso');
+  const mensaje = document.getElementById('mensajeModelo');
+
+  // Reinicia barra y mensaje
+  barra.classList.remove('bg-success', 'bg-danger');
+  barra.classList.add('progress-bar-animated');
+  barra.style.width = '100%';
+  barra.innerText = 'Procesando...';
+
+  mensaje.innerHTML = `<div class="alert alert-info">Ejecutando modelo, por favor espera...</div>`;
+
+  fetch("{% url 'ejecutar_rec_pe' %}?fecha={{ fecha_final|date:'Y-m-d' }}")
+    .then(response => response.json())
+    .then(data => {
+      barra.classList.remove('progress-bar-animated');
+
+      if (data.status === 'success') {
+        barra.classList.add('bg-success');
+        barra.innerText = '100%';
+
+        mensaje.innerHTML = `
+          <div class="alert alert-success">
+            ✅ ${data.message}<br>
+            ⏱ Tiempo de ejecución: ${data.elapsed_time} segundos.
+            <div class="mt-3">
+              <a href="{% url 'ver_resumen_pe' fecha=fecha_final|date:'Y-m-d' %}" class="btn btn-outline-info btn-sm p-1 mx-1" title="Ver Resumen">
+                <i class="fas fa-eye"></i>
+              </a>
+              <a href="#" class="btn btn-outline-success btn-sm p-1 mx-1" title="Exportar Comprobante">
+                <i class="fas fa-file-export"></i>
+              </a>
+              <a href="#" class="btn btn-outline-warning btn-sm p-1 mx-1" title="Exportar PE">
+                <i class="fas fa-file-download"></i>
+              </a>
+              <a href="#" class="btn btn-outline-secondary btn-sm p-1 mx-1" title="Exportar Liquidación">
+                <i class="fas fa-file-alt"></i>
+              </a>
+            </div>
+          </div>`;
+      } else {
+        barra.classList.add('bg-danger');
+        barra.innerText = 'Error';
+        mensaje.innerHTML = `<div class="alert alert-danger">❌ ${data.message}</div>`;
+      }
+    })
+    .catch(error => {
+      barra.classList.remove('progress-bar-animated');
+      barra.classList.add('bg-danger');
+      barra.innerText = 'Error';
+
+      mensaje.innerHTML = `<div class="alert alert-danger">❌ Error inesperado: ${error}</div>`;
+    });
+}
+</script>
+
+{% endblock %}
+

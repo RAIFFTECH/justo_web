@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="content-wrapper">
+    <div class="page-header">
+        <h2 class="text-primary">Cartera a una fecha y/o edades - Indicador de Cartera a la Fecha </h2>
+    </div>
+    <div class="col-md-12 grid-margin stretch-card rounded-5">
+        <div class="card rounded-5">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">        
+                        <form id="saldos-form" action="{% url 'cartera_fecha' %}" method="post">
+                            {% csrf_token %}
+                            
+                            <label for="fecha_corte">Fecha de Corte: </label>
+                            <input type="date" id="fecha_corte" name="fecha_corte"><br><br>
+
+                            <label for="min_dias">Mínimo Días de Mora: </label>
+                            <input type="number" id="min_dias" name="min_dias" value="0" min="0"><br><br>
+
+                            <label for="max_dias">Máximo Días de Mora: </label>
+                            <input type="number" id="max_dias" name="max_dias" value="9999" min="0"><br><br>
+
+                            <button type="submit" name="accion" value="exportar" target="_blank" title="Exportar" class="btn btn-light rounded-pill">
+                                <i class="bi bi-box-arrow-down"></i> Exportar
+                            </button>
+
+                            <button type="submit" name="accion" value="csv" title="CSV" class="btn btn-light rounded-pill">
+                                <i class="bi bi-filetype-csv"></i> CSV
+                            </button>
+
+                            <button type="submit" name="accion" value="Indi_cart" class="btn btn-light rounded-pill"
+                                onclick="document.getElementById('saldos-form').action='{% url 'indicador_de_cartera' %}'">
+                                <i class="bi bi-filetype-csv"></i> Indicador de Cartera
+                            </button>
+
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Función para establecer una fecha por defecto en un campo
+    function setDefaultDate(fieldId, date) {
+        document.getElementById(fieldId).value = date;
+    }
+    // Función para inicializar todas las fechas por defecto
+    function initializeDates() {
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, '0'); // MM
+        const day = String(today.getDate()).padStart(2, '0'); // DD
+        // Fecha actual
+        const currentDate = `${year}-${month}-${day}`;
+        // 1 de enero del año actual
+        const firstDayOfYear = `${year}-01-01`;
+        // Asignar fechas a los campos
+        // setDefaultDate('fecha_inicial', firstDayOfYear); // Fecha Inicial
+        setDefaultDate('fecha_corte', currentDate); // Fecha Corte
+        setDefaultDate('fecha_corte1', currentDate); // Fecha Corte1
+    }
+    // Llamar a la función de inicialización al cargar la página
+    window.onload = initializeDates;
+
+    document.getElementById("nombre_archivo").addEventListener("click", function () {
+            const contenido = "Este es un archivo generado en el navegador.";
+            const blob = new Blob([contenido], { type: "text/plain" });
+            const url = URL.createObjectURL(blob);
+
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = "mi_archivo.xls";  // Nombre del archivo a descargar
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        });
+</script>
+
+{% endblock %}

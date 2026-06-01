@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="content-wrapper">
+    <div class="page-header">
+        <h2 class=" text-primary">Listado de Cajeros </h2>
+    </div>
+    <div class="col-md-12 grid-margin stretch-card rounded-5">
+        <div class="card rounded-5">
+            <div class="card-body">
+                <a href="{% url 'cajeros_create' %}" class="btn btn-success mb-3" target="_blank" title="Agregar" type="button" class="btn btn-light rounded-pill"><i class="bi bi-file-earmark-plus"></i>
+                    Agregar Cajero</a>
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Usuario</th>
+                                <th>Oficina</th>
+                                <th>Fecha Ingreso</th>
+                                <th>Activo</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for cajero in cajeros %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ cajero.user.username }}</td>
+                                <td>{{ cajero.oficina.nombre_oficina }}</td>
+                                <td>{{ cajero.fecha_ingreso }}</td>
+                                <td>{{ cajero.get_activo_display }}</td>
+                                <td>
+                                    <a href="{% url 'cajeros_update' cajero.pk %}" class="btn btn-warning btn-sm">Editar</a>
+                                    <a href="{% url 'cajeros_delete' cajero.pk %}" class="btn btn-danger btn-sm">Eliminar</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

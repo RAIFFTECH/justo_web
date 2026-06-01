@@ -1,0 +1,759 @@
+{% load static %}
+{% load crispy_forms_tags %}
+{% load widget_tweaks %}
+
+<!DOCTYPE html>
+<html lang="es">
+<html>
+
+<head>
+    <title>Control de Producción</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@mdi/font/css/materialdesignicons.min.css" rel="stylesheet">
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menú Pro</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg: #f4f6f9;
+            --text: #111;
+            --sidebar: #111827;
+            --hover: #374151;
+        }
+    
+        body.dark {
+            --bg: #0f172a;
+            --text: #fff;
+            --sidebar: #020617;
+            --hover: #1e293b;
+        }
+    
+        body {
+            margin: 0;
+            display: flex;
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Segoe UI', sans-serif;
+            transition: 0.3s;
+        }
+    
+        /* SIDEBAR */
+        .sidebar {
+            width: 250px;
+            height: 100vh;
+            background: var(--sidebar);
+            color: #fff;
+            position: fixed;
+            transition: 0.3s;
+            overflow-y: auto;
+        }
+    
+        .sidebar.active {
+            width: 80px;
+        }
+    
+        .logo {
+            padding: 20px;
+            text-align: center;
+            font-weight: bold;
+            background: rgba(255, 255, 255, 0.05);
+        }
+    
+        /* MENU */
+        .menu {
+            list-style: none;
+            padding: 10px;
+        }
+    
+        .menu li {
+            padding: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            border-radius: 10px;
+            transition: 0.3s;
+            position: relative;
+        }
+    
+        .menu li:hover {
+            background: var(--hover);
+            transform: translateX(5px);
+        }
+    
+        .menu li i {
+            margin-right: 12px;
+        }
+    
+        .sidebar.active span {
+            display: none;
+        }
+    
+        /* SUBMENU */
+        .submenu {
+            display: none;
+            flex-direction: column;
+            margin-left: 20px;
+        }
+    
+        .submenu a {
+            padding: 8px;
+            text-decoration: none;
+            color: #ccc;
+            transition: 0.2s;
+        }
+    
+        .submenu a:hover {
+            color: #fff;
+            padding-left: 10px;
+        }
+    
+        /* CONTENT */
+        .content {
+            margin-left: 250px;
+            padding: 20px;
+            width: 100%;
+            transition: 0.3s;
+        }
+    
+        .content.active {
+            margin-left: 80px;
+        }
+    
+        /* BOTONES */
+        .toggle-btn {
+            position: fixed;
+            top: 15px;
+            left: 255px; /* mismo ancho del sidebar abierto */
+            transition: all 0.3s ease;
+            z-index: 1000;
+            cursor: pointer;
+        }
+
+        .dark-btn {
+            position: fixed;
+            top: 20px;
+            font-size: 20px;
+            cursor: pointer;
+        }
+    
+        .toggle-btn {
+            left: 255px;
+        }
+    
+        .dark-btn {
+            right: 20px;
+        }
+
+        /* CUANDO EL MENU SE COLAPSA */
+        body.menu-collapsed .toggle-btn {
+            left: 80px; /* mismo valor que .sidebar.active */
+        }
+
+        /* EFECTO HOVER PRO */
+        .toggle-btn:hover {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .sidebar {
+                left: -250px;
+            }
+    
+            .sidebar.active {
+                left: 0;
+                width: 250px;
+            }
+    
+            .content {
+                margin-left: 0;
+            }
+        }
+    </style>
+
+</head>
+
+<body>
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll('.mayuscula').forEach(function (input) {
+            input.addEventListener('input', function () {
+                this.value = this.value.toUpperCase();
+            });
+        });
+    });
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll('.formato_fecha').forEach(function (input) {
+            input.type = 'date';
+        });
+    });
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll('.solo-numeros').forEach(function (input) {
+            input.addEventListener('input', function () {
+                this.value = this.value.replace(/[^0-9]/g, '');
+            });
+        });
+    });
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll('.numeros-miles').forEach(function (input) {
+            input.addEventListener('input', function () {
+                let valor = this.value.replace(/[^0-9,]/g, '');
+                this.value = valor;
+            });
+        });
+    });
+</script>
+<!-- 
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll('.solo-numeros').forEach(function (input) {
+            input.addEventListener('input', function () {
+                this.value = this.value.replace(/[^0-9]/g, '');
+            });
+        });
+    });
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        
+        function limpiar(valor) {
+            return valor.replace(/\$/g, '')
+                .replace(/\./g, '')
+                .replace(/,/g, '')
+                .replace(/\s/g, '');
+        }
+
+        function formatear(valor) {
+            const numero = Number(valor);
+            if (isNaN(numero) || valor === '') return '';
+            return numero.toLocaleString('es-CO');
+            
+            return '$ ' + numero.toLocaleString('es-CO');
+        }
+
+        // 🔥 Detecta TODOS los inputs numéricos (aunque crispy los genere)
+        document.querySelectorAll('input[name]').forEach(function (input) {
+            // 👉 SOLO campos numéricos
+            if (input.type === "number") {
+                // 🔥 convertir a texto
+                input.type = "text";
+                // 🔥 marcar como moneda
+                input.classList.add("moneda-auto");
+                // formatear valor inicial
+                if (input.value !== '') {
+                    input.value = formatear(input.value);
+                }
+                // evento al escribir
+                input.addEventListener("input", function () {
+                    let raw = limpiar(this.value);
+                    if (!isNaN(raw) && raw !== '') {
+                        this.value = formatear(raw);
+                    } else {
+                        this.value = '';
+                    }
+                });
+            }
+        });
+
+        // 🔥 limpiar antes de enviar (TODOS los formularios)
+        document.querySelectorAll('form').forEach(function (form) {
+            form.addEventListener("submit", function () {
+                form.querySelectorAll('.moneda-auto').forEach(function (input) {
+                    input.value = limpiar(input.value);
+                });
+            });
+        });
+    });
+</script> -->
+<!-- 
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        function limpiar(valor) {
+            return valor
+                .replace(/\$/g, '')
+                .replace(/\s/g, '')
+                .replace(/\./g, '') // miles
+                .replace(',', '.'); // coma → punto decimal
+        }
+
+        function formatear(valor) {
+            let numero = parseFloat(valor);
+            if (isNaN(numero)) return '';
+
+            return numero.toLocaleString('es-CO', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+        }
+
+        document.querySelectorAll('input[name]').forEach(function (input) {
+
+            if (input.type === "number") {
+
+                input.type = "text";
+                input.classList.add("moneda-auto");
+
+                if (input.value !== '') {
+                    input.value = formatear(input.value);
+                }
+
+                input.addEventListener("input", function () {
+
+                    let valor = this.value;
+
+                    // ✅ permitir números, punto y coma
+                    valor = valor.replace(/[^0-9.,]/g, '');
+
+                    // ✅ evitar múltiples comas o puntos
+                    let partes = valor.split(/[.,]/);
+                    if (partes.length > 2) {
+                        valor = partes[0] + ',' + partes.slice(1).join('');
+                    }
+
+                    let limpio = limpiar(valor);
+
+                    if (!isNaN(limpio) && limpio !== '') {
+                        this.value = formatear(limpio);
+                    } else {
+                        this.value = '';
+                    }
+                });
+            }
+        });
+
+        // 🔥 limpiar antes de enviar
+        document.querySelectorAll('form').forEach(function (form) {
+            form.addEventListener("submit", function () {
+                form.querySelectorAll('.moneda-auto').forEach(function (input) {
+                    input.value = limpiar(input.value);
+                });
+            });
+        });
+
+    });
+</script> -->
+
+<style>
+    .btn-ui {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 18px;
+        font-size: 14px;
+        font-weight: 500;
+        border-radius: 50px;
+        text-decoration: none;
+        border: none;
+        cursor: pointer;
+        transition: all 0.25s ease;
+        color: #fff;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    }
+
+    /* Hover general */
+    .btn-ui:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 14px rgba(0,0,0,0.25);
+    }
+
+    /* Icono animado */
+    .btn-ui i {
+        font-size: 16px;
+        transition: transform 0.3s ease;
+    }
+
+    .btn-ui:hover i {
+        transform: scale(1.2);
+    }
+
+    /* Colores */
+    .btn-aceptar { background: linear-gradient(135deg, #1cc88a, #13855c); }
+    .btn-cancelar { background: linear-gradient(135deg, #e74a3b, #be2617); }
+    .btn-editar { background: linear-gradient(135deg, #36b9cc, #258391); }
+    .btn-imprimir { background: linear-gradient(135deg, #8d71c2, #4e2c8c); }
+    .btn-eliminar { background: linear-gradient(135deg, #d63031, #a71d1d); }
+    .btn-excel { background: linear-gradient(135deg, #28a745, #1e7e34); }
+    .btn-csv { background: linear-gradient(135deg, #20c997, #138d75); }
+    .btn-importar { background: linear-gradient(135deg, #f6c23e, #dda20a); }
+    .btn-agregar { background: linear-gradient(135deg, #4e73df, #224abe); }
+    .btn-vista { background: linear-gradient(135deg, #6c757d, #495057); }
+    .btn-armortizar { background: linear-gradient(135deg, #fd7e14, #c6530f); }  
+    .btn-login { background: linear-gradient(135deg, #6c63ff, #4834d4); }
+    .btn-pdf { background: linear-gradient(135deg, #fa024d, #fd0241); }
+       
+    .btn-login:hover {
+        transform: scale(1.03);
+        box-shadow: 0 5px 15px rgba(108, 99, 255, 0.5);
+    }
+
+    /* Active */
+    .btn-ui:active {
+        transform: scale(0.95);
+    }
+</style>
+
+<style>
+    .btn-modern {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 20px;
+        font-size: 15px;
+        font-weight: 500;
+        color: #fff;
+        background: linear-gradient(135deg, #4e73df, #224abe);
+        border: none;
+        border-radius: 50px;
+        text-decoration: none;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+        transition: all 0.3s ease;
+    }
+
+    .btn-modern i {
+        font-size: 18px;
+        transition: transform 0.3s ease;
+    }
+
+    .btn-modern:hover {
+        background: linear-gradient(135deg, #224abe, #1a3aa8);
+        box-shadow: 0 6px 14px rgba(0, 0, 0, 0.25);
+        transform: translateY(-2px);
+    }
+
+    .btn-modern:hover i {
+        transform: translateX(-4px);
+    }
+
+    .btn-modern:active {
+        transform: scale(0.97);
+        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+    }
+</style>
+
+
+<!-- SIDEBAR -->
+<div class="sidebar" id="sidebar">
+    <div class="logo">INDUSANCHEZ</div>
+    <ul class="menu">
+        {% if user.is_authenticated %}
+            <li onclick="location.href='{% url 'inicio' %}'">
+                <i class="fas fa-home"></i><span>Inicio</span>
+            </li>
+        {% else %}
+            <li onclick="location.href='{% url 'iniciar_sesion' %}'">
+                <i class="fas fa-home"></i><span>Inicio</span>
+            </li>
+        {% endif %}
+
+        {% if user.is_authenticated %}
+            <li onclick="location.href='{% url 'iniciar_sesion' %}'">
+                <i class="fas fa-exchange-alt"></i><span>Registros</span>
+            </li>
+        {% else %}
+            <li onclick="location.href='{% url 'iniciar_sesion' %}'"></li>
+        {% endif %}
+
+        {% if user.is_authenticated %}
+            <li onclick="location.href='{% url 'iniciar_sesion' %}'">
+                <i class="fas fa-clipboard-list"></i><span>Labores</span>
+            </li>
+        {% else %}
+            <li onclick="location.href='{% url 'iniciar_sesion' %}'"></li>
+        {% endif %}
+
+        {% if user.is_authenticated %}
+            <li onclick="location.href='{% url 'iniciar_sesion' %}'">
+                <i class="fas fa-user-friends"></i><span>Colaboradores</span>
+            </li>
+        {% else %}
+            <li onclick="location.href='{% url 'iniciar_sesion' %}'"></li>
+        {% endif %}
+
+        <!-- SUBMENU -->
+        {% if user.is_authenticated %}
+            <li onclick="toggleSubmenu(this)">
+                <i class="fas fa-chart-line"></i><span>Reportes</span>
+                <i class="fas fa-chevron-down" style="margin-left:auto;"></i>
+            </li>
+            <div class="submenu">
+                <a href="{% url 'resumen' %}">Resumen</a>
+        
+                <!-- <a href="{% url 'archivo_plano' %}">Archivo Plano para Pagos</a> -->
+            </div>
+        {% else %}
+            <li onclick="location.href='{% url 'iniciar_sesion' %}'"></li>
+        {% endif %}
+
+        <!-- SUBMENU -->
+        {% if user.is_authenticated %}
+            <li onclick="toggleSubmenu(this)">
+                <i class="fas fa-gear"></i><span>Configuración</span>
+                <i class="fas fa-chevron-down" style="margin-left:auto;"></i>
+            </li>
+            <div class="submenu">
+                <a href="{% url 'iniciar_sesion' %}"><i class="fas fa-city"></i>  Ciudades</a>
+                <a href="{% url 'restore_backup' %}"><i class="fas fa-undo-alt"></i> Restaurar Backup</a>
+                <!-- <a href="{% url 'registrar_usuario' %}">Crear</a> -->
+            </div>
+        {% else %}
+            <li onclick="location.href='{% url 'iniciar_sesion' %}'"></li>
+        {% endif %}
+        
+        <!-- <li onclick="location.href='{% url 'iniciar_sesion' %}'">
+            <i class="fas fa-right-to-bracket"></i><span>Iniciar Sesión</span>
+        </li> -->
+        
+        {% if user.is_authenticated %}
+            <li onclick="location.href='{% url 'cerrar_sesion' %}'">
+                <i class="fas fa-sign-out-alt"></i><span>Salir</span>
+            </li>
+        {% else %}
+            <li onclick="location.href='{% url 'iniciar_sesion' %}'"></li>
+        {% endif %}
+        <!-- <div class="modal fade" id="sessionModal" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content shadow-lg rounded-4 border-0">
+                    <div class="modal-header bg-warning text-dark rounded-top-4">
+                        <h5 class="modal-title">⚠️ Sesión por expirar</h5>
+                    </div>
+                    <div class="modal-body text-center">
+                        <p class="mb-2">Tu sesión se cerrará por inactividad</p>
+                        <h2 id="countdown" class="fw-bold text-danger mb-3">60</h2>
+                        <!-- 🔥 BARRA DE PROGRESO
+                        <div class="progress mb-2" style="height: 12px; border-radius: 20px;">
+                            <div id="progressBar" class="progress-bar bg-danger progress-bar-striped progress-bar-animated"
+                                role="progressbar" style="width: 100%;">
+                            </div>
+                        </div>
+                        <small class="text-muted">Tiempo restante</small>
+                    </div>
+                    <div class="modal-footer justify-content-center border-0">
+                        <button class="btn btn-success px-4" onclick="continuarSesion()">
+                            Seguir trabajando
+                        </button>
+                        <button class="btn btn-danger px-4" onclick="cerrarSesion()">
+                            Cerrar sesión
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div> -->
+    </ul>
+</div>
+
+
+<!-- BOTONES -->
+<div class="toggle-btn" id="toggleBtn">
+    <i class="fas fa-bars"></i>
+</div>
+
+<div class="dark-btn" onclick="toggleDark()">
+    🌙
+</div>
+
+
+<!-- CONTENIDO -->
+<div class="content" id="content">
+    {% block content %}
+    
+    {% endblock %}
+</div>
+
+
+<script>
+    // ELEMENTOS
+    const sidebar = document.getElementById("sidebar");
+    const content = document.getElementById("content");
+    const toggleBtn = document.getElementById("toggleBtn");
+
+    // ===== TOGGLE SIDEBAR =====
+    document.getElementById("toggleBtn").onclick = () => {
+        sidebar.classList.toggle("active");
+        content.classList.toggle("active");
+        document.body.classList.toggle("menu-collapsed");
+
+        localStorage.setItem("menu", sidebar.classList.contains("active"));
+    };
+
+    // RESTAURAR ESTADO
+    if (localStorage.getItem("menu") === "true") {
+        sidebar.classList.add("active");
+        content.classList.add("active");
+        document.body.classList.add("menu-collapsed");
+    }
+
+    // ===== SUBMENU =====
+    function toggleSubmenu(el) {
+        let submenu = el.nextElementSibling;
+        submenu.style.display = submenu.style.display === "flex" ? "none" : "flex";
+    }
+
+    // ===== DARK MODE =====
+    function toggleDark() {
+        document.body.classList.toggle("dark");
+        localStorage.setItem("dark", document.body.classList.contains("dark"));
+    }
+
+    // RESTAURAR DARK MODE
+    if (localStorage.getItem("dark") === "true") {
+        document.body.classList.add("dark");
+    }
+</script>
+
+
+<script>
+    function uploadFile() {
+        let formData = new FormData();
+        let file = document.getElementById("file").files[0];
+
+        formData.append("archivo", file);
+
+        let xhr = new XMLHttpRequest();
+
+        xhr.upload.addEventListener("progress", function (e) {
+            let percent = (e.loaded / e.total) * 100;
+            document.getElementById("bar").style.width = percent + "%";
+            document.getElementById("bar").innerHTML = Math.round(percent) + "%";
+        });
+
+        xhr.open("POST", "/vista_previa/", true);
+        xhr.send(formData);
+    }
+</script>
+
+<script>
+    function formatDate(d) {
+        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    }
+
+    function getMonday(date) {
+        const d = new Date(date);
+        const day = d.getDay(); // 0 domingo - 6 sábado
+        const diff = (day === 0 ? -6 : 1) - day;
+        d.setDate(d.getDate() + diff);
+        return d;
+    }
+
+    function initializeDates() {
+
+        const inputFinal = document.getElementById('fecha_final');
+        const inputInicial = document.getElementById('fecha_inicial');
+
+        // 🔥 SOLO usar hoy si está vacío (primera carga)
+        if (!inputFinal.value) {
+            const today = new Date();
+            inputFinal.value = formatDate(today);
+        }
+
+        // 🔥 tomar la fecha final (sea del usuario o la inicial)
+        const fechaFinal = new Date(inputFinal.value);
+
+        // 🔥 calcular lunes según fecha_final
+        const monday = getMonday(fechaFinal);
+
+        inputInicial.value = formatDate(monday);
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        initializeDates();
+
+        // 🔥 si el usuario cambia fecha_final, recalcular solo inicio
+        document.getElementById('fecha_final').addEventListener('change', function () {
+            initializeDates();
+        });
+    });
+</script>
+
+<!-- <script>
+    let tiempoAviso = 60; // 60 segundos
+    let contador = tiempoAviso;
+    let intervalo;
+    let timeout;
+
+    function iniciarTemporizador() {
+        clearTimeout(timeout);
+        timeout = setTimeout(mostrarModal, 60); //540 9 minutos
+    }
+
+    function mostrarModal() {
+        let modal = new bootstrap.Modal(document.getElementById('sessionModal'));
+        modal.show();
+
+        contador = tiempoAviso;
+        actualizarUI();
+
+        intervalo = setInterval(() => {
+            contador--;
+            actualizarUI();
+
+            if (contador <= 0) {
+                clearInterval(intervalo);
+                cerrarSesion();
+            }
+        }, 1000);
+    }
+
+    function actualizarUI() {
+        document.getElementById("countdown").innerText = contador;
+
+        let porcentaje = (contador / tiempoAviso) * 100;
+
+        document.getElementById("progressBar").style.width = porcentaje + "%";
+
+        // cambio de color dinámico
+        let bar = document.getElementById("progressBar");
+
+        if (contador <= 15) {
+            bar.classList.remove("bg-warning");
+            bar.classList.add("bg-danger");
+        } else if (contador <= 30) {
+            bar.classList.add("bg-warning");
+        }
+    }
+
+    function continuarSesion() {
+        fetch("/keep-alive/")
+            .then(() => {
+                clearInterval(intervalo);
+
+                let modalEl = document.getElementById('sessionModal');
+                let modal = bootstrap.Modal.getInstance(modalEl);
+                modal.hide();
+
+                iniciarTemporizador();
+            });
+    }
+
+    function cerrarSesion() {
+        window.location.href = '{% url 'cerrar_sesion' %}';
+    }
+
+    // actividad del usuario
+    document.onload = iniciarTemporizador;
+    document.onmousemove = iniciarTemporizador;
+    document.onkeypress = iniciarTemporizador;
+    document.onclick = iniciarTemporizador;
+</script> -->
+
+</body>
+
+</html>
+

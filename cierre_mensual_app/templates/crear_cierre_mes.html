@@ -1,0 +1,152 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+<!-- <link rel="stylesheet" href="{% static 'vendors/mdi/css/materialdesignicons.min.css' %}"> -->
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+<!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+	integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous"> -->
+
+<div class="content-wrapper">
+	<div class="page-header">
+		<h2 class=" text-primary">Crear Cierre Mensual </h3>
+			<a href="{% url 'listar_cierre_mes' %}" class="btn btn-inverse-primary rounded-pill">
+				<i class="mdi mdi-arrow-left mx-2"></i>
+				Volver
+			</a>
+	</div>
+
+	<div class="col-md-12 grid-margin stretch-card rounded-5">
+		<div class="card rounded-5">
+			<div class="card-body">
+				<!-- <div class="grid-margin stretch-card mb-0"> -->
+				<form class="formulario_contacto" method="post" enctype="multipart/form-data" class="row gx-4">
+					<!-- Token de seguridad para poder crear un nuevo registro -->
+					{% csrf_token %}
+					<div class="col-md-12">
+						<div class="form-group">
+							{{ form.oficina|as_crispy_field }}
+							{% if form.oficina.help_text %}
+							<small class="form-text text-muted">{{ form.oficina.help_text }}</small>
+							{% endif %}
+							{% if form.oficina.errors %}
+							<div class="text-danger">
+								{% for error in form.oficina.errors %}
+								{{ error }}
+								{% endfor %}
+							</div>
+							{% endif %}
+						</div>
+					</div>
+					<div class="col-md-12">
+						<div class="form-group">
+							{{ form.fecha|as_crispy_field }}
+							{% if form.fecha.help_text %}
+							<small class="form-text text-muted">{{ form.fecha.help_text }}</small>
+							{% endif %}
+							{% if form.fecha.errors %}
+							<div class="text-danger">
+								{% for error in form.fecha.errors %}
+								{{ error }}
+								{% endfor %}
+							</div>
+							{% endif %}
+						</div>
+					</div>
+					<div class="col-md-12">
+						<div class="form-group">
+							{{ form.protegido|as_crispy_field }}
+							{% if form.protegido.help_text %}
+							<small class="form-text text-muted">{{ form.protegido.help_text }}</small>
+							{% endif %}
+							{% if form.protegido.errors %}
+							<div class="text-danger">
+								{% for error in form.protegido.errors %}
+								{{ error }}
+								{% endfor %}
+							</div>
+							{% endif %}
+						</div>
+					</div>
+					<div class="col-md-12">
+						<div class="form-group">
+							{{ form.tot_deb|as_crispy_field }}
+							{% if form.tot_deb.help_text %}
+							<small class="form-text text-muted">{{ form.tot_deb.help_text }}</small>
+							{% endif %}
+							{% if form.tot_deb.errors %}
+							<div class="text-danger">
+								{% for error in form.tot_deb.errors %}
+								{{ error }}
+								{% endfor %}
+							</div>
+							{% endif %}
+						</div>
+					</div>
+					<div class="col-md-12">
+						<div class="form-group">
+							{{ form.tot_cre|as_crispy_field }}
+							{% if form.tot_cre.help_text %}
+							<small class="form-text text-muted">{{ form.tot_cre.help_text }}</small>
+							{% endif %}
+							{% if form.tot_cre.errors %}
+							<div class="text-danger">
+								{% for error in form.tot_cre.errors %}
+								{{ error }}
+								{% endfor %}
+							</div>
+							{% endif %}
+						</div>
+					</div>
+					<div class="col-md-12">
+						<div class="form-group">
+							{{ form.fec_cie|as_crispy_field }}
+							{% if form.fec_cie.help_text %}
+							<small class="form-text text-muted">{{ form.fec_cie.help_text }}</small>
+							{% endif %}
+							{% if form.fec_cie.errors %}
+							<div class="text-danger">
+								{% for error in form.fec_cie.errors %}
+								{{ error }}
+								{% endfor %}
+							</div>
+							{% endif %}
+						</div>
+					</div>
+					<div class="col-md-12">
+						<div class="form-group">
+							{{ form.usuario|as_crispy_field }}
+							{% if form.usuario.help_text %}
+							<small class="form-text text-muted">{{ form.usuario.help_text }}</small>
+							{% endif %}
+							{% if form.usuario.errors %}
+							<div class="text-danger">
+								{% for error in form.usuario.errors %}
+								{{ error }}
+								{% endfor %}
+							</div>
+							{% endif %}
+						</div>
+					</div>
+					<button type="submit" title="Guardar" class="btn btn-light rounded-pill"><i
+							class="bi bi-floppy"></i> Guardar</button>
+					<a href="../lista" title="Cancelar" type="submit" class="btn btn-light rounded-pill"><i
+							class="bi bi-x-square"></i> Cancelar</a>
+			</div>
+
+			</form>
+		</div>
+	</div>
+
+	<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"
+		integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p"
+		crossorigin="anonymous"></script>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js"
+		integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF"
+		crossorigin="anonymous"></script>
+
+</div>
+{% endblock %}

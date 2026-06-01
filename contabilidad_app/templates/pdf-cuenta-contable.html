@@ -1,0 +1,114 @@
+{% extends "base-pdf.html" %}
+{% block content %}
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th colspan="2" class="text-center">Información General de la Cuenta</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <th class="txt_negrita text-start">Cliente</th>
+            <td>{{ cuenta.cliente }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Periodo Contable</th>
+            <td>{{ cuenta.per_con }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Código Cuenta</th>
+            <td>{{ cuenta.cod_cta }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Nombre Cuenta</th>
+            <td>{{ cuenta.nom_cta }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Tipo Cuenta</th>
+            <td>{{ cuenta.tip_cta }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Dinámica</th>
+            <td>{{ cuenta.dinamica }}</td>
+        </tr>
+        </tbody>
+    </table>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th colspan="2" class="text-center">Propiedades de la Cuenta</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <th class="txt_negrita text-start">Naturaleza</th>
+            <td>{{ cuenta.naturaleza }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Cuenta Activa?</th>
+            <td>{{ cuenta.activa }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Contabiliza por Tercero?</th>
+            <td>{{ cuenta.por_tercero }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Cuenta Activo Fijo?</th>
+            <td>{{ cuenta.cta_act_fij }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Cuenta Presupuesto?</th>
+            <td>{{ cuenta.cta_pre }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Cuenta de Balance?</th>
+            <td>{{ cuenta.cta_bal }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Cuenta de Resultados?</th>
+            <td>{{ cuenta.cta_res }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Cuenta de Orden?</th>
+            <td>{{ cuenta.cta_ord }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Cuenta de Banco?</th>
+            <td>{{ cuenta.cta_ban }}</td>
+        </tr>
+        </tbody>
+    </table>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th colspan="2" class="text-center">Otros Detalles Contables</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <th class="txt_negrita text-start">Cuenta Ganancias?</th>
+            <td>{{ cuenta.cta_gan_per }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Cuenta Pérdidas?</th>
+            <td>{{ cuenta.cta_per_gan }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Cuenta Depreciación?</th>
+            <td>{{ cuenta.cta_dep }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Cuenta Ingresos y Retenciones?</th>
+            <td>{{ cuenta.cta_ing_ret }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Cuenta Reteiva?</th>
+            <td>{{ cuenta.cta_ret_iva }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Cuenta Recíproca?</th>
+            <td>{{ cuenta.cta_rec }}</td>
+        </tr>
+        </tbody>
+    </table>
+{% endblock %}

@@ -1,0 +1,275 @@
+{% extends "base-pdf.html" %}
+{% block content %}
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th colspan="2" class="text-center">Tercero</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <th class="txt_negrita text-start">Cliente:</th>
+            <td>{{ estado.cliente }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Tercero:</th>
+            <td>{{ estado.cliente }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Fecha Información:</th>
+            <td>{{ estado.fec_inf }}</td>
+        </tr>
+        </tbody>
+    </table>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th colspan="2" class="text-center">Ingresos</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <th class="txt_negrita text-start">Ingresos por Salario Fijo:</th>
+            <td>{{ estado.ing_sal_fij }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Ingresos por Honorarios:</th>
+            <td>{{ estado.ing_hon }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Ingresos por Pensión:</th>
+            <td>{{ estado.ing_pen }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Ingresos por Arrendamientos:</th>
+            <td>{{ estado.ing_arr }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Ingresos por Comisiones:</th>
+            <td>{{ estado.ing_com }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Otros Ingresos:</th>
+            <td>{{ estado.ing_ext }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Otros Ingresos:</th>
+            <td>{{ estado.ing_otr }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Total Ingresos:</th>
+            <td>{{ estado.ing_tot }}</td>
+        </tr>
+        </tbody>
+    </table>
+   <table class="table table-striped">
+        <thead>
+        <tr>
+            <th colspan="2" class="text-center">Egresos</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <th class="txt_negrita text-start">Egresos por Alimentación:</th>
+            <td>{{ estado.egr_ali }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Egresos por Arriendo:</th>
+            <td>{{ estado.egr_arr }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Egresos por Educación:</th>
+            <td>{{ estado.egr_edu }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Egresos por Entretenimiento:</th>
+            <td>{{ estado.egr_ent }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Egresos por Salud:</th>
+            <td>{{ estado.egr_sal }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Egresos por Transporte:</th>
+            <td>{{ estado.egr_tra }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Otros Egresos:</th>
+            <td>{{ estado.egr_ext }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Total Egresos:</th>
+            <td>{{ estado.egr_tot }}</td>
+        </tr>
+        </tbody>
+   </table>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th colspan="2" class="text-center">Activos</th>
+        </tr>
+        </thead>
+    <tbody>
+    <tr>
+        <th class="txt_negrita text-start">Activos Tipo de Bien:</th>
+        <td>{{ estado.act_tip_bien }}</td>
+    </tr>
+    <tr>
+        <th class="txt_negrita text-start">Activos Vehículo:</th>
+        <td>{{ estado.act_vei }}</td>
+    </tr>
+    <tr>
+        <th class="txt_negrita text-start">Otros Activos:</th>
+        <td>{{ estado.act_otr }}</td>
+    </tr>
+    <tr>
+        <th class="txt_negrita text-start">Total Activos:</th>
+        <td>{{ estado.tot_act }}</td>
+    </tr>
+    <tr>
+        <th class="txt_negrita text-start">Activos Finca Raíz:</th>
+        <td>{{ estado.act_fin_rai }}</td>
+    </tr>
+    <tr>
+        <th class="txt_negrita text-start">Activos Inversiones:</th>
+        <td>{{ estado.act_inv }}</td>
+    </tr>
+    <tr>
+        <th class="txt_negrita text-start">Matrícula Escritura:</th>
+        <td>{{ estado.escritura }}</td>
+    </tr>
+    </tbody>
+    </table>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th colspan="2" class="text-center">Pasivos</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <th class="txt_negrita text-start">Otros Pasivos:</th>
+            <td>{{ estado.pas_otr }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Pasivo Tipo:</th>
+            <td>{{ estado.pas_tip }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Total Patrimonio:</th>
+            <td>{{ estado.tot_pat }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Valor Pasivos:</th>
+            <td>{{ estado.pas_val }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Total Pasivos:</th>
+            <td>{{ estado.tot_pas }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Pasivos Descuentos:</th>
+            <td>{{ estado.pas_des }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Declara Renta?:</th>
+            <td>{{ estado.dec_ren }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Tipo Pasivo:</th>
+            <td>{{ estado.tip_pas }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Descripción Pasivo:</th>
+            <td>{{ estado.des_pas }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Valor Pasivo:</th>
+            <td>{{ estado.val_pas }}</td>
+        </tr>
+        </tbody>
+    </table>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th colspan="2" class="text-center">Operaciones Extranjeras</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <th class="txt_negrita text-start">Oper. Moneda Extranjera?:</th>
+            <td>{{ estado.ope_mon_ext }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Nombre Banco Extranjero:</th>
+            <td>{{ estado.nom_ban_ext }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Oper. País Extranjero?:</th>
+            <td>{{ estado.ope_pais_ext }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Oper. Monto Extranjero?:</th>
+            <td>{{ estado.ope_monto_ext }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Núm. Cuenta Extranjero:</th>
+            <td>{{ estado.num_cta_ext }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Tipo Oper. Extranjero:</th>
+            <td>{{ estado.tip_ope_ext }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Monto Oper. Extranjera?:</th>
+            <td>{{ estado.mon_ope_ext }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Producto Moneda Extranjera?:</th>
+            <td>{{ estado.prod_mon_ext }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Descripción Producto Extranjero:</th>
+            <td>{{ estado.des_prod_ext }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Monto Producto Extranjero:</th>
+            <td>{{ estado.mon_prod_ext }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">País Producto Extranjero:</th>
+            <td>{{ estado.pais_prod_ext }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Ciudad Producto Extranjero:</th>
+            <td>{{ estado.ciu_prod_ext }}</td>
+        </tr>
+        <tr>
+            <th class="txt_negrita text-start">Promedio producto Extranjero:</th>
+            <td>{{ estado.prom_prod_ext }}</td>
+        </tr>
+        </tbody>
+
+    </table>
+    <table class="table table-striped">
+    <thead>
+    <tr>
+        <th colspan="2" class="text-center">Otros</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <th class="txt_negrita text-start">Tiene Activos de Vivienda?:</th>
+        <td>{{ estado.act_vivienda }}</td>
+    </tr>
+    <tr>
+        <th class="txt_negrita text-start">Tiene Inversiones?:</th>
+        <td>{{ estado.tiene_inversiones }}</td>
+    </tr>
+    <tr>
+        <th class="txt_negrita text-start">Tiene otros pasivos?:</th>
+        <td>{{ estado.otros_pasivos }}</td>
+    </tr>
+    </tbody>
+    </table>
+{% endblock %}

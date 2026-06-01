@@ -1,0 +1,223 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+    <!--Menú y barra superior -->
+<div class="content-wrapper">
+        <div class="page-header">
+            <h2 class=" text-primary">Agregar referencia </h2>
+            <a href="{% url 'listar_asociados' %}" class="btn btn-primary rounded-4">
+                <i class="mdi mdi-arrow-left mx-2"></i>
+                Volver
+            </a>
+        </div>
+        <!-- del container fluid de la barra superior del menú -->
+        <!-- Logo e iniciales -->
+    <div class="row g-3">
+        <div class="col-md-12">
+            <button id="add-form" type="button" class="btn btn-primary">+</button>
+            {% if data %}
+                <div class="row g-3">
+                    <div id="form-container'saved">
+                        {% for item in data %}
+                        <div class="col-md-12 mt-5">
+                            <div class="card border rounded">
+                                <div class="card-header">
+                                    <h5>Referencia</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row g-3">
+                                            <div class="col-md-3">
+                                                <div class="mb-3">
+                                                    <label class="form-label requiredField">
+                                                        Tipo Referencia<span class="asteriskField">*</span>
+                                                    </label>
+                                                    <input type="text" class="form-control" value="{{ item.tipo_ref }}" readonly>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="mb-3">
+                                                    <label class="form-label requiredField">
+                                                        Parentesco<span class="asteriskField">*</span>
+                                                    </label>
+                                                    <input type="text" class="form-control" value="{{ item.parentesco }}" readonly>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="mb-3">
+                                                    <label class="form-label requiredField">
+                                                        Nombre Completo<span class="asteriskField">*</span>
+                                                    </label>
+                                                    <input type="text" class="form-control" value="{{ item.nombre }}" readonly>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="mb-3">
+                                                    <label class="form-label requiredField">
+                                                        Ocupacion<span class="asteriskField">*</span>
+                                                    </label>
+                                                    <input type="text" class="form-control" value="{{ item.ocupacion }}" readonly>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="mb-3">
+                                                    <label class="form-label requiredField">
+                                                        Empresa<span class="asteriskField">*</span>
+                                                    </label>
+                                                    <input type="text" class="form-control" value="{{ item.empresa}}" readonly>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="mb-3">
+                                                    <label class="form-label requiredField">
+                                                        Direccion
+                                                    </label>
+                                                    <input type="text" class="form-control" value="{{ item.direccion }}" readonly>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="mb-3">
+                                                    <label class="form-label requiredField">
+                                                        Telefono
+                                                    </label>
+                                                    <input type="text" class="form-control" value="{{ item.tel_fijo }}" readonly>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="mb-3">
+                                                    <label class="form-label requiredField">
+                                                        Celular
+                                                    </label>
+                                                    <input type="text" class="form-control" value="{{ item.tel_cel }}" readonly>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="mb-3">
+                                                    <label class="form-label requiredField">
+                                                        Telefono Empresa
+                                                    </label>
+                                                    <input type="text" class="form-control" value="{{ item.tel_emp }}" readonly>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="mb-3">
+                                                    <label class="form-label requiredField">
+                                                        Es Familiar de un directivo Entidad
+                                                    </label>
+                                                    <input type="text" class="form-control" value="{{ item.es_fam_dir_cli }}" readonly>
+                                                </div>
+                                            </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <input id="pk" name="pk" type="hidden" value="{{ pk }}">
+                <div class="row g-3">
+                    <div id="form-container">
+                        <div class="col-md-12 mt-5">
+                            <div class="card border rounded">
+                                <div class="card-header d-flex justify-content-between">
+                                    <h5>Beneficiario</h5>
+                                    <button type="button" id="delete" class="btn btn-danger" onclick="deleteCard()">
+                                        Eliminar
+                                    </button>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row g-3">
+                                            <div class="col-md-3">
+                                                {{ form.tipo_ref|as_crispy_field }}
+                                            </div>
+                                            <div class="col-md-3">
+                                                {{ form.parentesco|as_crispy_field }}
+                                            </div>
+                                            <div class="col-md-3">
+                                                {{ form.nombre|as_crispy_field }}
+                                            </div>
+                                            <div class="col-md-3">
+                                                {{ form.ocupacion|as_crispy_field }}
+                                            </div>
+                                            <div class="col-md-3">
+                                                {{ form.empresa|as_crispy_field }}
+                                            </div>
+                                            <div class="col-md-3">
+                                                {{ form.direccion|as_crispy_field }}
+                                            </div>
+                                            <div class="col-md-3">
+                                                    {{ form.tel_fijo|as_crispy_field }}
+                                            </div>
+                                            <div class="col-md-3">
+                                                    {{ form.tel_cel|as_crispy_field }}
+                                            </div>
+                                            <div class="col-md-3">
+                                                {{ form.tel_emp|as_crispy_field }}
+                                            </div>
+                                            <div class="col-md-3">
+                                                {{ form.es_fam_dir_cli|as_crispy_field }}
+                                            </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-12 text-center">
+                        <button type="submit" title="Guardar" class="btn btn-primary rounded-4"><i
+                                class="bi bi-floppy"></i> Guardar</button>
+                        <a href="{% url 'listar_asociados' %}" title="Cancelar" type="submit" class="btn btn-primary rounded-4"><i
+                                class="bi bi-x-square"></i> Cancelar</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    </div>
+
+    <script>
+
+         document.getElementById('add-form').onclick = function() {
+             let formsetContainer = document.getElementById('form-container');
+            let totalForms = formsetContainer.children.length;
+            let newForm = formsetContainer.children[0].cloneNode(true);
+            let inputs = newForm.getElementsByTagName('input');
+            for (let i = 0; i < inputs.length; i++) {
+                inputs[i].value = '';
+            }
+
+            newForm.innerHTML = newForm.innerHTML.replace(/form-\d+/, 'form-' + totalForms);
+
+            let buttonDelete = newForm.getElementsByTagName('button')[0];
+            buttonDelete.id = 'delete_' + totalForms;
+
+            let selects = newForm.getElementsByTagName('select');
+            for (let i = 0; i < selects.length; i++) {
+                selects[i].name = selects[i].name + "_" + totalForms;
+                selects[i].id = selects[i].id + "_" + totalForms;
+            }
+
+            for (let input of inputs) {
+                input.name = input.name + "_" + totalForms;
+                input.id = input.id + "_" + totalForms;
+            }
+
+            formsetContainer.appendChild(newForm);
+
+        };
+
+        function deleteCard() {
+            let formsetContainer = document.getElementById('form-container');
+            let totalForms = formsetContainer.children.length;
+            if (totalForms > 1) {
+                formsetContainer.removeChild(formsetContainer.children[totalForms - 1]);
+            }
+        }
+    </script>
+{% endblock %}

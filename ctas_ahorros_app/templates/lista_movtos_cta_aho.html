@@ -1,0 +1,277 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+
+<h3 class="text-center">Movimientos de Cuentas de Ahorros</h3>
+<style>
+    .right-align {
+        text-align: right;
+    }
+    .pagination {
+        display: flex;
+        justify-content: center;
+    }
+    .pagination a {
+        margin: 0 5px;
+        padding: 8px 16px;
+        text-decoration: none;
+        color: #333;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+    }
+    .pagination a.active {
+        background-color: #007bff;
+        color: white;
+        border: 1px solid #007bff;
+    }
+    .pagination a:hover {
+        background-color: #ddd;
+    }
+</style>
+<script>
+    function formatCurrency(value) {
+        return value.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+    }
+
+    document.addEventListener('DOMContentLoaded', (event) => {
+        const currencyElements = document.querySelectorAll('.currency');
+        currencyElements.forEach((element) => {
+            const value = parseFloat(element.textContent.replace(',', ''));
+            if (!isNaN(value)) {
+                element.textContent = formatCurrency(value);
+            }
+        });
+    });
+</script>
+<form id="miFormulario"  method="GET" action="{% url 'movtos_cta_ahorro' %}" class="form-row justify-content-center">
+    <div class="row w-100">
+        <!-- Botón de búsqueda al inicio -->
+        <div class="form-group col-md-1 text-center">
+            <button type="button" class="btn btn-primary rounded px-3" data-bs-toggle="modal" data-bs-target="#busquedaModal">
+                <i class="fas fa-search"></i> Buscar
+            </button>
+        </div>
+    
+        <div class="form-group col-md-2">
+            <label for="num_cta">Cuenta de Ahorros</label>
+            <input type="text" name="num_cta" id="num_cta" value="{{ num_cta }}" placeholder="Cuenta de Ahorros" class="form-control">
+        </div>
+    
+        <!-- Campo solo lectura: Nombre Titular -->
+        <div class="form-group col-md-4">
+            <label for="nom_titular">Nombre Titular</label>
+            <input type="text" name="nom_titular" id="nom_titular" value="{{ nom_titular }}" class="form-control">
+        </div>
+    
+        <div class="form-group col-md-2">
+            <label for="fecha_inicio">Fecha inicio:</label>
+            <input type="date" name="fecha_inicio" value="{{ fecha_inicio }}" class="form-control">
+        </div>
+    
+        <div class="form-group col-md-2">
+            <label for="fecha_fin">Fecha fin:</label>
+            <input type="date" name="fecha_final" value="{{ fecha_final }}" class="form-control">
+        </div>
+        <div class="form-group col-md-1 text-center">
+            <button type="submit" class="btn btn-primary rounded px-3" onclick="document.getElementById('miFormulario').submit();">
+                <i class="fas fa-search"></i> Mvtos
+            </button> 
+        </div>
+    </div>
+</form>
+
+<div class="form-group col-md-2">
+    <label for="saldo_cta">Saldo:</label>
+    <input type="text" id="saldo_cta" name="saldo_cta" class="form-control text-center font-weight-bold"
+           style="background-color: #ffff99; color: #d9534f;" value="{{ saldo_cta|default:"" }}" readonly>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="busquedaModal" tabindex="-1" aria-labelledby="busquedaModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" style="max-width: 90%;">  <!-- Hace el modal más ancho -->
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="busquedaModalLabel">Buscar Cuenta de Ahorros</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Formulario de búsqueda -->
+                <form id="busquedaForm">
+                    <div class="row align-items-end">
+                        <div class="col-md-4">
+                            <label for="doc_ide">Documento</label>
+                            <input type="text" id="doc_ide" class="form-control" placeholder="Ingrese documento">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="nombre">Nombre</label>
+                            <input type="text" id="nombre" class="form-control" placeholder="Ingrese nombre">
+                        </div>
+                        <div class="col-md-2 d-flex">
+                            <button id="botonBusqueda" type="button" class="btn btn-success w-100 rounded-pill" onclick="buscarCuentas()">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+                <!-- Tabla de resultados -->
+                <div class="mt-4">
+                    <table class="table table-striped table-bordered">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Cuenta</th>
+                                <th>Nombre Titular</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablaResultados">
+                            <!-- Aquí se insertarán los resultados dinámicamente -->
+                        </tbody>
+                    </table>
+                    <script>
+                        function buscarCuentas() {
+                            let doc_ide = document.getElementById("doc_ide").value;
+                            let nombre = document.getElementById("nombre").value;
+                            var url = window.location.origin+ `/cta_ahorro/buscar/?doc_ide=${encodeURIComponent(doc_ide)}&nombre=${encodeURIComponent(nombre)}`;
+                            fetch(url, {
+                                method: 'GET', headers: {'X-Requested-With': 'XMLHttpRequest'}  // Importante para que la vista detecte AJAX}
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                let tbody = document.getElementById("tablaResultados");
+                                tbody.innerHTML = "";  // Limpiar la tabla antes de agregar nuevos resultados
+                                data.forEach(item => {
+                                    let row = `<tr>
+                                        <td>${item.num_cta}</td>
+                                        <td>${item.asociado__tercero__nombre}</td>
+                                        <td>${item.est_cta}</td>
+                                    </tr>`;
+                                    tbody.innerHTML += row;
+                                });
+                            })
+                            .catch(error => console.error('Error al buscar cuentas:', error));
+                        }    
+                    </script>
+
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary rounded px-3" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function() {
+        $('#busquedaModal').on('shown.bs.modal', function () {
+            $('#doc_ide, #nombre').prop('readonly', false);
+        });
+    });
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        document.getElementById("num_cta").addEventListener("blur", function () {
+            let numCta = this.value.trim();
+            if (numCta.length > 6) {
+                var url = window.location.origin+ `/cta_ahorro/titular_cta_aho/${numCta}/`;
+                fetch(url)  // Reemplaza con la URL real de tu endpoint
+                .then(response => response.json())
+                .then(data => {
+                    if (data.nom_titular) {
+                        document.getElementById("nom_titular").value = data.nom_titular;
+                    }
+                })
+                .catch(error => console.error("Error al obtener el titular:", error));
+            }
+        });
+    });
+</script>
+
+<script>
+    $(document).ready(function() {
+        // Detectar clic en cualquier fila de la tabla dentro del modal
+        $(document).on("click", "#tablaResultados tr", function() {
+            var numCuenta = $(this).find("td:eq(0)").text().trim();
+            var nombreTitular = $(this).find("td:eq(1)").text().trim();
+            // Colocar los valores en los campos del formulario principal
+            $("#num_cta").val(numCuenta);
+            $("#nom_titular").val(nombreTitular);
+            // Cerrar el modal
+            $("#busquedaModal").modal("hide");
+        });
+    });
+</script>
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+
+<script>
+    $(document).ready(function() {
+        $('#busquedaModal').on('shown.bs.modal', function () {
+            $('.modal-backdrop').remove();  // Elimina el fondo opaco del modal
+            $(this).css('z-index', 1050);   // Asegura que el modal se muestre correctamente
+        });
+    });
+</script>
+
+<table class="table table-striped mt-3">
+    <thead>
+        <tr>
+            <th>Fecha</th>
+            <th>Comprobante</th>
+            <th>Numero</th>
+            <th>Concepto</th>
+            <th class="right-align">Consignacion</th>
+            <th class="right-align">Retiro</th>
+            <th class="right-align">Saldo</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for hecho in context %}
+            <tr>
+                <td>{{ hecho.Fecha }}</td>
+                <td>{{ hecho.Comprobante }}</td>
+                <td>{{ hecho.Numero }}</td>
+                <td>{{ hecho.Concepto }}</td>
+                <td class="currency right-align">{{ hecho.Consignacion|floatformat:2 }}</td>
+                <td class="currency right-align">{{ hecho.Retiro|floatformat:2 }}</td>
+                <td class="currency right-align">{{ hecho.Saldo|floatformat:2 }}</td>
+            </tr>
+        {% empty %}
+            <tr>
+                <td colspan="7">No se encontraron resultados.</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<div class="pagination">
+    {% if page_obj.has_previous %}
+
+        <a href="?page=1{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">«
+        Primero</a>
+    
+        <a href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">Anterior</a>
+
+
+        <!-- <a href="?page=1{% if request.GET.urlencode %}&{{ request.GET.urlencode }}{% endif %}">« Primero</a>
+        <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.urlencode %}&{{ request.GET.urlencode }}{% endif %}">Anterior</a> -->
+    {% endif %}
+
+
+    {% if page_obj.has_next %}
+
+        <a href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">Siguiente</a>
+        
+        <a href="?page={{ page_obj.paginator.num_pages }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">Último »</a>
+
+        <!-- <a href="?page={{ page_obj.next_page_number }}{% if request.GET.urlencode %}&{{ request.GET.urlencode }}{% endif %}">Siguiente</a>
+        <a href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.urlencode %}&{{ request.GET.urlencode }}{% endif %}">Último »</a> -->
+    {% endif %}
+
+</div>
+
+{% endblock %}
+
+
